@@ -1,5 +1,6 @@
 const { auth, db } = require("../helpers/firebaseSetup");
 const { convertToURL } = require('../helpers/cryptoSetup');
+const sendEmail = require('../helpers/emailSetup');
 
 module.exports = {
   path: "/create-account",
@@ -7,17 +8,20 @@ module.exports = {
     const username = req.query.username;
     if (!username) {
       res.status(400).send('auth/no-empty-username');
+      console.log("Here1");
       return;
     }
 
     if (!username.match(/^[A-Za-z0-9\_]+$/)) {
       res.status(400).send('auth/incorrect-username-syntax');
+      console.log("Here2");
       return;
     }
 
     const usernameExists = await db.ref(`/users/${username}`).once('value').then(snapshot => snapshot.val());
     if (usernameExists) {
       res.status(400).send("auth/username-already-exists");
+      console.log("Here3");
       return;
     }
 
@@ -26,7 +30,10 @@ module.exports = {
       password: req.query.password,
       displayName: username
     }).then(async userRecord => {
-      await db.ref(`users/${username}`).set(req.query.email);
+      await db.ref(`users/${username}`).set({
+        email: req.query.email,
+        uid: userRecord.uid
+      });
       await db.ref(`userInformation/${userRecord.uid}`).set({
         roles: {
           testTaker: 'testTaker'
@@ -44,6 +51,7 @@ module.exports = {
       res.status(200).send("Account created");
     }).catch(error => {
       res.status(400).send(error.code);
+      console.log(error);
     });
   }
 }
