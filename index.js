@@ -1,13 +1,103 @@
+/*
+ * Welcome to the OPAL Backend:
+ *  ___________    _________    __________    __
+ * | _________ |  |    __   \  /   _____  \  |  |
+ * | |       | |  |   |__|  |  |  |_____| |  |  |
+ * | |       | |  |   _____/   |   ____   |  |  |
+ * | |       | |  |  |         |  |    |  |  |  |
+ * | |_______| |  |  |         |  |    |  |  |  |_______
+ * |___________|  |__|         |__|    |__|  |__________|
+ *
+ * OPAL, or the Online Problem Archival Location is a convenient way to store
+ * problems for a mathematics contest. The OPAL software allows problem
+ * proposers to sign up, where they have a multitude of options, including, but
+ * not limited to:
+ *     - Proposing problems: With the simple LaTeX as you go syntax, it is
+ *         simpler than ever to propose a problem. In addition, the simple UI
+ *         interface provides all the necessary information.
+ *     - Adding tags: Tags are necessary for almost anything, in order to make
+ *         sure there is organization. OPAL has an in-built tagging mechanism,
+ *         which allows any user to see problems satisfying the given
+ *         constraints.
+ *     - Difficulty ratings. Proposers and testsolvers can give difficulty
+ *         ratings, which are then averaged to calculate the overall rating of
+ *         the problem. Problems can be queried by average difficulty,
+ *         difficulty according to a certain person, and the number of people
+ *         who have rated it.
+ *     - In-built search function. This search function not only allows you to
+ *         easily access problems by searching the content, but allows
+ *         additional filters, such as the problem proposer, difficulty ratings,
+ *         tags, and number of solutions. This helps make it easy and efficient
+ *         to sort out well-recieved problems from hard problems.
+ *
+ * OPAL aims to satisfy your needs for a problem management system. Here's a
+ * general process of how a problem can be submitted (note that this is not
+ * a strict guideline on how to use the system):
+ *     1. The administrator (User 0) controls the three tags `Accepted`,
+ *         `Shortlist`, and `Longlist`.
+ *     2. User 1 proposes a problem to OPAL. He adds the fully LaTeXed problem,
+ *          his difficulty ratings, appropriate tags, and his solution, which he
+ *          elects to hide temporarily (this is to encourage solving the problem
+ *          rather than looking at the official solution).
+ *     3. Users 2 through 4 attempt to solve the problem. User 2 has a solution
+ *          that is very similar to User 1, and his solution is recorded and he
+ *          obtains access to all solutions to that problem (note that the
+ *          feature is not intended to be abused - you shouldn't type in `Hi` as
+ *          your solution, and then look at the official solution). This
+ *          solution is documented the same, and while existing in the database,
+ *          will not appear on the UI.
+ *     4. User 3 has a different solution, and that gets documented as well. As
+ *          his solution is different, it is going to be displayed in the UI.
+ *     5. User 4 is unable to solve it, so then User 0 allows User 4t o view the
+ *          available solutions (note solutions marked `duplicate` will not be
+ *          displayed).
+ *     6. The problem selection commitee (PSC) votes on the problem, and they
+ *          give their votes to User 0. User 0 then will mark the problems
+ *          accordingly, and can create additional tags to make it easy to see
+ *          which problems are ranked at which difficulty. Note that these tags
+ *          can be created so that only User 0 can change them, or the PSC as
+ *          well.
+ *
+ * EXTRA FEATURES: WE WILL TRY TO ADD THEM
+ * In addition, OPAL features one collaborative, real-time, LaTeX editor. This
+ * LaTeX editor serves the purpose of being able to allow your problem proposers
+ * to see what the test and shortlist will look like ahead of time, to catch any
+ * clerical errors.
+ *
+ * OPAL is created by the following people:
+ * @author Amol Rama
+ * @author Anthony Wang
+ * @author Arnav Adhikhari
+ * @author Arul Kolla
+ *
+ * If you have any design ideas for OPAL, email us at
+ *  ___________________________________________________________________________
+ * |                                                                           |
+ * |                  onlineproblemarchivallocation@gmail.com                  |
+ * |___________________________________________________________________________|
+ *
+ * All code here is copyrighted by our team.
+ */
+
+/*
+ * @name index
+ *
+ * This is the main file that runs the backend. The main backend is controlled
+ * by an express web server, which takes requests, feeds them into the database,
+ * and passes them back.
+ */
+
+/*
+ * Critical requires that enable express. The bodyParser allows us to see the
+ * contents of the request, while the port is where our server runs. Lastly, the
+ * CORS is required to access the server in development.
+ */
 const express = require('express');
 const app = express();
 const port = 2718;
 const bodyParser = require('body-parser');
 const urlEncoded = bodyParser.urlencoded({ extended: false });
 const cors = require('cors');
-
-const sendEmail = require('./helpers/emailSetup');
-const { auth, db } = require('./helpers/firebaseSetup');
-const { encrypt, decrypt, convertToURL, convertFromURL } = require('./helpers/cryptoSetup');
 
 const fs = require('fs');
 
@@ -20,81 +110,7 @@ for (const file of routes) {
 
   app.all(route.path, urlEncoded, (req, res) => route.execute(req, res));
 }
-/*
-app.all("/create-account", urlEncoded, async (req, res) => {
-  const username = req.query.username;
-  console.log(username)
-  if (!username) {
-    res.status(400).send('auth/no-empty-username');
-    return;
-  }
 
-  if (!username.match(/^[A-Za-z0-9\_]+$/)) {
-    res.status(400).send('auth/incorrect-username-syntax');
-    return;
-  }
-
-  const usernameExists = await db.ref(`/users/${username}`).once('value').then(snapshot => snapshot.val());
-  if (usernameExists) {
-    res.status(400).send("auth/username-already-exists");
-    return;
-  }
-
-  auth.createUser({
-    email: req.query.email,
-    password: req.query.password,
-    displayName: username
-  }).then(async userRecord => {
-    await db.ref(`users/${username}`).set(req.query.email);
-    await db.ref(`userInformation/${userRecord.uid}`).set({
-      roles: {
-        testTaker: 'testTaker'
-      },
-      username,
-      email: req.query.email,
-      emailVerified: false
-    });
-    const link = req.protocol + '://' + req.get('host') + '/verify/' + convertToURL(userRecord.uid);
-    await sendEmail({
-      email: req.query.email,
-      subject: `Verify Your Account, ${username}`,
-      content: `Hello ${username},<br /><br />You recently signed up for the Math Olympiad website. We're glad to have you here. But before you can start, you'll need to verify your account by clicking <a href="${link}">here</a>. If that doesn't work, copy the following into the browser: <a href="${link}">${link}</a>.<br /><br />Sincerely,<br />The Math Olympiad Team`
-    });
-    res.status(200).send("Account created");
-  }).catch(error => {
-    res.status(400).send(error.code);
-  });
-});
-
-app.get("/verify/:id", (req, res) => {
-  let encryptedUID = req.url.replace('/verify/', '');
-  let uid;
-  try {
-    uid = convertFromURL(encryptedUID);
-  }
-  catch (e) {
-    res.status(400).send("Invalid ID");
-    return;
-  }
-  auth.updateUser(uid, { emailVerified: true }).then(async userRecord => {
-    await db.ref(`userInformation/${userRecord.uid}/emailVerified`).set(true);
-    res.status(200).send("Verified!");
-  }).catch(error => {
-    res.status(400).send("There is no such user");
-    return;
-  });
-})
-
-app.all("/get-all-usernames", urlEncoded, async (req, res) => {
-  const usernames = await db.ref(`/users`).once('value').then(snapshot => snapshot.val());
-
-  if (!usernames) {
-    res.send('No users yet!');
-    return;
-  }
-  res.send(JSON.stringify(usernames));
-});
-*/
 app.listen(port, _ => {
   console.log(`Listening at http://localhost:${port}`);
 })
