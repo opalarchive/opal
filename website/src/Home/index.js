@@ -2,15 +2,23 @@ import React from 'react';
 import logo from '../logo.svg';
 import styles from './index.module.css';
 
-function App() {
-  return (
-    <div className={styles.app}>
-      <header className={styles.appHeader}>
-        <img src={logo}  className={styles.appLogo} alt="logo" />
-        Math Olympiad Yada Yada Yada
-      </header>
-    </div>
-  );
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
+
+
+  }
+
+  render() {
+    return (
+      <div className={styles.home}>
+        <header className={styles.homeHeader}>
+          <img src={logo} className={styles.homeLogo} alt="logo" />
+          Math Olympiad Yada Yada Yada
+        </header>
+      </div>
+    );
+  }
 }
 
-export default App;
+export default Home;

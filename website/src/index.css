@@ -12,6 +12,24 @@ code {
     monospace;
 }
 
-.floating {
-  
+.box {
+  border: 1px solid rgb(218, 220, 224);
+}
+
+.boxl {
+  border-left: 1px solid rgb(218, 220, 224);
+}
+.boxt {
+  border-top: 1px solid rgb(218, 220, 224);
+}
+.boxr {
+  border-right: 1px solid rgb(218, 220, 224);
+}
+.boxb {
+  border-bottom: 1px solid rgb(218, 220, 224);
+}
+
+.float {
+  border: none;
+  box-shadow: 0 5px 25px 0 rgba(0,0,0,.1);
 }
