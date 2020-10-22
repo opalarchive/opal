@@ -19,7 +19,7 @@ function App() {
       <Route exact path={ROUTES.PROJECT_VIEW} component={Project} />
       <div>
         <Sidebar width={width} />
-        <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem" }}>
+        <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgb(245, 246, 250)" }}>
           <Route exact path={ROUTES.PROJECT} component={Priority} />
           <Route exact path={ROUTES.PROJECT_PRIORITY} component={Priority} />
         </div>

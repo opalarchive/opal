@@ -12,10 +12,14 @@
 }
 
 .link.active, .link:hover, .link:focus {
-  background-color: rgb(242, 243, 248);
+  background-color: rgb(245, 246, 250);
   color: rgb(30, 30, 30);
   text-decoration: none;
   outline: none;
+}
+
+.link.active {
+  cursor: default;
 }
 
 .linkname {
