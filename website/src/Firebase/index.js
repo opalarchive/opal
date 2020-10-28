@@ -5,14 +5,14 @@ import FirebaseContext, { withFirebase } from './context';
 export { FirebaseContext, withFirebase };
 
 var firebaseConfig = {
-  apiKey: "AIzaSyD2IpcjsgD-6E0rlHLyRBgjrg47flZmjpo",
-  authDomain: "math-oly.firebaseapp.com",
-  databaseURL: "https://math-oly.firebaseio.com",
-  projectId: "math-oly",
-  storageBucket: "math-oly.appspot.com",
-  messagingSenderId: "166607846818",
-  appId: "1:166607846818:web:0bddd4a7f10bf7020dc6fb",
-  measurementId: "G-SJBMXZKRWV"
+  apiKey: "AIzaSyA5FtY_otDq2-P9Z4NFKoInrK6_kKhYuo0",
+  authDomain: "opal-5625e.firebaseapp.com",
+  databaseURL: "https://opal-5625e.firebaseio.com",
+  projectId: "opal-5625e",
+  storageBucket: "opal-5625e.appspot.com",
+  messagingSenderId: "1073802644774",
+  appId: "1:1073802644774:web:c4c498378739c0d44085e7",
+  measurementId: "G-M6M62MF7RN"
 };
 
 const fetchLocation = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:2718';

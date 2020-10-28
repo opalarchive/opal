@@ -1,8 +1,9 @@
 import React from "react";
 import styles from "./index.module.css";
 
-import { withRouter } from "react-router-dom";
+import * as ROUTES from '../Constants/routes';
 
+import { withRouter } from "react-router-dom";
 import { auth, getUsernames, createUser, understandError } from "../Firebase";
 
 class SignUp extends React.Component {
@@ -33,7 +34,7 @@ class SignUp extends React.Component {
     this.updateMobile();
     window.addEventListener('resize', this.updateMobile);
     auth.onAuthStateChanged((user) => {
-      if (user) this.props.history.push("/profile");
+      if (user) this.props.history.push(ROUTES.PROJECT);
     });
     getUsernames().then((usernames) =>
       this.setState({ usernames, loading: false })
