@@ -1,5 +1,8 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import FirebaseContext, { withFirebase } from './context';
+
+export { FirebaseContext, withFirebase };
 
 var firebaseConfig = {
   apiKey: "AIzaSyD2IpcjsgD-6E0rlHLyRBgjrg47flZmjpo",
@@ -39,7 +42,7 @@ export const createUser = async (username, password, email) => {
 export const understandError = e => {
   let error = "";
   switch(e) {
-    case 'auth/email-already-in-use':
+    case 'auth/email-already-exists':
       error = "This email address is already in use. Please use an alternate address."
       break;
     case 'auth/invalid-user-token':

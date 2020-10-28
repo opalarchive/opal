@@ -12,7 +12,8 @@
     "react-dom": "^16.13.1",
     "react-feather": "^2.0.8",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^3.4.4"
+    "react-scripts": "^3.4.4",
+    "recompose": "^0.30.0"
   },
   "scripts": {
     "start": "react-scripts start",

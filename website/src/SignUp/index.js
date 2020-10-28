@@ -72,6 +72,7 @@ class SignUp extends React.Component {
 
   async onLogIn(event) {
     event.preventDefault();
+    console.log(this.state.email + " " + this.state.password);
     auth
       .signInWithEmailAndPassword(this.state.email, this.state.password)
       .catch((error) => {
@@ -102,7 +103,7 @@ class SignUp extends React.Component {
   }
 
   render() {
-    console.log(this.state.isMobile)
+    //console.log(this.state.isMobile)
     const {
       username,
       email,

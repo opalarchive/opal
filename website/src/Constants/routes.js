@@ -5,6 +5,7 @@ export const SIGNUP = '/signup';
 
 export const PROJECT = '/project';
 export const PROJECT_VIEW = '/project/view/:id';
+export const PROJECT_NEW = '/project/new'
 
 export const PROJECT_PRIORITY = '/project/priority';
 export const PROJECT_MY_PROJECTS = '/project/my-projects';
