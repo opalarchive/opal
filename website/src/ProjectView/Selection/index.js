@@ -6,9 +6,6 @@ import * as ROUTES from '../../Constants/routes';
 import { Route, withRouter } from 'react-router-dom';
 
 import Sidebar from './Sidebar';
-import { withFirebase } from '../../Firebase';
-import { withAuthorization } from '../../Session';
-import { compose } from 'recompose';
 
 class SelectionBase extends React.Component {
 
@@ -77,10 +74,6 @@ class SelectionBase extends React.Component {
   }
 
   componentDidMount() {
-    const includeMine = this.categories[this.props.type].includeMine;
-    const includeShared = this.categories[this.props.type].includeShared;
-    const includeAllStarred = this.categories[this.props.type].includeAllStarred;
-    const includeTrash = this.categories[this.props.type].includeTrash;
     const data = this.categories[this.props.type].data;
     const sortable = this.categories[this.props.type].sortable;
 
@@ -98,13 +91,15 @@ class SelectionBase extends React.Component {
     if (project.trashed) {
       return includeTrash;
     }
-    if (project.editors[this.props.authuser.uid].starred && includeAllStarred) {
+    if (project.editors[this.props.authUser.uid].starred && includeAllStarred) {
       return true;
     }
-    if (project.owner === this.props.authuser.uid && includeMine) {
-      return true;
+    if (project.owner === this.props.authUser.uid) {
+      if (includeMine) {
+        return true;
+      }
     }
-    if (Object.keys(project.editors).includes(this.props.authuser.uid) && includeShared) {
+    else if (Object.keys(project.editors).includes(this.props.authUser.uid) && includeShared) {
       return true;
     }
 
@@ -128,7 +123,7 @@ class Selection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visibleProjects: null
+      visibleProjects: {}
     };
   }
 
@@ -144,7 +139,7 @@ class Selection extends React.Component {
             lastEdit: 2309840212301,
             starred: false
           },
-          "iPKthto6lXba4pmbcjHnaL7AfdA2": {
+          "f6rgt74aDCYTOAwNbFXKOlQYZrM2": {
             shareDate: 16942017385,
             lastEdit: 23209840212301,
             starred: false
@@ -152,10 +147,10 @@ class Selection extends React.Component {
         }
       },
       aramo12123123la: {
-        owner: "iPKthto6lXba4pmbcjHnaL7AfdA2",
+        owner: "f6rgt74aDCYTOAwNbFXKOlQYZrM2",
         trashed: false,
         editors: {
-          "iPKthto6lXba4pmbcjHnaL7AfdA2": {
+          "f6rgt74aDCYTOAwNbFXKOlQYZrM2": {
             shareDate: 7942017385,
             lastEdit: 2309840212301,
             starred: false
@@ -177,22 +172,16 @@ class Selection extends React.Component {
       <div>
         <Sidebar width={width} />
         <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgb(245, 246, 250)" }}>
-          <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authuser={this.props.authuser} />} />
-          <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authuser={this.props.authuser} />} />
-          <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase type="myProjects" visibleProjects={this.state.visibleProjects} authuser={this.props.authuser} />} />
-          <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase type="sharedWithMe" visibleProjects={this.state.visibleProjects} authuser={this.props.authuser} />} />
-          <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase type="recent" visibleProjects={this.state.visibleProjects} authuser={this.props.authuser} />} />
-          <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase type="trash" visibleProjects={this.state.visibleProjects} authuser={this.props.authuser} />} />
+          <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase type="myProjects" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase type="sharedWithMe" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase type="recent" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase type="trash" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
         </div>
       </div>
     );
   }
 }
 
-const condition = authUser => !!authUser;
-
-export default compose(
-  withAuthorization(condition),
-  withFirebase,
-  withRouter,
-)(Selection);
+export default Selection;

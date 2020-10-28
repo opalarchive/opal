@@ -5,25 +5,30 @@ import * as ROUTES from '../Constants/routes';
 
 import {
   Route,
-  Switch
+  Switch,
+  withRouter
 } from "react-router-dom";
 
 import Project from './Project';
 import Selection from './Selection';
-import { AuthUserContext } from '../Session';
+import { AuthUserContext, withAuthorization } from '../Session';
+import { compose } from 'recompose';
+import { withFirebase } from '../Firebase';
 
 function App() {
   let width = 15;
   return (
-    <AuthUserContext.Consumer>
-      {authuser =>
-        <Switch>
-          <Route exact path={ROUTES.PROJECT_VIEW} component={Project} authuser={authuser} />
-          <Route component={Selection} authuser={authuser} />
-        </Switch>
-      }
-    </AuthUserContext.Consumer>
+    <Switch>
+      <Route exact path={ROUTES.PROJECT_VIEW} component={Project} authUser={this.props.authUser} />
+      <Route component={Selection} authUser={this.props.authUser} />
+    </Switch>
   );
 }
 
-export default App;
+const condition = authUser => !!authUser;
+
+export default compose(
+  withAuthorization(condition),
+  withFirebase,
+  withRouter,
+)(Selection);

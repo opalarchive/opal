@@ -19,7 +19,7 @@ const withAuthorization = (condition) => Component => {
       return (
         <AuthUserContext.Consumer>
           {authUser =>
-            condition(authUser) ? <Component {...this.props} /> : "not logged in :("
+            condition(authUser) ? <Component {...this.props} authUser={authUser} /> : "not logged in :("
           }
         </AuthUserContext.Consumer>
       );

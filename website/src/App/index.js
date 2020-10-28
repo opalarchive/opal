@@ -17,6 +17,7 @@ import Project from '../ProjectView';
 import AuthProvider from '../Providers/AuthProvider.js';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { withAuthentication } from '../Session';
 
 const theme = createMuiTheme({
   palette: {
@@ -60,4 +61,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withAuthentication(App);
