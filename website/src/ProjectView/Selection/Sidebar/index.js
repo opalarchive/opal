@@ -22,7 +22,6 @@ function navlink(location, Icon, name, url, urlAlias, yOffset) {
 class Sidebar extends React.Component {
   render() {
     const location = window.location.pathname;
-    console.log(location);
     return (
       <div className={`${styles.sidebar} float`} style={{ width: `${this.props.width}rem` }}>
         <div className={styles.item}>
