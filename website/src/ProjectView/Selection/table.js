@@ -2,7 +2,7 @@ import React from 'react';
 
 import * as ROUTES from '../../Constants/routes';
 
-import { TableContainer, Table, TableHead, TableCell, TableRow, Paper, TableBody, Checkbox, Toolbar, Typography, Tooltip, IconButton, makeStyles, lighten } from '@material-ui/core';
+import { TableContainer, Table, TableHead, TableCell, TableRow, Paper, TableBody, Checkbox, Toolbar, Typography, Tooltip, IconButton, makeStyles, lighten, TableSortLabel } from '@material-ui/core';
 import { Filter, Trash2 } from 'react-feather';
 import { Link } from 'react-router-dom';
 
@@ -65,7 +65,12 @@ class ProjectTable extends React.Component {
     super(props);
 
     this.state = {
-      selected: {}
+      selected: {},
+      sortedProjectKeys: [],
+      sort: {
+        dataPoint: 'name',
+        direction: 'asc'
+      }
     };
 
     this.camelToTitle = (string) => {
@@ -108,14 +113,21 @@ class ProjectTable extends React.Component {
         case 'owner':
           return proj.owner;
         case 'lastModified':
-          return this.formatTime(Math.max(...Object.values(proj.editors).map(info => info.lastEdit)));
+          return Math.max(...Object.values(proj.editors).map(info => info.lastEdit));
         case 'shareDate':
-          return this.formatTime(proj.editors[this.props.authUser.displayName].shareDate);
+          return proj.editors[this.props.authUser.displayName].shareDate;
         case 'lastModifiedByMe':
-          return this.formatTime(proj.editors[this.props.authUser.displayName].lastEdit);
+          return proj.editors[this.props.authUser.displayName].lastEdit;
         default:
           return null
       }
+    }
+
+    this.formatData = data => {
+      if (typeof data === 'number') {
+        return this.formatTime(data);
+      }
+      return data;
     }
 
     this.onRowClick = (event, projName) => {
@@ -126,21 +138,69 @@ class ProjectTable extends React.Component {
 
       this.setState({ selected });
     }
+
+    this.onAllClick = (event) => {
+      if (event.target.checked) {
+        let selected = {};
+        Object.values(this.props.projects).every(proj => {
+          selected[proj.name] = true;
+          return true;
+        });
+        console.log(selected);
+        this.setState({ selected });
+      } else {
+        this.setState({ selected: {} });
+      }
+    }
+
+    this.sortProjectKeys = (sort, sortedProjectKeys) => {
+      let stabilized = sortedProjectKeys.map(key => [this.getDataPoint(this.props.projects[key], sort.dataPoint), key]);
+
+      const comp = (a, b) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+      }
+
+      stabilized.sort((a, b) => {
+        let difference = (comp(a[0], b[0]) === 0) ? comp(a[1], b[1]) : comp(a[0], b[0]);
+        return difference * (sort.direction === 'asc' ? 1 : -1);
+      });
+
+      return stabilized.map(arr => arr[1]);
+    }
+
+    this.onSortClick = (event, dataPoint) => {
+      let sort = { dataPoint: dataPoint, direction: 'asc' };
+      if (dataPoint === this.state.sort.dataPoint) {
+        sort = { dataPoint, direction: (this.state.sort.direction === 'asc') ? 'desc' : 'asc' };
+      }
+      this.setState({ sort, sortedProjectKeys: this.sortProjectKeys(sort, this.state.sortedProjectKeys) });
+    }
+  }
+
+  componentDidMount() {
+    this.setState({ sort: this.props.defaultSort, sortedProjectKeys: Object.keys(this.props.projects) });
   }
 
   render() {
     const { projects, data, fixed, defaultSort, authUser } = this.props;
 
+    const realSelected = Object.keys(this.state.selected).filter(proj => this.state.selected[proj]);
+    const { orderBy, order } = this.state.sort;
+
     return (
       <Paper>
-        <ProjectToolbar selected={Object.keys(this.state.selected).filter(proj => this.state.selected[proj])} />
+        <ProjectToolbar selected={realSelected} />
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={false}
+                    indeterminate={realSelected.length > 0 && realSelected.length < Object.values(projects).length}
+                    checked={Object.values(projects).length > 0 && realSelected.length === Object.values(projects).length}
+                    onChange={this.onAllClick}
                     inputProps={{ 'aria-label': 'select all projects' }}
                   />
                 </TableCell>
@@ -152,13 +212,19 @@ class ProjectTable extends React.Component {
                     align={index === 0 ? "left" : "right"}
                     key={dataPoint}
                   >
-                    {this.camelToTitle(dataPoint)}
+                    <TableSortLabel
+                      active={this.state.sort.dataPoint === dataPoint}
+                      direction={this.state.sort.dataPoint === dataPoint ? this.state.sort.direction : 'asc'}
+                      onClick={(event) => this.onSortClick(event, dataPoint)}
+                    >
+                      {this.camelToTitle(dataPoint)}
+                    </TableSortLabel>
                   </TableCell>
                 )}
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.keys(projects).map((id, index) => {
+              {this.state.sortedProjectKeys.map((id, index) => {
                 let proj = projects[id];
                 const labelId = `project-table-checkbox-${index}`;
 
@@ -181,9 +247,9 @@ class ProjectTable extends React.Component {
                     {data.map((dataPoint, index) =>
                       (index == 0 ?
                         <TableCell component="th" scope="row" id={labelId} padding="none" key={`${id}-${dataPoint}`}>
-                          <Link to={ROUTES.PROJECT_VIEW.replace(':id', id)}>{this.getDataPoint(proj, dataPoint)}</Link>
+                          <Link to={ROUTES.PROJECT_VIEW.replace(':id', id)}>{this.formatData(this.getDataPoint(proj, dataPoint))}</Link>
                         </TableCell>
-                        : <TableCell align="right" key={`${id}-${dataPoint}`}>{this.getDataPoint(proj, dataPoint)}</TableCell>
+                        : <TableCell align="right" key={`${id}-${dataPoint}`}>{this.formatData(this.getDataPoint(proj, dataPoint))}</TableCell>
                       ))}
                   </TableRow>
                 );

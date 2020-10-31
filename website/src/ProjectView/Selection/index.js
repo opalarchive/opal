@@ -18,7 +18,8 @@ class SelectionBase extends React.Component {
       projects: {},
       data: [],
       fixed: false, // whether we can't sort (i.e. fixed => no sorting)
-      defaultSort: {}
+      defaultSort: {},
+      loading: true
     };
 
     /*
@@ -85,11 +86,11 @@ class SelectionBase extends React.Component {
         includeMine: false,
         includeShared: false,
         includeAllStarred: false,
-        includeTrash: true,                 // trash is only trash by me (i.e. only owner can trash)
+        includeTrash: true,                          // trash is only trash by me (i.e. only owner can trash)
         data: ['name', 'owner', 'lastModified'],     // last modified = trash date for obvious reasons 
-        fixed: false,                       // (disable editing when trashed)
+        fixed: false,                                // (disable editing when trashed)
         defaultSort: {
-          dataPoint: 'lastModifiedByMe',
+          dataPoint: 'lastModified',
           direction: 'desc'
         }
       }
@@ -97,7 +98,6 @@ class SelectionBase extends React.Component {
   }
 
   componentDidMount() {
-
     let projectsKeys = Object.keys(this.props.visibleProjects).filter(id => this.isIncludable(this.props.visibleProjects[id],
       this.categories[this.props.type].includeMine,
       this.categories[this.props.type].includeShared,
@@ -110,8 +110,9 @@ class SelectionBase extends React.Component {
       let fixed = this.categories[this.props.type].fixed;  
       let defaultSort = this.categories[this.props.type].defaultSort;  
 
-      this.setState({ projects, data, fixed, defaultSort });
+      this.setState({ projects, data, fixed, defaultSort, loading: false });
     }
+    this.setState({ loading: false });
   }
 
   isIncludable(project, includeMine, includeShared, includeAllStarred, includeTrash) {
@@ -134,6 +135,8 @@ class SelectionBase extends React.Component {
   }
 
   render() {
+    if (this.state.loading) return <div></div>;
+
     return (
       <div>
         <Table projects={this.state.projects} data={this.state.data} fixed={this.state.fixed} defaultSort={this.state.defaultSort} authUser={this.props.authUser}/>
