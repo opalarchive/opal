@@ -17,7 +17,8 @@ class SelectionBase extends React.Component {
     this.state = {
       projects: {},
       data: [],
-      sortable: []
+      fixed: false, // whether we can't sort (i.e. fixed => no sorting)
+      defaultSort: {}
     };
 
     /*
@@ -38,7 +39,11 @@ class SelectionBase extends React.Component {
         includeAllStarred: true,
         includeTrash: false,
         data: ['name', 'owner', 'lastModified'],
-        sortable: ['name', 'owner', 'lastModified']
+        fixed: false,
+        defaultSort: {
+          dataPoint: 'name',
+          direction: 'asc'
+        }
       },
       myProjects: {
         includeMine: true,
@@ -46,7 +51,11 @@ class SelectionBase extends React.Component {
         includeAllStarred: false,
         includeTrash: false,
         data: ['name', 'owner', 'lastModified'],
-        sortable: ['name', 'owner', 'lastModified']
+        fixed: false,
+        defaultSort: {
+          dataPoint: 'name',
+          direction: 'asc'
+        }
       },
       sharedWithMe: {
         includeMine: false,
@@ -54,7 +63,11 @@ class SelectionBase extends React.Component {
         includeAllStarred: false,
         includeTrash: false,
         data: ['name', 'owner', 'shareDate'],    // owner = shared by in this case (unless we allow collaborator sharing?)
-        sortable: ['name', 'owner', 'shareDate'] // owner is still better I think
+        fixed: false,                            // owner is still better I think
+        defaultSort: {
+          dataPoint: 'shareDate',
+          direction: 'desc'
+        }
       },
       recent: {
         includeMine: true,
@@ -62,15 +75,23 @@ class SelectionBase extends React.Component {
         includeAllStarred: false,
         includeTrash: false,
         data: ['name', 'owner', 'lastModifiedByMe'],
-        sortable: 'lastModifiedByMe'
+        fixed: true,
+        defaultSort: {
+          dataPoint: 'lastModifiedByMe',
+          direction: 'desc'
+        }
       },
       trash: {
         includeMine: false,
         includeShared: false,
         includeAllStarred: false,
-        includeTrash: true,                // trash is only trash by me (i.e. only owner can trash)
-        data: ['name', 'lastModified'],    // last modified = trash date for obvious reasons
-        sortable: ['name', 'lastModified'] // (disable editing when trashed)
+        includeTrash: true,                 // trash is only trash by me (i.e. only owner can trash)
+        data: ['name', 'owner', 'lastModified'],     // last modified = trash date for obvious reasons 
+        fixed: false,                       // (disable editing when trashed)
+        defaultSort: {
+          dataPoint: 'lastModifiedByMe',
+          direction: 'desc'
+        }
       }
     };
   }
@@ -86,9 +107,10 @@ class SelectionBase extends React.Component {
     if (projectsKeys && projectsKeys[0]) {
       let projects = Object.fromEntries(projectsKeys.map(id => [id, this.props.visibleProjects[id]]));
       let data = this.categories[this.props.type].data;
-      let sortable = this.categories[this.props.type].sortable;  
+      let fixed = this.categories[this.props.type].fixed;  
+      let defaultSort = this.categories[this.props.type].defaultSort;  
 
-      this.setState({ projects, data, sortable });
+      this.setState({ projects, data, fixed, defaultSort });
     }
   }
 
@@ -96,15 +118,15 @@ class SelectionBase extends React.Component {
     if (project.trashed) {
       return includeTrash;
     }
-    if (project.editors[this.props.authUser.uid].starred && includeAllStarred) {
+    if (project.editors[this.props.authUser.displayName].starred && includeAllStarred) {
       return true;
     }
-    if (project.owner === this.props.authUser.uid) {
+    if (project.owner === this.props.authUser.displayName) {
       if (includeMine) {
         return true;
       }
     }
-    else if (Object.keys(project.editors).includes(this.props.authUser.uid) && includeShared) {
+    else if (Object.keys(project.editors).includes(this.props.authUser.displayName) && includeShared) {
       return true;
     }
 
@@ -114,7 +136,7 @@ class SelectionBase extends React.Component {
   render() {
     return (
       <div>
-        <Table projects={this.state.projects} ownerUsernames={this.props.ownerUsernames} data={this.state.data} sortable={this.state.sortable} authUser={this.props.authUser}/>
+        <Table projects={this.state.projects} data={this.state.data} fixed={this.state.fixed} defaultSort={this.state.defaultSort} authUser={this.props.authUser}/>
       </div>
     );
   }
@@ -125,7 +147,6 @@ class Selection extends React.Component {
     super(props);
     this.state = {
       visibleProjects: {},
-      ownerUsernames: {},
       loading: true
     };
   }
@@ -135,15 +156,15 @@ class Selection extends React.Component {
     let visibleProjects = {
       amolrama: {
         name: 'test project 1 orz rama',
-        owner: '9Nq2ay3wYTe5jYqf3FzZNSkO7uO2',
+        owner: 'naman12',
         trashed: false,
         editors: {
-          '9Nq2ay3wYTe5jYqf3FzZNSkO7uO2': {
+          'naman12': {
             shareDate: 6942017385,
             lastEdit: 119840212301,
             starred: false
           },
-          'f6rgt74aDCYTOAwNbFXKOlQYZrM2': {
+          'testuser': {
             shareDate: 16942017385,
             lastEdit: 1109840212301,
             starred: false
@@ -152,27 +173,40 @@ class Selection extends React.Component {
       },
       aramo12123123la: {
         name: 'haha this is mine',
-        owner: 'f6rgt74aDCYTOAwNbFXKOlQYZrM2',
+        owner: 'testuser',
         trashed: false,
         editors: {
-          'f6rgt74aDCYTOAwNbFXKOlQYZrM2': {
+          'testuser': {
             shareDate: 7942017385,
             lastEdit: 119840212301,
             starred: false
           },
-          '9Nq2ay3wYTe5jYqf3FzZNSkO7uO2': {
+          'naman12': {
             shareDate: 26942017385,
             lastEdit: 1109840212301,
             starred: false
           }
         }
-      }
+      },
+      wen: {
+        name: 'wen',
+        owner: 'wen',
+        trashed: true,
+        editors: {
+          'wen': {
+            shareDate: 6942017385,
+            lastEdit: 119840212301,
+            starred: false
+          },
+          'testuser': {
+            shareDate: 16942017385,
+            lastEdit: 1109840212301,
+            starred: false
+          }
+        }
+      },
     };
-    let ownerUsernames = {
-      amolrama: 'naman12',
-      aramo12123123la: 'vitriol'
-    }
-    this.setState({ visibleProjects, ownerUsernames, loading: false });
+    this.setState({ visibleProjects, loading: false });
   }
 
   render() {
@@ -184,12 +218,12 @@ class Selection extends React.Component {
       <div>
         <Sidebar width={width} />
         <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgb(245, 246, 250)" }}>
-          <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} ownerUsernames={this.state.ownerUsernames} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} ownerUsernames={this.state.ownerUsernames} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase type="myProjects" visibleProjects={this.state.visibleProjects} ownerUsernames={this.state.ownerUsernames} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase type="sharedWithMe" visibleProjects={this.state.visibleProjects} ownerUsernames={this.state.ownerUsernames} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase type="recent" visibleProjects={this.state.visibleProjects} ownerUsernames={this.state.ownerUsernames} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase type="trash" visibleProjects={this.state.visibleProjects} ownerUsernames={this.state.ownerUsernames} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase type="myProjects" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase type="sharedWithMe" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase type="recent" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase type="trash" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
         </div>
       </div>
     );
