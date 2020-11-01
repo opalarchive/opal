@@ -59,6 +59,9 @@ const ProjectToolbar = (props) => {
   );
 }
 
+const tableStyles = makeStyles((theme) => ({
+  
+}));
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -212,13 +215,18 @@ class ProjectTable extends React.Component {
                     align={index === 0 ? "left" : "right"}
                     key={dataPoint}
                   >
-                    <TableSortLabel
-                      active={this.state.sort.dataPoint === dataPoint}
-                      direction={this.state.sort.dataPoint === dataPoint ? this.state.sort.direction : 'asc'}
-                      onClick={(event) => this.onSortClick(event, dataPoint)}
-                    >
-                      {this.camelToTitle(dataPoint)}
-                    </TableSortLabel>
+                    {this.props.fixed ?
+                      this.camelToTitle(dataPoint)
+                      :
+                      <TableSortLabel
+                        active={this.state.sort.dataPoint === dataPoint}
+                        direction={this.state.sort.dataPoint === dataPoint ? this.state.sort.direction : 'asc'}
+                        onClick={(event) => this.onSortClick(event, dataPoint)}
+                        disabled={!this.props.fixed}
+                      >
+                        {this.camelToTitle(dataPoint)}
+                      </TableSortLabel>
+                    }
                   </TableCell>
                 )}
               </TableRow>

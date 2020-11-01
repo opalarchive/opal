@@ -11,16 +11,17 @@ import {
 
 import Project from './Project';
 import Selection from './Selection';
-import { AuthUserContext, withAuthorization } from '../Session';
+import { withAuthorization } from '../Session';
 import { compose } from 'recompose';
 import { withFirebase } from '../Firebase';
 
-function App() {
+const ProjectView = (props) => {
+  console.log(props.authUser);
   let width = 15;
   return (
     <Switch>
-      <Route exact path={ROUTES.PROJECT_VIEW} component={Project} authUser={this.props.authUser} />
-      <Route component={Selection} authUser={this.props.authUser} />
+      <Route exact path={ROUTES.PROJECT_VIEW} component={() => <Project authUser={props.authUser} />} />
+      <Route component={() => <Selection authUser={props.authUser} />} />
     </Switch>
   );
 }
@@ -31,4 +32,4 @@ export default compose(
   withAuthorization(condition),
   withFirebase,
   withRouter,
-)(Selection);
+)(ProjectView);

@@ -12,7 +12,7 @@ import {
 
 import Home from '../Home';
 import SignUp from '../SignUp';
-import Project from '../ProjectView';
+import ProjectView from '../ProjectView';
 
 import AuthProvider from '../Providers/AuthProvider.js';
 
@@ -52,7 +52,7 @@ class App extends React.Component {
               <Route exact path={ROUTES.CUSTOM_HOME} component={Home} />
               <Route exact path={ROUTES.HOME} component={Home} />
               <Route exact path={ROUTES.SIGNUP} component={SignUp} />
-              <Route path={ROUTES.PROJECT} component={Project} />
+              <Route path={ROUTES.PROJECT} component={ProjectView} />
             </Switch>
           </Router>
         </ThemeProvider>
