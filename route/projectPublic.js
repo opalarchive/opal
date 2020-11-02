@@ -8,8 +8,8 @@ module.exports = {
       return Object.fromEntries(Object.entries(usernameInfo).map(user => [user[0], user[1].username]));
     }
 
-    const uuid = req.query.uuid;
-    let publico = await db.ref(`/projectPublic/${uuid}`).once('value').then(snapshot => snapshot.val());
+    const authuid = req.query.authuid;
+    let publico = await db.ref(`/projectPublic`).once('value').then(snapshot => snapshot.val());
 
     const usernameInfo = await getUsernameInfo();
 
@@ -18,9 +18,14 @@ module.exports = {
       return '!usernameNotFound';
     }
 
+    // filter for projects the authuid can access
+    publico = Object.fromEntries(Object.entries(publico).filter(proj => Object.keys(proj[1].editors).includes(authuid)));
+
     // change all the private uids to usernames
-    publico.editors = Object.fromEntries(Object.entries(publico.editors).map(editor => [idToUsername(editor[0]), editor[1]]));
-    publico.owner = idToUsername(publico.owner);
+    Object.keys(publico).map(key => {
+      publico[key].editors = Object.fromEntries(Object.entries(publico[key].editors).map(editor => [idToUsername(editor[0]), editor[1]]));
+      publico[key].owner = idToUsername(publico[key].owner);
+    });
 
     res.send(publico);
   }
