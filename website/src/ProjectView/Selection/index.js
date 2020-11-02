@@ -8,6 +8,7 @@ import { Route, withRouter } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Loading from '../../Loading';
 import Table from './table';
+import { getVisibleProjects } from "../../Firebase";
 
 class SelectionBase extends React.Component {
 
@@ -154,62 +155,13 @@ class Selection extends React.Component {
     };
   }
 
-  componentDidMount() {
-    // change this filler obviously
-    let visibleProjects = {
-      amolrama: {
-        name: 'test project 1 orz rama',
-        owner: 'naman12',
-        trashed: false,
-        editors: {
-          'naman12': {
-            shareDate: 6942017385,
-            lastEdit: 119840212301,
-            starred: false
-          },
-          'testuser': {
-            shareDate: 16942017385,
-            lastEdit: 1109840212301,
-            starred: false
-          }
-        }
-      },
-      aramo12123123la: {
-        name: 'haha this is mine',
-        owner: 'testuser',
-        trashed: false,
-        editors: {
-          'testuser': {
-            shareDate: 7942017385,
-            lastEdit: 119840212301,
-            starred: false
-          },
-          'naman12': {
-            shareDate: 26942017385,
-            lastEdit: 1109840212301,
-            starred: false
-          }
-        }
-      },
-      wen: {
-        name: 'wen',
-        owner: 'wen',
-        trashed: true,
-        editors: {
-          'wen': {
-            shareDate: 6942017385,
-            lastEdit: 119840212301,
-            starred: false
-          },
-          'testuser': {
-            shareDate: 16942017385,
-            lastEdit: 1109840212301,
-            starred: false
-          }
-        }
-      },
-    };
+  async setProjects() {
+    let visibleProjects = await getVisibleProjects(this.props.authUser.uid);
     this.setState({ visibleProjects, loading: false });
+  }
+
+  componentDidMount() {
+    this.setProjects();
   }
 
   render() {

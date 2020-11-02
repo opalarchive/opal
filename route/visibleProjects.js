@@ -1,7 +1,7 @@
 const { db } = require("../helpers/firebaseSetup");
 
 module.exports = {
-  path: "/project-public",
+  path: "/visible-projects",
   execute: async (req, res) => {
     const getUsernameInfo = async () => {
       const usernameInfo = await db.ref(`/userInformation`).once('value').then(snapshot => snapshot.val());

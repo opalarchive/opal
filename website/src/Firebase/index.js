@@ -39,6 +39,19 @@ export const createUser = async (username, password, email) => {
   return;
 };
 
+export const getVisibleProjects = async (uid) => {
+  const projString = await fetch(`${fetchLocation}/visible-projects?authuid=${uid}`).then(res => res.text());
+  let projObject = {};
+
+  try {
+    projObject = JSON.parse(projString);
+  }
+  catch (e) {
+    return {};
+  }
+  return projObject;
+};
+
 export const understandError = e => {
   let error = "";
   switch(e) {

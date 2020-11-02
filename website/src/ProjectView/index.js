@@ -16,12 +16,11 @@ import { compose } from 'recompose';
 import { withFirebase } from '../Firebase';
 
 const ProjectView = (props) => {
-  console.log(props.authUser);
   let width = 15;
   return (
     <Switch>
-      <Route exact path={ROUTES.PROJECT_VIEW} component={() => <Project authUser={props.authUser} />} />
-      <Route component={() => <Selection authUser={props.authUser} />} />
+      <Route exact path={ROUTES.PROJECT_VIEW} render={() => <Project authUser={props.authUser} />} />
+      <Route render={() => <Selection authUser={props.authUser} />} />
     </Switch>
   );
 }
