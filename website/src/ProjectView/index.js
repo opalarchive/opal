@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './index.module.css';
 
 import * as ROUTES from '../Constants/routes';
 
