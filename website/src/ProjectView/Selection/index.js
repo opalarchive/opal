@@ -171,7 +171,7 @@ class Selection extends React.Component {
     }
     return (
       <div>
-        <Sidebar width={width} />
+        <Sidebar width={width} authUser={this.props.authUser} />
         <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgb(245, 246, 250)" }}>
           <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
           <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />

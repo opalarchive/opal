@@ -52,6 +52,10 @@ export const getVisibleProjects = async (uid) => {
   return projObject;
 };
 
+export const newProject = async (uid) => {
+  return await fetch(`${fetchLocation}/new-project?uid=${uid}`).then(res => res.text());
+};
+
 export const understandError = e => {
   let error = "";
   switch(e) {

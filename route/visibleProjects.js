@@ -22,7 +22,7 @@ module.exports = {
     publico = Object.fromEntries(Object.entries(publico).filter(proj => Object.keys(proj[1].editors).includes(authuid)));
 
     // change all the private uids to usernames
-    Object.keys(publico).map(key => {
+    Object.keys(publico).forEach(key => {
       publico[key].editors = Object.fromEntries(Object.entries(publico[key].editors).map(editor => [idToUsername(editor[0]), editor[1]]));
       publico[key].owner = idToUsername(publico[key].owner);
     });

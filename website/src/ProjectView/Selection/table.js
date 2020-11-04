@@ -104,9 +104,9 @@ class ProjectTable extends React.Component {
         return (hours % 12) + ':00' + (hours < 12 ? 'AM' : 'PM');
       }
       if (hours % 12 == 0) {
-        return '12:' + (minutes < 10 ? '0' : '') + minutes + (hours < 12 ? 'AM' : 'PM');
+        return '12:' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
       }
-      return (hours % 12) + ':' + (minutes < 10 ? '0' : '') + minutes + (hours < 12 ? 'AM' : 'PM');
+      return (hours % 12) + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
     }
 
     this.getDataPoint = (proj, dataPoint) => {

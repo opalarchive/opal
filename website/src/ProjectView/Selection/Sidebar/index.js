@@ -2,9 +2,10 @@ import React from 'react';
 import styles from './index.module.css';
 
 import * as ROUTES from '../../../Constants/routes';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Star, HardDrive, Users, Clock, Trash2, Plus } from 'react-feather';
-import { Tooltip, IconButton, Fab, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
+import { newProject } from '../../../Firebase';
 
 function navlink(location, Icon, name, url, urlAlias, yOffset) {
   if (!urlAlias) urlAlias = url;
@@ -19,13 +20,19 @@ function navlink(location, Icon, name, url, urlAlias, yOffset) {
     </Link>;
 }
 
+const onClickNewProject = async (uid, history) => {
+  const newProjectUUID = await newProject(uid);
+
+  history.push(ROUTES.PROJECT_VIEW.replace(':id', newProjectUUID));
+} 
+
 class Sidebar extends React.Component {
   render() {
     const location = window.location.pathname;
     return (
       <div className={`${styles.sidebar} float`} style={{ width: `${this.props.width}rem` }}>
         <div className={styles.item}>
-          <Button variant="contained" color="secondary" style={{ borderRadius: 1000 }} href={ROUTES.PROJECT_NEW}>
+          <Button variant="contained" color="secondary" style={{ borderRadius: 1000 }} onClick={() => onClickNewProject(this.props.authUser.uid, this.props.history)}>
             <Plus strokeWidth="1.5" style={{ position: "relative", top: "-0.07rem" }} /> <span className={styles.linkname}>New Project</span>
           </Button>
         </div>
@@ -40,4 +47,4 @@ class Sidebar extends React.Component {
   }
 }
 
-export default Sidebar;
+export default withRouter(Sidebar);
