@@ -59,9 +59,9 @@ const ProjectToolbar = (props) => {
   );
 }
 
-const tableStyles = makeStyles((theme) => ({
+// const tableStyles = makeStyles((theme) => ({
   
-}));
+// }));
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -97,13 +97,13 @@ class ProjectTable extends React.Component {
       let hours = date.getHours();
       let minutes = date.getMinutes();
 
-      if (minutes == 0) {
-        if (hours % 12 == 0) {
-          return '12:00 ' + (hours == 0 ? 'AM' : 'PM');
+      if (minutes === 0) {
+        if (hours % 12 === 0) {
+          return '12:00 ' + (hours === 0 ? 'AM' : 'PM');
         }
         return (hours % 12) + ':00' + (hours < 12 ? 'AM' : 'PM');
       }
-      if (hours % 12 == 0) {
+      if (hours % 12 === 0) {
         return '12:' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
       }
       return (hours % 12) + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
@@ -187,10 +187,9 @@ class ProjectTable extends React.Component {
   }
 
   render() {
-    const { projects, data, fixed, defaultSort, authUser } = this.props;
+    const { projects, data } = this.props;
 
     const realSelected = Object.keys(this.state.selected).filter(proj => this.state.selected[proj]);
-    const { orderBy, order } = this.state.sort;
 
     return (
       <Paper>
@@ -222,7 +221,6 @@ class ProjectTable extends React.Component {
                         active={this.state.sort.dataPoint === dataPoint}
                         direction={this.state.sort.dataPoint === dataPoint ? this.state.sort.direction : 'asc'}
                         onClick={(event) => this.onSortClick(event, dataPoint)}
-                        disabled={!this.props.fixed}
                       >
                         {this.camelToTitle(dataPoint)}
                       </TableSortLabel>
@@ -253,7 +251,7 @@ class ProjectTable extends React.Component {
                       />
                     </TableCell>
                     {data.map((dataPoint, index) =>
-                      (index == 0 ?
+                      (index === 0 ?
                         <TableCell component="th" scope="row" id={labelId} padding="none" key={`${id}-${dataPoint}`}>
                           <Link to={ROUTES.PROJECT_VIEW.replace(':id', id)}>{this.formatData(this.getDataPoint(proj, dataPoint))}</Link>
                         </TableCell>

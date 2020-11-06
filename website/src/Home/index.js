@@ -3,11 +3,9 @@ import logo from '../logo.svg';
 import styles from './index.module.css';
 
 class Home extends React.Component {
-  constructor(props) {
-    super(props);
-
-
-  }
+  // constructor(props) {
+  //   super(props);
+  // }
 
   render() {
     return (

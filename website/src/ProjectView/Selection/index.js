@@ -1,9 +1,8 @@
 import React from 'react';
-import styles from './index.module.css';
 
 import * as ROUTES from '../../Constants/routes';
 
-import { Route, withRouter } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
 import Sidebar from './Sidebar';
 import Loading from '../../Loading';

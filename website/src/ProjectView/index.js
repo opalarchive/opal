@@ -15,7 +15,6 @@ import { compose } from 'recompose';
 import { withFirebase } from '../Firebase';
 
 const ProjectView = (props) => {
-  let width = 15;
   return (
     <Switch>
       <Route exact path={ROUTES.PROJECT_VIEW} render={() => <Project authUser={props.authUser} />} />

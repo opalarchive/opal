@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './index.module.css';
 
 import * as ROUTES from '../Constants/routes';
 
@@ -7,7 +6,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from "react-router-dom";
 
 import Home from '../Home';
@@ -38,10 +36,6 @@ const theme = createMuiTheme({
 
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <AuthProvider>

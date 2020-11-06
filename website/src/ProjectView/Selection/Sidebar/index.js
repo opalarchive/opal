@@ -10,7 +10,7 @@ import { newProject } from '../../../Firebase';
 function navlink(location, Icon, name, url, urlAlias, yOffset) {
   if (!urlAlias) urlAlias = url;
 
-  return location == url || location == urlAlias ?
+  return location === url || location === urlAlias ?
     <Link className={`${styles.item} ${styles.link} ${styles.active}`} onClick={(event) => event.preventDefault()} to='#'>
       <Icon strokeWidth="1.5" size="1.2rem" style={{ position: "relative", top: `${yOffset}rem` }} /><span className={styles.linkname}>{name}</span>
     </Link>

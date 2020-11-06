@@ -123,10 +123,10 @@ class SignUp extends React.Component {
       (logIn || email === confirmEmail); //Either we login (no confirm) or the email + confirm are same
     const passwordValid =
       (logIn && password) ||
-      password.match(
+      (password.match(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*{}"'`/,._[\]~\-+])[a-zA-Z\d\w\W]{8,}$/
       ) && //Matches 8 characters, one capital, one lowercase, numeric, and special character
-      (password === confirmPassword); //Either we log in (no confirm) or the password + confirm are same
+      (password === confirmPassword)); //Either we log in (no confirm) or the password + confirm are same
     const isValid = usernameValid && emailValid && passwordValid;
 
     return (
