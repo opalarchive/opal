@@ -60,6 +60,23 @@ export const getVisibleProjects = async (uid) => {
   return projObject;
 };
 
+export const getProjectPrivate = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
+  let projObject = {};
+
+  if (attempt.status !== 200) return attempt.text();
+
+  await attempt.text().then(text => {
+    try {
+      projObject = JSON.parse(text);
+    } catch (e) { 
+      projObject = {};
+    }
+  });
+
+  return projObject;
+};
+
 export const newProject = async (uid) => {
   return await fetch(`${fetchLocation}/new-project?uid=${uid}`).then(res => res.text());
 };
