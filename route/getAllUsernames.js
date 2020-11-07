@@ -1,7 +1,7 @@
-const { db } = require("../helpers/firebaseSetup");
+const { db } = require('../helpers/firebaseSetup');
 
 module.exports = {
-  path: "/get-all-usernames",
+  path: '/get-all-usernames',
   execute: async (req, res) => {
     const usernames = await db.ref(`/users`).once('value').then(snapshot => snapshot.val());
 
@@ -9,6 +9,6 @@ module.exports = {
       res.send('No users yet!');
       return;
     }
-    res.send(JSON.stringify(usernames));
+    res.status(200).send(JSON.stringify(usernames));
   }
 }

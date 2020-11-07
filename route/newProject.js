@@ -1,19 +1,19 @@
-const { db } = require("../helpers/firebaseSetup");
+const { db } = require('../helpers/firebaseSetup');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
-  path: "/new-project",
+  path: '/new-project',
   execute: async (req, res) => {
     const uid = req.query.uid;
     let uuid = '';
 
     const projectIds = await db.ref(`/projectIds`).once('value').then(snapshot => snapshot.val());
-    const totalProjects = Object.values(projectIds).length;
-    
+    const totalProjects = !!projectIds ? projectIds.length : 0;
+
     // just create random uuids until it doesn't exist already
     do {
       uuid = uuidv4();
-    } while (Object.values(projectIds).includes(uuid));
+    } while (!!projectIds && Object.values(projectIds).includes(uuid));
 
     // create default info in the db
     await db.ref(`projectIds/${totalProjects}`).set(uuid);
@@ -32,6 +32,6 @@ module.exports = {
       }
     });
 
-    res.send(uuid);
+    res.status(201).send(uuid);
   }
 }

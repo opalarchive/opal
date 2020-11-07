@@ -1,7 +1,7 @@
-const { db } = require("../helpers/firebaseSetup");
+const { db } = require('../helpers/firebaseSetup');
 
 module.exports = {
-  path: "/visible-projects",
+  path: '/visible-projects',
   execute: async (req, res) => {
     const getUsernameInfo = async () => {
       const usernameInfo = await db.ref(`/userInformation`).once('value').then(snapshot => snapshot.val());
@@ -10,6 +10,11 @@ module.exports = {
 
     const authuid = req.query.authuid;
     let publico = await db.ref(`/projectPublic`).once('value').then(snapshot => snapshot.val());
+
+    if (!publico) {
+      res.status(200).send(null);
+      return;
+    }
 
     const usernameInfo = await getUsernameInfo();
 
@@ -27,6 +32,6 @@ module.exports = {
       publico[key].owner = idToUsername(publico[key].owner);
     });
 
-    res.send(publico);
+    res.status(200).send(publico);
   }
 }
