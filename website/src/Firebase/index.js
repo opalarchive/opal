@@ -35,7 +35,15 @@ export const getUsernames = async _ => {
 
 export const createUser = async (username, password, email) => {
   const works = await fetch(`${fetchLocation}/create-account?username=${username}&password=${password}&email=${email}`);
-  if (works.status !== 200) return works.text();
+  if (works.status !== 201) return works.text();
+
+  // immediately sign them in
+  auth
+    .signInWithEmailAndPassword(email, password)
+    .catch((error) => {
+      console.log(error.code);
+    });
+
   return;
 };
 
@@ -58,7 +66,7 @@ export const newProject = async (uid) => {
 
 export const understandError = e => {
   let error = "";
-  switch(e) {
+  switch (e) {
     case 'auth/email-already-exists':
       error = "This email address is already in use. Please use an alternate address."
       break;
