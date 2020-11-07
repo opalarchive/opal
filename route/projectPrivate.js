@@ -5,6 +5,14 @@ module.exports = {
   path: '/project-private',
   execute: async (req, res) => {
     const uuid = req.query.uuid;
+    const authuid = req.query.authuid;
+
+    const projectAccess = await db.ref(`projectPublic/${uuid}/editors/${authuid}`).once('value').then(snapshot => snapshot.exists());
+
+    if (!projectAccess) {
+      res.status(403).send('forbidden');
+      return;
+    }
 
     let config = await db.ref(`/projectConfigs/${uuid}`).once('value').then(snapshot => snapshot.val());
 
