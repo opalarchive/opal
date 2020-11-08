@@ -7,9 +7,17 @@ module.exports = {
     const uuid = req.query.uuid;
     const authuid = req.query.authuid;
 
-    const projectAccess = await db.ref(`projectPublic/${uuid}/editors/${authuid}`).once('value').then(snapshot => snapshot.exists());
 
-    if (!projectAccess) {
+    const projectPublic = await db.ref(`projectPublic/${uuid}`).once('value').then(snapshot => snapshot.val());
+
+    if (!projectPublic) {
+      // it doesn't exist
+      res.status(404).send('does-not-exist');
+      return;
+    }
+
+    if (!projectPublic.editors[authuid]) {
+      // you can't access it
       res.status(403).send('forbidden');
       return;
     }
