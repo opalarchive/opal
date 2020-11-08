@@ -38,7 +38,7 @@ const ProjectToolbar = (props) => {
         </Typography>
       ) : (
           <Typography className={styles.title} variant="h6" id="tableTitle" component="div">
-            Projects
+            {props.name}
           </Typography>
         )}
 
@@ -59,9 +59,12 @@ const ProjectToolbar = (props) => {
   );
 }
 
-// const tableStyles = makeStyles((theme) => ({
-  
-// }));
+const tableStyles = makeStyles((theme) => ({
+  link: {
+    color: "black",
+    textDecoration: "none",
+  }
+}));
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -133,11 +136,11 @@ class ProjectTable extends React.Component {
       return data;
     }
 
-    this.onRowClick = (event, projName) => {
+    this.onRowClick = (event, projID) => {
       event.preventDefault();
 
       let selected = this.state.selected;
-      selected[projName] = !selected[projName];
+      selected[projID] = !selected[projID];
 
       this.setState({ selected });
     }
@@ -145,11 +148,7 @@ class ProjectTable extends React.Component {
     this.onAllClick = (event) => {
       if (event.target.checked) {
         let selected = {};
-        Object.values(this.props.projects).every(proj => {
-          selected[proj.name] = true;
-          return true;
-        });
-        console.log(selected);
+        Object.keys(this.props.projects).forEach(id => { selected[id] = true; });
         this.setState({ selected });
       } else {
         this.setState({ selected: {} });
@@ -187,13 +186,13 @@ class ProjectTable extends React.Component {
   }
 
   render() {
-    const { projects, data } = this.props;
+    const { projects, data, name } = this.props;
 
     const realSelected = Object.keys(this.state.selected).filter(proj => this.state.selected[proj]);
 
     return (
-      <Paper>
-        <ProjectToolbar selected={realSelected} />
+      <Paper elevation={3}>
+        <ProjectToolbar selected={realSelected} name={this.camelToTitle(name)} />
         <TableContainer>
           <Table>
             <TableHead>
@@ -237,16 +236,16 @@ class ProjectTable extends React.Component {
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => this.onRowClick(event, proj.name)}
+                    onClick={(event) => this.onRowClick(event, id)}
                     role="checkbox"
-                    aria-checked={!!this.state.selected[proj.name]}
-                    selected={!!this.state.selected[proj.name]}
-                    key={proj.name}
+                    aria-checked={!!this.state.selected[id]}
+                    selected={!!this.state.selected[id]}
+                    key={id}
                     tabIndex={-1}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={!!this.state.selected[proj.name]}
+                        checked={!!this.state.selected[id]}
                         inputProps={{ 'aria-labelledby': labelId }}
                       />
                     </TableCell>

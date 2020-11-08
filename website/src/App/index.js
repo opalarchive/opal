@@ -40,7 +40,6 @@ class App extends React.Component {
     return (
       <AuthProvider>
         <ThemeProvider theme={theme}>
-          <link type="text/css" rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
           <Router>
             <Switch>
               <Route exact path={ROUTES.CUSTOM_HOME} component={Home} />

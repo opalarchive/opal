@@ -11,13 +11,13 @@ class SpinningBase extends React.Component {
 
     const prefix = "3px solid ";
     return (
-      <div className="position-relative" style={{ top: "2rem" }}>
-        <div className="position-relative" style={{ height: "8rem" }}>
+      <div style={{ position: "relative", top: "2rem" }}>
+        <div style={{ position: "relative", height: "8rem" }}>
           <div className={styles.inner} style={{ borderLeft: prefix + background, borderTop: prefix + inner, borderRight: prefix + background }}></div>
           <div className={styles.center} style={{ borderLeft: prefix + background, borderTop: prefix + center, borderRight: prefix + background }}></div>
           <div className={styles.outer} style={{ borderLeft: prefix + background, borderTop: prefix + outer, borderRight: prefix + background }}></div>
         </div>
-        <div className={`${styles.text} lead mt-3`}>Loading...</div>
+        <div className={`${styles.text}`} style={{ marginTop: "1rem" }}>Loading...</div>
       </div>
     );
   }

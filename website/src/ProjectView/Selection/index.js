@@ -8,6 +8,7 @@ import Sidebar from './Sidebar';
 import Loading from '../../Loading';
 import Table from './table';
 import { getVisibleProjects } from "../../Firebase";
+import TopBar from './TopBar';
 
 class SelectionBase extends React.Component {
 
@@ -103,12 +104,12 @@ class SelectionBase extends React.Component {
       this.categories[this.props.type].includeShared,
       this.categories[this.props.type].includeAllStarred,
       this.categories[this.props.type].includeTrash));
-    
+
     if (projectsKeys && projectsKeys[0]) {
       let projects = Object.fromEntries(projectsKeys.map(id => [id, this.props.visibleProjects[id]]));
       let data = this.categories[this.props.type].data;
-      let fixed = this.categories[this.props.type].fixed;  
-      let defaultSort = this.categories[this.props.type].defaultSort;  
+      let fixed = this.categories[this.props.type].fixed;
+      let defaultSort = this.categories[this.props.type].defaultSort;
 
       this.setState({ projects, data, fixed, defaultSort, loading: false });
     }
@@ -137,11 +138,7 @@ class SelectionBase extends React.Component {
   render() {
     if (this.state.loading) return <div></div>;
 
-    return (
-      <div>
-        <Table projects={this.state.projects} data={this.state.data} fixed={this.state.fixed} defaultSort={this.state.defaultSort} authUser={this.props.authUser}/>
-      </div>
-    );
+    return <Table projects={this.state.projects} data={this.state.data} fixed={this.state.fixed} defaultSort={this.state.defaultSort} authUser={this.props.authUser} name={this.props.type} />
   }
 }
 
@@ -170,14 +167,17 @@ class Selection extends React.Component {
     }
     return (
       <div>
-        <Sidebar width={width} authUser={this.props.authUser} />
-        <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgb(245, 246, 250)" }}>
-          <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase type="myProjects" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase type="sharedWithMe" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase type="recent" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-          <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase type="trash" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+        <TopBar notifs={7} />
+        <div>
+          <Sidebar width={width} authUser={this.props.authUser} />
+          <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgba(0, 0, 0, 0.04)" }}>
+            <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+            <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+            <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase type="myProjects" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+            <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase type="sharedWithMe" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+            <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase type="recent" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+            <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase type="trash" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          </div>
         </div>
       </div>
     );
