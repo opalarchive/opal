@@ -2,9 +2,66 @@ import React from 'react';
 
 import * as ROUTES from '../../Constants/routes';
 
-import { TableContainer, Table, TableHead, TableCell, TableRow, Paper, TableBody, Checkbox, Toolbar, Typography, Tooltip, IconButton, makeStyles, lighten, TableSortLabel } from '@material-ui/core';
+import { TableContainer, Table, TableHead, TableCell, TableRow, Paper, TableBody, Checkbox, Toolbar, Typography, Tooltip, IconButton, makeStyles, lighten, TableSortLabel, darken } from '@material-ui/core';
 import { Filter, Trash2 } from 'react-feather';
 import { Link } from 'react-router-dom';
+
+const camelToTitle = (string) => {
+  let result = string.replace(/([A-Z])/g, " $1");
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}
+
+const formatTime = time => {
+  let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  let date = new Date(time);
+  let now = new Date();
+
+  if (now.getTime() > date.getTime() + 86400000) {
+    return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+  }
+  if (now.getTime() < date.getTime()) {
+    return 'Hello time traveler! ^-^';
+  }
+
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+
+  if (minutes === 0) {
+    if (hours % 12 === 0) {
+      return '12:00 ' + (hours === 0 ? 'AM' : 'PM');
+    }
+    return (hours % 12) + ':00' + (hours < 12 ? 'AM' : 'PM');
+  }
+  if (hours % 12 === 0) {
+    return '12:' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
+  }
+  return (hours % 12) + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
+}
+
+const getDataPoint = (proj, dataPoint, username) => {
+  switch (dataPoint) {
+    case 'name':
+      return proj.name;
+    case 'owner':
+      return proj.owner;
+    case 'lastModified':
+      return Math.max(...Object.values(proj.editors).map(info => info.lastEdit));
+    case 'shareDate':
+      return proj.editors[username].shareDate;
+    case 'lastModifiedByMe':
+      return proj.editors[username].lastEdit;
+    default:
+      return null
+  }
+}
+
+const formatData = data => {
+  if (typeof data === 'number') {
+    return formatTime(data);
+  }
+  return data;
+}
 
 const toolbarStyles = makeStyles((theme) => ({
   root: {
@@ -23,7 +80,6 @@ const toolbarStyles = makeStyles((theme) => ({
     flex: '1 1 100%',
   },
 }));
-
 
 const ProjectToolbar = (props) => {
   const { selected } = props;
@@ -59,12 +115,49 @@ const ProjectToolbar = (props) => {
   );
 }
 
-const tableStyles = makeStyles((theme) => ({
+const rowStyles = makeStyles((theme) => ({
   link: {
     color: "black",
     textDecoration: "none",
+    '&:hover': {
+      color: darken(theme.palette.secondary.dark, 0.1)
+    }
   }
 }));
+
+const ProjectRow = (props) => {
+  const styles = rowStyles();
+  const { id, index, data, proj, selected, onRowClick, username } = props;
+  
+  const labelId = `project-table-checkbox-${index}`;
+
+  return (
+    <TableRow
+      hover
+      onClick={(event) => onRowClick(event, id)}
+      role="checkbox"
+      aria-checked={selected}
+      selected={selected}
+      key={id}
+      tabIndex={-1}
+    >
+      <TableCell padding="checkbox">
+        <Checkbox
+          checked={selected}
+          inputProps={{ 'aria-labelledby': labelId }}
+        />
+      </TableCell>
+      {data.map((dataPoint, index) =>
+        (index === 0 ?
+          <TableCell component="th" scope="row" id={labelId} padding="none" key={`${id}-${dataPoint}`}>
+            <Link className={styles.link} to={ROUTES.PROJECT_VIEW.replace(':id', id)}>{formatData(getDataPoint(proj, dataPoint, username))}</Link>
+          </TableCell>
+          : <TableCell align="right" key={`${id}-${dataPoint}`}>{formatData(getDataPoint(proj, dataPoint, username))}</TableCell>
+        ))}
+    </TableRow>
+  );
+}
+
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -78,63 +171,6 @@ class ProjectTable extends React.Component {
         direction: 'asc'
       }
     };
-
-    this.camelToTitle = (string) => {
-      let result = string.replace(/([A-Z])/g, " $1");
-      return result.charAt(0).toUpperCase() + result.slice(1);
-    }
-
-    this.formatTime = time => {
-      let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-      let date = new Date(time);
-      let now = new Date();
-
-      if (now.getTime() > date.getTime() + 86400000) {
-        return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
-      }
-      if (now.getTime() < date.getTime()) {
-        return 'Hello time traveler! ^-^';
-      }
-
-      let hours = date.getHours();
-      let minutes = date.getMinutes();
-
-      if (minutes === 0) {
-        if (hours % 12 === 0) {
-          return '12:00 ' + (hours === 0 ? 'AM' : 'PM');
-        }
-        return (hours % 12) + ':00' + (hours < 12 ? 'AM' : 'PM');
-      }
-      if (hours % 12 === 0) {
-        return '12:' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
-      }
-      return (hours % 12) + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + (hours < 12 ? 'AM' : 'PM');
-    }
-
-    this.getDataPoint = (proj, dataPoint) => {
-      switch (dataPoint) {
-        case 'name':
-          return proj.name;
-        case 'owner':
-          return proj.owner;
-        case 'lastModified':
-          return Math.max(...Object.values(proj.editors).map(info => info.lastEdit));
-        case 'shareDate':
-          return proj.editors[this.props.authUser.displayName].shareDate;
-        case 'lastModifiedByMe':
-          return proj.editors[this.props.authUser.displayName].lastEdit;
-        default:
-          return null
-      }
-    }
-
-    this.formatData = data => {
-      if (typeof data === 'number') {
-        return this.formatTime(data);
-      }
-      return data;
-    }
 
     this.onRowClick = (event, projID) => {
       event.preventDefault();
@@ -192,7 +228,7 @@ class ProjectTable extends React.Component {
 
     return (
       <Paper elevation={3}>
-        <ProjectToolbar selected={realSelected} name={this.camelToTitle(name)} />
+        <ProjectToolbar selected={realSelected} name={camelToTitle(name)} />
         <TableContainer>
           <Table>
             <TableHead>
@@ -214,14 +250,14 @@ class ProjectTable extends React.Component {
                     key={dataPoint}
                   >
                     {this.props.fixed ?
-                      this.camelToTitle(dataPoint)
+                      camelToTitle(dataPoint)
                       :
                       <TableSortLabel
                         active={this.state.sort.dataPoint === dataPoint}
                         direction={this.state.sort.dataPoint === dataPoint ? this.state.sort.direction : 'asc'}
                         onClick={(event) => this.onSortClick(event, dataPoint)}
                       >
-                        {this.camelToTitle(dataPoint)}
+                        {camelToTitle(dataPoint)}
                       </TableSortLabel>
                     }
                   </TableCell>
@@ -229,36 +265,9 @@ class ProjectTable extends React.Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.sortedProjectKeys.map((id, index) => {
-                let proj = projects[id];
-                const labelId = `project-table-checkbox-${index}`;
-
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => this.onRowClick(event, id)}
-                    role="checkbox"
-                    aria-checked={!!this.state.selected[id]}
-                    selected={!!this.state.selected[id]}
-                    key={id}
-                    tabIndex={-1}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={!!this.state.selected[id]}
-                        inputProps={{ 'aria-labelledby': labelId }}
-                      />
-                    </TableCell>
-                    {data.map((dataPoint, index) =>
-                      (index === 0 ?
-                        <TableCell component="th" scope="row" id={labelId} padding="none" key={`${id}-${dataPoint}`}>
-                          <Link to={ROUTES.PROJECT_VIEW.replace(':id', id)}>{this.formatData(this.getDataPoint(proj, dataPoint))}</Link>
-                        </TableCell>
-                        : <TableCell align="right" key={`${id}-${dataPoint}`}>{this.formatData(this.getDataPoint(proj, dataPoint))}</TableCell>
-                      ))}
-                  </TableRow>
-                );
-              })}
+              {this.state.sortedProjectKeys.map((id, index) =>
+                <ProjectRow id={id} index={index} data={data} proj={projects[id]} selected={!!this.state.selected[id]} onRowClick={this.onRowClick} username={this.props.authUser.displayName} />
+              )}
             </TableBody>
           </Table>
         </TableContainer>
