@@ -66,7 +66,7 @@ export const getDataPoint = (proj, dataPoint, username) => {
     case "name":
       return proj.name;
     case "owner":
-      return proj.owner;
+      return proj.owner === username ? 'me' : proj.owner;
     case "lastModified":
       return Math.max(
         ...Object.values(proj.editors).map((info) => info.lastEdit)
