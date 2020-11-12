@@ -60,6 +60,30 @@ export const getVisibleProjects = async (uid) => {
   return projObject;
 };
 
+export const deleteProject = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/delete-project?uuid=${uuid}&authuid=${authuid}`);
+
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
+export const shareProject = async (username, uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/share-project?uuid=${uuid}&authuid=${authuid}&username=${username}`);
+
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
+export const changeName = async (name, uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/change-project-name?uuid=${uuid}&authuid=${authuid}&projectname=${name}`);
+  
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
 export const getProjectPrivate = async (uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
   let projObject = {};
@@ -69,7 +93,7 @@ export const getProjectPrivate = async (uuid, authuid) => {
   await attempt.text().then(text => {
     try {
       projObject = JSON.parse(text);
-    } catch (e) { 
+    } catch (e) {
       projObject = {};
     }
   });

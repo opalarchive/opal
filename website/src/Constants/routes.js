@@ -12,3 +12,4 @@ export const PROJECT_MY_PROJECTS = '/project/my-projects';
 export const PROJECT_SHARED_WITH_ME = '/project/shared-with-me';
 export const PROJECT_RECENT = '/project/recent';
 export const PROJECT_TRASH = '/project/trash';
+export const PROJECT_SHARE = '/project/share';
