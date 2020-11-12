@@ -18,7 +18,7 @@ import {
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
-import {deleteProject, shareProject, changeName} from "../../../Firebase";
+import {deleteProject, shareProject, changeName, restoreProject} from "../../../Firebase";
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -146,6 +146,9 @@ class ProjectTable extends React.Component {
       case 'change-name':
         const tryToChange = await changeName(this.state.modal.input, this.state.modal.activeProject, this.props.authUser.uid);
         break;
+      case 'restore':
+        const tryToRestore = await restoreProject(this.state.modal.activeProject, this.props.authUser.uid);
+        break;
       default:
         console.log("Undefined");
     }
@@ -221,7 +224,6 @@ class ProjectTable extends React.Component {
                     )}
                   </TableCell>
                 ))}
-                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -235,6 +237,7 @@ class ProjectTable extends React.Component {
                   onRowClick={this.onRowClick}
                   username={this.props.authUser.displayName}
                   showModal={this.showModal}
+                  name={name}
                 />
               ))}
             </TableBody>

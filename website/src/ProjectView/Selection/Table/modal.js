@@ -1,6 +1,7 @@
 import React from 'react';
 import {Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button} from "@material-ui/core";
 import {Trash2, UserPlus, Edit2} from "react-feather";
+import { RestoreFromTrash } from '@material-ui/icons';
 
 export default function Modal (props) {
   switch (props.type) {
@@ -33,7 +34,7 @@ export default function Modal (props) {
             <Button onClick={props.onClose} variant="outlined" color="primary">
               Cancel
             </Button>
-            <Button onClick={props.modalSuccess} startIcon={<UserPlus />} color="primary" variant="contained" color="primary">
+            <Button onClick={props.modalSuccess} startIcon={<UserPlus />} color="primary" variant="contained" autoFocus>
               Share
             </Button>
           </DialogActions>
@@ -91,8 +92,32 @@ export default function Modal (props) {
             <Button onClick={props.onClose} variant="outlined" color="primary">
               Cancel
             </Button>
-            <Button onClick={props.modalSuccess} startIcon={<Edit2 />} color="primary" variant="contained" color="primary">
+            <Button onClick={props.modalSuccess} startIcon={<Edit2 />} color="primary" variant="contained" autoFocus>
               Change
+            </Button>
+          </DialogActions>
+        </Dialog>
+      );
+    case "restore":
+      return (
+        <Dialog
+          open={props.show}
+          onClose={props.onClose}
+          aria-labelledby="restore-dialog-title"
+          aria-describedby="restore-dialog-description"
+        >
+          <DialogTitle id="restore-dialog-title">Are you sure you want to restore this project?</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="delete-dialog-description">
+              IDK man.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={props.onClose} color="primary" variant="outlined">
+              Cancel
+            </Button>
+            <Button onClick={props.modalSuccess} startIcon={<RestoreFromTrash />} variant="contained" color="primary" autoFocus>
+              Restore
             </Button>
           </DialogActions>
         </Dialog>

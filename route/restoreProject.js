@@ -1,9 +1,8 @@
 const { db } = require('../helpers/firebaseSetup');
 
 module.exports = {
-  path: '/change-project-name',
+  path: '/restore-project',
   execute: async (req, res) => {
-    const projectname = req.query.projectname;
     const uuid = req.query.uuid;
     const authuid = req.query.authuid;
 
@@ -20,16 +19,10 @@ module.exports = {
       return;
     }
 
-    if (projectPublic.trashed) {
-      res.status(403).send('project-trashed');
-      return;
-    }
-
     const date = new Date();
-    const now = date.getTime();
-    await db.ref(`projectPublic/${uuid}/name`).set(projectname);
-    await db.ref(`projectPublic/${uuid}/editors/${authuid}/lastEdit`).set(now);
+    await db.ref(`projectPublic/${uuid}/trashed`).set(false);
+    await db.ref(`projectPublic/${uuid}/editors/${authuid}/lastEdit`).set(date.getTime());
 
-    res.status(201).send(`Success. Project is now updated to have name ${projectname}.`);
+    res.status(201).send(`Success. Project is now restored.`);
   }
 }

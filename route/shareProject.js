@@ -31,6 +31,11 @@ module.exports = {
       return;
     }
 
+    if (projectPublic.trashed) {
+      res.status(403).send('project-trashed');
+      return;
+    }
+
     const date = new Date();
     const now = date.getTime();
     await db.ref(`projectPublic/${uuid}/editors/${userinfo.uid}`).set({

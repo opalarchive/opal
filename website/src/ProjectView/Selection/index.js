@@ -40,7 +40,7 @@ class SelectionBase extends React.Component {
         includeShared: false,
         includeAllStarred: true,
         includeTrash: false,
-        data: ['name', 'owner', 'lastModified'],
+        data: ['name', 'owner', 'lastModified', 'actions'],
         fixed: false,
         defaultSort: {
           dataPoint: 'name',
@@ -52,7 +52,7 @@ class SelectionBase extends React.Component {
         includeShared: false,
         includeAllStarred: false,
         includeTrash: false,
-        data: ['name', 'owner', 'lastModified'],
+        data: ['name', 'owner', 'lastModified', 'actions'],
         fixed: false,
         defaultSort: {
           dataPoint: 'name',
@@ -76,7 +76,7 @@ class SelectionBase extends React.Component {
         includeShared: true,
         includeAllStarred: false,
         includeTrash: false,
-        data: ['name', 'owner', 'lastModifiedByMe'],
+        data: ['name', 'owner', 'lastModifiedByMe', 'actions'],
         fixed: true,
         defaultSort: {
           dataPoint: 'lastModifiedByMe',
@@ -88,7 +88,7 @@ class SelectionBase extends React.Component {
         includeShared: false,
         includeAllStarred: false,
         includeTrash: true,                          // trash is only trash by me (i.e. only owner can trash)
-        data: ['name', 'owner', 'lastModified'],     // last modified = trash date for obvious reasons
+        data: ['name', 'owner', 'lastModified', 'actions'],     // last modified = trash date for obvious reasons
         fixed: false,                                // (disable editing when trashed)
         defaultSort: {
           dataPoint: 'lastModified',

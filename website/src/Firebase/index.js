@@ -78,7 +78,15 @@ export const shareProject = async (username, uuid, authuid) => {
 
 export const changeName = async (name, uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/change-project-name?uuid=${uuid}&authuid=${authuid}&projectname=${name}`);
-  
+
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
+export const restoreProject = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/restore-project?uuid=${uuid}&authuid=${authuid}`);
+
   if (attempt.status !== 201) return attempt.text();
 
   return {success: true};
