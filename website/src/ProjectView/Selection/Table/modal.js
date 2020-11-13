@@ -1,9 +1,17 @@
-import React from 'react';
-import {Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button} from "@material-ui/core";
-import {Trash2, UserPlus, Edit2} from "react-feather";
-import { RestoreFromTrash } from '@material-ui/icons';
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  TextField,
+  DialogActions,
+  Button
+} from "@material-ui/core";
+import { Trash2, UserPlus, Edit2, Star } from "react-feather";
+import { RestoreFromTrash } from "@material-ui/icons";
 
-export default function Modal (props) {
+export default function Modal(props) {
   switch (props.type) {
     case "share":
       return (
@@ -34,7 +42,13 @@ export default function Modal (props) {
             <Button onClick={props.onClose} variant="outlined" color="primary">
               Cancel
             </Button>
-            <Button onClick={props.modalSuccess} startIcon={<UserPlus />} color="primary" variant="contained" autoFocus>
+            <Button
+              onClick={props.modalSuccess}
+              startIcon={<UserPlus />}
+              color="primary"
+              variant="contained"
+              autoFocus
+            >
               Share
             </Button>
           </DialogActions>
@@ -48,17 +62,30 @@ export default function Modal (props) {
           aria-labelledby="delete-dialog-title"
           aria-describedby="delete-dialog-description"
         >
-          <DialogTitle id="delete-dialog-title">Are you sure you want to delete this project?</DialogTitle>
+          <DialogTitle id="delete-dialog-title">
+            Are you sure you want to delete this project?
+          </DialogTitle>
           <DialogContent>
             <DialogContentText id="delete-dialog-description">
-              Deleting this project will move it to your trash, where you can choose to permanently delete it or restore it.
+              Deleting this project will move it to your trash, where you can
+              choose to permanently delete it or restore it.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={props.onClose} variant="contained" color="primary" autoFocus>
+            <Button
+              onClick={props.onClose}
+              variant="contained"
+              color="primary"
+              autoFocus
+            >
               Cancel
             </Button>
-            <Button onClick={props.modalSuccess} startIcon={<Trash2 />} color="primary" variant="outlined">
+            <Button
+              onClick={props.modalSuccess}
+              startIcon={<Trash2 />}
+              color="primary"
+              variant="outlined"
+            >
               Delete
             </Button>
           </DialogActions>
@@ -92,7 +119,13 @@ export default function Modal (props) {
             <Button onClick={props.onClose} variant="outlined" color="primary">
               Cancel
             </Button>
-            <Button onClick={props.modalSuccess} startIcon={<Edit2 />} color="primary" variant="contained" autoFocus>
+            <Button
+              onClick={props.modalSuccess}
+              startIcon={<Edit2 />}
+              color="primary"
+              variant="contained"
+              autoFocus
+            >
               Change
             </Button>
           </DialogActions>
@@ -106,9 +139,11 @@ export default function Modal (props) {
           aria-labelledby="restore-dialog-title"
           aria-describedby="restore-dialog-description"
         >
-          <DialogTitle id="restore-dialog-title">Are you sure you want to restore this project?</DialogTitle>
+          <DialogTitle id="restore-dialog-title">
+            Are you sure you want to restore this project?
+          </DialogTitle>
           <DialogContent>
-            <DialogContentText id="delete-dialog-description">
+            <DialogContentText id="restore-dialog-description">
               IDK man.
             </DialogContentText>
           </DialogContent>
@@ -116,13 +151,24 @@ export default function Modal (props) {
             <Button onClick={props.onClose} color="primary" variant="outlined">
               Cancel
             </Button>
-            <Button onClick={props.modalSuccess} startIcon={<RestoreFromTrash />} variant="contained" color="primary" autoFocus>
+            <Button
+              onClick={props.modalSuccess}
+              startIcon={<RestoreFromTrash />}
+              variant="contained"
+              color="primary"
+              autoFocus
+            >
               Restore
             </Button>
           </DialogActions>
         </Dialog>
       );
+    case "star":
+      if (props.show) props.modalSuccess({preventDefault: () => {}});
+      return (
+        <></>
+      );
     default:
       return <h1>BLARGH</h1>;
   }
-};
+}

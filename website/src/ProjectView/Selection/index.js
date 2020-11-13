@@ -1,17 +1,16 @@
-import React from 'react';
+import React from "react";
 
-import * as ROUTES from '../../Constants/routes';
+import * as ROUTES from "../../Constants/routes";
 
-import { Route } from 'react-router-dom';
+import { Route } from "react-router-dom";
 
-import Sidebar from './Sidebar';
-import Loading from '../../Loading';
-import Table from './Table';
+import Sidebar from "./Sidebar";
+import Loading from "../../Loading";
+import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
-import TopBar from './TopBar';
+import TopBar from "./TopBar";
 
 class SelectionBase extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -24,15 +23,15 @@ class SelectionBase extends React.Component {
     };
 
     /*
-    * + denotes union
-    * starred is a subset of my projects + shared
-    *
-    * priority = my projects + starred, sort by name
-    * my projects = my projects, sort by name
-    * shared = shared, sort by share date
-    * recent = my projects + shared, sort by last modified date (perhaps only by me)
-    * trash = my projects trash, sort by trash date (same as last modified date)
-    */
+     * + denotes union
+     * starred is a subset of my projects + shared
+     *
+     * priority = my projects + starred, sort by name
+     * my projects = my projects, sort by name
+     * shared = shared, sort by share date
+     * recent = my projects + shared, sort by last modified date (perhaps only by me)
+     * trash = my projects trash, sort by trash date (same as last modified date)
+     */
 
     this.categories = {
       priority: {
@@ -40,11 +39,11 @@ class SelectionBase extends React.Component {
         includeShared: false,
         includeAllStarred: true,
         includeTrash: false,
-        data: ['name', 'owner', 'lastModified', 'actions'],
+        data: ["name", "owner", "lastModified", "actions"],
         fixed: false,
         defaultSort: {
-          dataPoint: 'name',
-          direction: 'asc'
+          dataPoint: "name",
+          direction: "asc"
         }
       },
       myProjects: {
@@ -52,11 +51,11 @@ class SelectionBase extends React.Component {
         includeShared: false,
         includeAllStarred: false,
         includeTrash: false,
-        data: ['name', 'owner', 'lastModified', 'actions'],
+        data: ["name", "owner", "lastModified", "actions"],
         fixed: false,
         defaultSort: {
-          dataPoint: 'name',
-          direction: 'asc'
+          dataPoint: "name",
+          direction: "asc"
         }
       },
       sharedWithMe: {
@@ -64,11 +63,11 @@ class SelectionBase extends React.Component {
         includeShared: true,
         includeAllStarred: false,
         includeTrash: false,
-        data: ['name', 'owner', 'shareDate'],    // owner = shared by in this case (unless we allow collaborator sharing?)
-        fixed: false,                            // owner is still better I think
+        data: ["name", "owner", "shareDate", "actions"], // owner = shared by in this case (unless we allow collaborator sharing?)
+        fixed: false, // owner is still better I think
         defaultSort: {
-          dataPoint: 'shareDate',
-          direction: 'desc'
+          dataPoint: "shareDate",
+          direction: "desc"
         }
       },
       recent: {
@@ -76,37 +75,43 @@ class SelectionBase extends React.Component {
         includeShared: true,
         includeAllStarred: false,
         includeTrash: false,
-        data: ['name', 'owner', 'lastModifiedByMe', 'actions'],
+        data: ["name", "owner", "lastModifiedByMe", "actions"],
         fixed: true,
         defaultSort: {
-          dataPoint: 'lastModifiedByMe',
-          direction: 'desc'
+          dataPoint: "lastModifiedByMe",
+          direction: "desc"
         }
       },
       trash: {
         includeMine: false,
         includeShared: false,
         includeAllStarred: false,
-        includeTrash: true,                          // trash is only trash by me (i.e. only owner can trash)
-        data: ['name', 'owner', 'lastModified', 'actions'],     // last modified = trash date for obvious reasons
-        fixed: false,                                // (disable editing when trashed)
+        includeTrash: true, // trash is only trash by me (i.e. only owner can trash)
+        data: ["name", "owner", "lastModified", "actions"], // last modified = trash date for obvious reasons
+        fixed: false, // (disable editing when trashed)
         defaultSort: {
-          dataPoint: 'lastModified',
-          direction: 'desc'
+          dataPoint: "lastModified",
+          direction: "desc"
         }
       }
     };
   }
 
   componentDidMount() {
-    let projectsKeys = Object.keys(this.props.visibleProjects).filter(id => this.isIncludable(this.props.visibleProjects[id],
-      this.categories[this.props.type].includeMine,
-      this.categories[this.props.type].includeShared,
-      this.categories[this.props.type].includeAllStarred,
-      this.categories[this.props.type].includeTrash));
+    let projectsKeys = Object.keys(this.props.visibleProjects).filter((id) =>
+      this.isIncludable(
+        this.props.visibleProjects[id],
+        this.categories[this.props.type].includeMine,
+        this.categories[this.props.type].includeShared,
+        this.categories[this.props.type].includeAllStarred,
+        this.categories[this.props.type].includeTrash
+      )
+    );
 
     if (projectsKeys && projectsKeys[0]) {
-      let projects = Object.fromEntries(projectsKeys.map(id => [id, this.props.visibleProjects[id]]));
+      let projects = Object.fromEntries(
+        projectsKeys.map((id) => [id, this.props.visibleProjects[id]])
+      );
       let data = this.categories[this.props.type].data;
       let fixed = this.categories[this.props.type].fixed;
       let defaultSort = this.categories[this.props.type].defaultSort;
@@ -116,19 +121,30 @@ class SelectionBase extends React.Component {
     this.setState({ loading: false });
   }
 
-  isIncludable(project, includeMine, includeShared, includeAllStarred, includeTrash) {
+  isIncludable(
+    project,
+    includeMine,
+    includeShared,
+    includeAllStarred,
+    includeTrash
+  ) {
     if (project.trashed) {
       return includeTrash;
     }
-    if (project.editors[this.props.authUser.displayName].starred && includeAllStarred) {
+    if (
+      project.editors[this.props.authUser.displayName].starred &&
+      includeAllStarred
+    ) {
       return true;
     }
     if (project.owner === this.props.authUser.displayName) {
       if (includeMine) {
         return true;
       }
-    }
-    else if (Object.keys(project.editors).includes(this.props.authUser.displayName) && includeShared) {
+    } else if (
+      Object.keys(project.editors).includes(this.props.authUser.displayName) &&
+      includeShared
+    ) {
       return true;
     }
 
@@ -138,7 +154,17 @@ class SelectionBase extends React.Component {
   render() {
     if (this.state.loading) return <div></div>;
 
-    return <Table projects={this.state.projects} data={this.state.data} fixed={this.state.fixed} defaultSort={this.state.defaultSort} authUser={this.props.authUser} name={this.props.type} refreshProjects={this.props.refreshProjects} />
+    return (
+      <Table
+        projects={this.state.projects}
+        data={this.state.data}
+        fixed={this.state.fixed}
+        defaultSort={this.state.defaultSort}
+        authUser={this.props.authUser}
+        name={this.props.type}
+        refreshProjects={this.props.refreshProjects}
+      />
+    );
   }
 }
 
@@ -165,20 +191,93 @@ class Selection extends React.Component {
   render() {
     let width = 15;
     if (this.state.loading) {
-      return <Loading background="white" />
+      return <Loading background="white" />;
     }
     return (
       <div>
         <TopBar notifs={7} />
         <div>
           <Sidebar width={width} authUser={this.props.authUser} />
-          <div style={{ marginLeft: `${width}rem`, height: "100vh", padding: "1rem", backgroundColor: "rgba(0, 0, 0, 0.04)" }}>
-            <Route exact path={ROUTES.PROJECT} component={() => <SelectionBase refreshProjects={this.setProjects} type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-            <Route exact path={ROUTES.PROJECT_PRIORITY} component={() => <SelectionBase refreshProjects={this.setProjects} type="priority" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-            <Route exact path={ROUTES.PROJECT_MY_PROJECTS} component={() => <SelectionBase refreshProjects={this.setProjects} type="myProjects" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-            <Route exact path={ROUTES.PROJECT_SHARED_WITH_ME} component={() => <SelectionBase refreshProjects={this.setProjects} type="sharedWithMe" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-            <Route exact path={ROUTES.PROJECT_RECENT} component={() => <SelectionBase refreshProjects={this.setProjects} type="recent" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
-            <Route exact path={ROUTES.PROJECT_TRASH} component={() => <SelectionBase refreshProjects={this.setProjects} type="trash" visibleProjects={this.state.visibleProjects} authUser={this.props.authUser} />} />
+          <div
+            style={{
+              marginLeft: `${width}rem`,
+              height: "100vh",
+              padding: "1rem",
+              backgroundColor: "rgba(0, 0, 0, 0.04)"
+            }}
+          >
+            <Route
+              exact
+              path={ROUTES.PROJECT}
+              component={() => (
+                <SelectionBase
+                  refreshProjects={this.setProjects}
+                  type="priority"
+                  visibleProjects={this.state.visibleProjects}
+                  authUser={this.props.authUser}
+                />
+              )}
+            />
+            <Route
+              exact
+              path={ROUTES.PROJECT_PRIORITY}
+              component={() => (
+                <SelectionBase
+                  refreshProjects={this.setProjects}
+                  type="priority"
+                  visibleProjects={this.state.visibleProjects}
+                  authUser={this.props.authUser}
+                />
+              )}
+            />
+            <Route
+              exact
+              path={ROUTES.PROJECT_MY_PROJECTS}
+              component={() => (
+                <SelectionBase
+                  refreshProjects={this.setProjects}
+                  type="myProjects"
+                  visibleProjects={this.state.visibleProjects}
+                  authUser={this.props.authUser}
+                />
+              )}
+            />
+            <Route
+              exact
+              path={ROUTES.PROJECT_SHARED_WITH_ME}
+              component={() => (
+                <SelectionBase
+                  refreshProjects={this.setProjects}
+                  type="sharedWithMe"
+                  visibleProjects={this.state.visibleProjects}
+                  authUser={this.props.authUser}
+                />
+              )}
+            />
+            <Route
+              exact
+              path={ROUTES.PROJECT_RECENT}
+              component={() => (
+                <SelectionBase
+                  refreshProjects={this.setProjects}
+                  type="recent"
+                  visibleProjects={this.state.visibleProjects}
+                  authUser={this.props.authUser}
+                />
+              )}
+            />
+            <Route
+              exact
+              path={ROUTES.PROJECT_TRASH}
+              component={() => (
+                <SelectionBase
+                  refreshProjects={this.setProjects}
+                  type="trash"
+                  visibleProjects={this.state.visibleProjects}
+                  authUser={this.props.authUser}
+                />
+              )}
+            />
           </div>
         </div>
       </div>

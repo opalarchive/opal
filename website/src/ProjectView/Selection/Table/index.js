@@ -11,14 +11,17 @@ import {
   Checkbox,
   TableSortLabel
 } from "@material-ui/core";
-import {
-  camelToTitle,
-  getDataPoint
-} from "./constants.js";
+import { camelToTitle, getDataPoint } from "./constants.js";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
-import {deleteProject, shareProject, changeName, restoreProject} from "../../../Firebase";
+import {
+  deleteProject,
+  shareProject,
+  changeName,
+  restoreProject,
+  starProject
+} from "../../../Firebase";
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -124,36 +127,57 @@ class ProjectTable extends React.Component {
   updateModalInput(event) {
     event.preventDefault();
 
-    this.setState({modal: {...this.state.modal, input: event.target.value}});
+    this.setState({
+      modal: { ...this.state.modal, input: event.target.value }
+    });
   }
 
   closeModal(event) {
     event.preventDefault();
 
-    this.setState({ modal: { ...this.state.modal, show: !this.state.modal.show }});
+    this.setState({
+      modal: { ...this.state.modal, show: !this.state.modal.show }
+    });
   }
 
   async modalSuccess(event) {
     event.preventDefault();
 
-    switch(this.state.modal.type) {
-      case 'delete':
-        const tryToDelete = await deleteProject(this.state.modal.activeProject, this.props.authUser.uid);
+    switch (this.state.modal.type) {
+      case "delete":
+        const tryToDelete = await deleteProject(
+          this.state.modal.activeProject,
+          this.props.authUser.uid
+        );
         break;
-      case 'share':
-        const tryToShare = await shareProject(this.state.modal.input, this.state.modal.activeProject, this.props.authUser.uid);
+      case "share":
+        const tryToShare = await shareProject(
+          this.state.modal.input,
+          this.state.modal.activeProject,
+          this.props.authUser.uid
+        );
         break;
-      case 'change-name':
-        const tryToChange = await changeName(this.state.modal.input, this.state.modal.activeProject, this.props.authUser.uid);
+      case "change-name":
+        const tryToChange = await changeName(
+          this.state.modal.input,
+          this.state.modal.activeProject,
+          this.props.authUser.uid
+        );
         break;
-      case 'restore':
-        const tryToRestore = await restoreProject(this.state.modal.activeProject, this.props.authUser.uid);
+      case "restore":
+        const tryToRestore = await restoreProject(
+          this.state.modal.activeProject,
+          this.props.authUser.uid
+        );
+        break;
+      case "star":
+        const tryToStar = await starProject(this.state.modal.activeProject, this.props.authUser.uid);
         break;
       default:
         console.log("Undefined");
     }
 
-    this.closeModal(event);
+    this.closeModal({preventDefault: () => {}});
     this.props.refreshProjects();
   }
 
@@ -238,6 +262,7 @@ class ProjectTable extends React.Component {
                   username={this.props.authUser.displayName}
                   showModal={this.showModal}
                   name={name}
+                  key={`project-row-${id}`}
                 />
               ))}
             </TableBody>

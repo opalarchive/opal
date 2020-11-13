@@ -28,7 +28,12 @@ module.exports = {
 
     // change all the private uids to usernames
     Object.keys(publico).forEach(key => {
+      publico[key].starred = publico[key].editors[authuid].starred;
       publico[key].editors = Object.fromEntries(Object.entries(publico[key].editors).map(editor => [idToUsername(editor[0]), editor[1]]));
+      Object.keys(publico[key].editors).forEach(editorKey => {
+        if (publico[key].owner === authuid) publico[key].editors[editorKey] = { shareDate: publico[key].editors[editorKey].shareDate, lastEdit: publico[key].editors[editorKey].lastEdit };
+        else publico[key].editors[editorKey] = { lastEdit: publico[key].editors[editorKey].lastEdit };
+      });
       publico[key].owner = idToUsername(publico[key].owner);
     });
 

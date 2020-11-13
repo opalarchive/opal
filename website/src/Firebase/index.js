@@ -92,6 +92,14 @@ export const restoreProject = async (uuid, authuid) => {
   return {success: true};
 }
 
+export const starProject = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/star-project?uuid=${uuid}&authuid=${authuid}`);
+
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
 export const getProjectPrivate = async (uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
   let projObject = {};
