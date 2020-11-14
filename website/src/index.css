@@ -12,30 +12,29 @@ code {
     monospace;
 }
 
-.box {
-  border: 1px solid rgb(218, 220, 224);
-}
-
-.boxl {
-  border-left: 1px solid rgb(218, 220, 224);
-}
-.boxt {
-  border-top: 1px solid rgb(218, 220, 224);
-}
-.boxr {
-  border-right: 1px solid rgb(218, 220, 224);
-}
-.boxb {
-  border-bottom: 1px solid rgb(218, 220, 224);
-}
-
-.float {
-  border: none;
-  box-shadow: 0 5px 15px 0 rgba(0,0,0,.1);
-}
-
 /* Triggered */
 
 a.MuiButton-containedSecondary:hover {
   color: rgb(0, 0, 0);
+}
+
+
+/* Fix default scrollbar styling */
+
+.vertical-border {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ScrollbarsCustom-TrackY {
+  z-index: 10011;
+  top: 0 !important;
+  height: 100% !important;
+}
+
+.ScrollbarsCustom-TrackX {
+  z-index: 10011;
+  left: 0 !important;
+  width: 100% !important;
 }

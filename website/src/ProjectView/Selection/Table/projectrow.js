@@ -9,8 +9,7 @@ import {
   Tooltip,
   IconButton
 } from "@material-ui/core";
-import { RestoreFromTrash } from "@material-ui/icons";
-import { UserPlus, Trash2, Edit, Star } from "react-feather";
+import { UserPlus, Trash2, Edit, Star, CornerLeftUp } from "react-feather";
 import { Link } from "react-router-dom";
 import { rowStyles, getDataPoint, formatData } from "./constants";
 
@@ -69,6 +68,7 @@ export default function ProjectRow(props) {
                       onClick={(event) =>
                         props.showModal(event, "share", props.id)
                       }
+                      size="small"
                     >
                       <UserPlus />
                     </IconButton>
@@ -79,6 +79,7 @@ export default function ProjectRow(props) {
                       onClick={(event) =>
                         props.showModal(event, "delete", props.id)
                       }
+                      size="small"
                     >
                       <Trash2 />
                     </IconButton>
@@ -89,6 +90,7 @@ export default function ProjectRow(props) {
                       onClick={(event) =>
                         props.showModal(event, "change-name", props.id)
                       }
+                      size="small"
                     >
                       <Edit />
                     </IconButton>
@@ -99,6 +101,7 @@ export default function ProjectRow(props) {
                       onClick={(event) =>
                         props.showModal(event, "star", props.id)
                       }
+                      size="small"
                     >
                       {proj.starred ? <Star color='#FFD700' fill='#FFD700' /> : <Star />}
                     </IconButton>
@@ -112,8 +115,9 @@ export default function ProjectRow(props) {
                       onClick={(event) =>
                         props.showModal(event, "restore", props.id)
                       }
+                      size="small"
                     >
-                      <RestoreFromTrash />
+                      <CornerLeftUp />
                     </IconButton>
                   </Tooltip>
 
@@ -123,6 +127,7 @@ export default function ProjectRow(props) {
                       onClick={(event) =>
                         props.showModal(event, "star", props.id)
                       }
+                      size="small"
                     >
                       {proj.starred ? <Star color='#FFD700' fill='#FFD700' /> : <Star />}
                     </IconButton>
@@ -134,6 +139,7 @@ export default function ProjectRow(props) {
                 <IconButton
                   aria-label="star"
                   onClick={(event) => props.showModal(event, "star", props.id)}
+                  size="small"
                 >
                   {proj.starred ? <Star color='#FFD700' fill='#FFD700' /> : <Star />}
                 </IconButton>

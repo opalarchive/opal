@@ -112,5 +112,9 @@ export const rowStyles = makeStyles((theme) => ({
     "&:hover": {
       color: darken(theme.palette.secondary.dark, 0.1)
     }
+  },
+  icon: {
+    paddingTop: 0,
+    paddingBottom: 0,
   }
 }));
