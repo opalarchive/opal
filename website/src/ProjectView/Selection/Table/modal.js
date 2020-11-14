@@ -8,7 +8,7 @@ import {
   DialogActions,
   Button
 } from "@material-ui/core";
-import { Trash2, UserPlus, Edit2, Star, CornerLeftUp } from "react-feather";
+import { Trash2, UserPlus, Edit2, CornerLeftUp } from "react-feather";
 
 export default function Modal(props) {
   switch (props.type) {

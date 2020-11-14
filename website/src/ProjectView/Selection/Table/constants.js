@@ -1,3 +1,4 @@
+import React from 'react';
 import { makeStyles, lighten, darken } from "@material-ui/core";
 
 export const camelToTitle = (string) => {
@@ -105,7 +106,7 @@ export const toolbarStyles = makeStyles((theme) => ({
   }
 }));
 
-export const rowStyles = makeStyles((theme) => ({
+export const rowStyles = (theme) => ({
   link: {
     color: "black",
     textDecoration: "none",
@@ -117,4 +118,20 @@ export const rowStyles = makeStyles((theme) => ({
     paddingTop: 0,
     paddingBottom: 0,
   }
-}));
+});
+
+export const IfDisplay = props => {
+  if (props.condition) {
+    return (
+      <>
+        {props.children}
+      </>
+    );
+  }
+  else {
+    return (
+      <>
+      </>
+    );
+  }
+};
