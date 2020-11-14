@@ -68,6 +68,14 @@ export const deleteProject = async (uuid, authuid) => {
   return {success: true};
 }
 
+export const deleteForeverProject = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/delete-forever-project?uuid=${uuid}&authuid=${authuid}`);
+
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
 export const shareProject = async (username, uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/share-project?uuid=${uuid}&authuid=${authuid}&username=${username}`);
 

@@ -17,6 +17,7 @@ import ProjectRow from "./projectrow";
 import Modal from "./modal";
 import {
   deleteProject,
+  deleteForeverProject,
   shareProject,
   changeName,
   restoreProject,
@@ -146,6 +147,12 @@ class ProjectTable extends React.Component {
     switch (this.state.modal.type) {
       case "delete":
         const tryToDelete = await deleteProject(
+          this.state.modal.activeProject,
+          this.props.authUser.uid
+        );
+        break;
+      case "delete-forever":
+        const tryToDeleteForever = await deleteForeverProject(
           this.state.modal.activeProject,
           this.props.authUser.uid
         );

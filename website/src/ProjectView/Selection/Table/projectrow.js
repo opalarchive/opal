@@ -121,6 +121,18 @@ export default function ProjectRow(props) {
                     </IconButton>
                   </Tooltip>
 
+                  <Tooltip title="Delete Forever">
+                    <IconButton
+                      aria-label="delete-forever"
+                      onClick={(event) =>
+                        props.showModal(event, "delete-forever", props.id)
+                      }
+                      size="small"
+                    >
+                      <Trash2 />
+                    </IconButton>
+                  </Tooltip>
+
                   <Tooltip title="Star">
                     <IconButton
                       aria-label="star"

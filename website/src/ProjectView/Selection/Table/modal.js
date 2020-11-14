@@ -89,6 +89,42 @@ export default function Modal(props) {
           </DialogActions>
         </Dialog>
       );
+    case "delete-forever":
+      return (
+        <Dialog
+          open={props.show}
+          onClose={props.onClose}
+          aria-labelledby="delete-dialog-title"
+          aria-describedby="delete-dialog-description"
+        >
+          <DialogTitle id="delete-dialog-title">
+            Are you sure you want to permanently delete this project? You will not be able to restore it in the future.
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="delete-dialog-description">
+              Permanently deleting this project will remove it from your trash, and it won't be accessible again.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={props.onClose}
+              variant="contained"
+              color="primary"
+              autoFocus
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={props.modalSuccess}
+              startIcon={<Trash2 />}
+              color="primary"
+              variant="outlined"
+            >
+              Delete Permanently
+            </Button>
+          </DialogActions>
+        </Dialog>
+      );
     case "change-name":
       return (
         <Dialog
