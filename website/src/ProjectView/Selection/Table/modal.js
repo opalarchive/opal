@@ -21,11 +21,10 @@ export default function Modal(props) {
           aria-labelledby="share-dialog-title"
           aria-describedby="share-dialog-description"
         >
-          <DialogTitle id="share-dialog-title">Subscribe</DialogTitle>
+          <DialogTitle id="share-dialog-title">Share</DialogTitle>
           <DialogContent>
             <DialogContentText id="share-dialog-description">
-              To subscribe to this website, please enter your email address
-              here. We will send updates occasionally.
+              To share this project, please enter your desired collaborator's email address.
             </DialogContentText>
             <TextField
               autoFocus
@@ -99,11 +98,10 @@ export default function Modal(props) {
           aria-labelledby="change-name-dialog-title"
           aria-describedby="change-name-dialog-description"
         >
-          <DialogTitle id="change-name-dialog-title">Subscribe</DialogTitle>
+          <DialogTitle id="change-name-dialog-title">Rename</DialogTitle>
           <DialogContent>
             <DialogContentText id="change-name-dialog-description">
-              To subscribe to this website, please enter your email address
-              here. We will send updates occasionally.
+              Enter a new name for your project.
             </DialogContentText>
             <TextField
               autoFocus
