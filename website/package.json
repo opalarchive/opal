@@ -14,6 +14,7 @@
     "react-feather": "^2.0.8",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.4",
+    "react-scrollbars-custom": "^4.0.25",
     "recompose": "^0.30.0"
   },
   "scripts": {
