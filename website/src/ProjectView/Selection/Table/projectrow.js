@@ -6,9 +6,6 @@ import {
   TableRow,
   TableCell,
   Checkbox,
-  Tooltip,
-  IconButton,
-  Button,
   Menu,
   MenuItem,
   ListItemIcon,
@@ -81,7 +78,7 @@ class ProjectRow extends React.Component {
   }
 
   render() {
-    const { id, index, data, proj, selected, onRowClick, username, showModal, classes } = this.props;
+    const { id, index, data, proj, selected, onRowClick, username, classes } = this.props;
     const { contextShowing, mouseX, mouseY } = this.state;
     const { star, share, edit, deleteProject, restore, deleteForever } = this.state.actions;
 

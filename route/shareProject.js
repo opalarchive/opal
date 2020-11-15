@@ -1,4 +1,5 @@
 const { db } = require('../helpers/firebaseSetup');
+const sendEmail = require('../helpers/emailSetup');
 
 module.exports = {
   path: '/share-project',
@@ -44,6 +45,18 @@ module.exports = {
       starred: false
     });
     await db.ref(`projectPublic/${uuid}/editors/${authuid}/lastEdit`).set(now);
+
+    const ownerUsername = await db.ref(`userInformation/${authuid}/username`).once('value').then(snapshot => snapshot.val());
+    await sendEmail({
+      email: userinfo.email,
+      subject: `${projectPublic.name} was shared with you by ${ownerUsername}, ${username}`,
+      content: `Hello ${username},<br /><br />You were invited to <a href="/project/view/${uuid}">${projectPublic.name}</a> by the owner, ${ownerUsername}. We hope you enjoy proposing problems and our system!<br /><br />Sincerely,<br />The Math Olympaid Team`
+    });
+
+    let currentNotifications = await db.ref(`userInformation/${userinfo.uid}/notifications`).once('value').then(snapshot => snapshot.val()) || {};
+    currentNotifications = Object.keys(currentNotifications).map(index => currentNotifications[index]) || [];
+    currentNotifications.push({ content: `${ownerUsername} has shared <a href="/project/view/${uuid}">${projectPublic.name}</a> with you!`, timestamp: now, link: `/project/view/${uuid}`, read: false, title: `New Project Shared!` });
+    await db.ref(`userInformation/${userinfo.uid}/notifications`).set(currentNotifications);
 
     res.status(201).send(`Success. Project is now shared with ${username}.`);
   }

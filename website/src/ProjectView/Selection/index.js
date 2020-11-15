@@ -8,7 +8,7 @@ import Scrollbar from "react-scrollbars-custom";
 import Sidebar from "./Sidebar";
 import Loading from "../../Loading";
 import Table from "./Table";
-import { getVisibleProjects } from "../../Firebase";
+import { getVisibleProjects, getNotifications } from "../../Firebase";
 import TopBar from "./TopBar";
 
 class SelectionBase extends React.Component {
@@ -174,10 +174,13 @@ class Selection extends React.Component {
     super(props);
     this.state = {
       visibleProjects: {},
-      loading: true
+      loading: true,
+      notifsLoading: true,
+      notifications: []
     };
 
     this.setProjects = this.setProjects.bind(this);
+    this.setNotifications = this.setNotifications.bind(this);
   }
 
   async setProjects() {
@@ -185,8 +188,14 @@ class Selection extends React.Component {
     this.setState({ visibleProjects, loading: false });
   }
 
+  async setNotifications() {
+    let notifications = await getNotifications(this.props.authUser.uid);
+    this.setState({ notifications, notifsLoading: false });
+  }
+
   componentDidMount() {
     this.setProjects();
+    this.setNotifications();
   }
 
   render() {
@@ -197,7 +206,7 @@ class Selection extends React.Component {
     return (
       <div>
         <div style={{ position: "relative", height: "100vh", display: "flex", flexDirection: "column" }}>
-          <TopBar notifs={7} />
+          <TopBar notifs={this.state.notifications} loading={this.state.notifsLoading} />
           <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
             <Sidebar width={width} authUser={this.props.authUser} />
             <div

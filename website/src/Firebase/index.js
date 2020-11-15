@@ -108,6 +108,23 @@ export const starProject = async (uuid, authuid) => {
   return {success: true};
 }
 
+export const getNotifications = async (authuid) => {
+  const attempt = await fetch(`${fetchLocation}/get-notifications?authuid=${authuid}`);
+  let notifications = [];
+
+  if (attempt.status !== 201) return attempt.text();
+
+  await attempt.text().then(text => {
+    try {
+      notifications = JSON.parse(text);
+    }
+    catch(e) {
+      notifications = [];
+    }
+  });
+  return notifications;
+}
+
 export const getProjectPrivate = async (uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
   let projObject = {};
