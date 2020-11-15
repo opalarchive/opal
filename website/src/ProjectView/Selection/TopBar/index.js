@@ -182,8 +182,6 @@ class Notifications extends React.Component {
       if (!notif.read) unreadNotifs ++;
     });
 
-    notifs[1] = notifs[0];
-
     return (
       <>
         <IconButton
