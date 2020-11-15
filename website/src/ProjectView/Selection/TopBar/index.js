@@ -84,7 +84,7 @@ class Notifications extends React.Component {
             onClick={(_) => this.setOpen(true)}
             ref={this.notificationButton}
           >
-            <Badge badgeContent=<Loader size={10}/> color="secondary">
+            <Badge badgeContent={<Loader size={10}/>} color="secondary">
               <Bell />
             </Badge>
           </IconButton>
