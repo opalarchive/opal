@@ -47,11 +47,11 @@ module.exports = {
     await db.ref(`projectPublic/${uuid}/editors/${authuid}/lastEdit`).set(now);
 
     const ownerUsername = await db.ref(`userInformation/${authuid}/username`).once('value').then(snapshot => snapshot.val());
-    /*await sendEmail({
+    await sendEmail({
       email: userinfo.email,
       subject: `${projectPublic.name} was shared with you by ${ownerUsername}, ${username}`,
       content: `Hello ${username},<br /><br />You were invited to <a href="/project/view/${uuid}">${projectPublic.name}</a> by the owner, ${ownerUsername}. We hope you enjoy proposing problems and our system!<br /><br />Sincerely,<br />The Math Olympaid Team`
-    });*/
+    });
 
     let currentNotifications = await db.ref(`userInformation/${userinfo.uid}/notifications`).once('value').then(snapshot => snapshot.val()) || {};
     currentNotifications = Object.keys(currentNotifications).map(index => currentNotifications[index]) || [];
