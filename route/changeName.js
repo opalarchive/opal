@@ -25,6 +25,11 @@ module.exports = {
       return;
     }
 
+    if (!projectname.matches(/^[ A-Za-z0-9]+$/g) || projectname.length > 32) {
+      res.status(400).send('bad-project-name');
+      return;
+    }
+
     const date = new Date();
     const now = date.getTime();
     await db.ref(`projectPublic/${uuid}/name`).set(projectname);

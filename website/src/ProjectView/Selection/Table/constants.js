@@ -120,18 +120,17 @@ export const rowStyles = (theme) => ({
   }
 });
 
-export const IfDisplay = props => {
+export const IfDisplay = React.forwardRef((props, ref) => {
   if (props.condition) {
     return (
-      <>
+      <div ref={ref}>
         {props.children}
-      </>
+      </div>
     );
   }
   else {
     return (
-      <>
-      </>
+      <div ref={ref}/>
     );
   }
-};
+});

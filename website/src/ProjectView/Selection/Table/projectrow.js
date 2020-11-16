@@ -61,7 +61,6 @@ class ProjectRow extends React.Component {
     }
 
     this.setState({contextShowing: true, mouseX: event.clientX + 2, mouseY: event.clientY + 4});
-    console.log(event.target);
   }
 
   closeContextMenu(event) {

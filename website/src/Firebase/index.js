@@ -125,6 +125,14 @@ export const getNotifications = async (authuid) => {
   return notifications;
 }
 
+export const markAllNotifications = async (authuid, number) => {
+  const attempt = await fetch(`${fetchLocation}/mark-notifications?authuid=${authuid}&number=${number}`);
+
+  if (attempt.status !== 201) return attempt.text();
+
+  return {success: true};
+}
+
 export const getProjectPrivate = async (uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
   let projObject = {};

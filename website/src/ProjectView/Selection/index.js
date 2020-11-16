@@ -8,7 +8,7 @@ import Scrollbar from "react-scrollbars-custom";
 import Sidebar from "./Sidebar";
 import Loading from "../../Loading";
 import Table from "./Table";
-import { getVisibleProjects, getNotifications } from "../../Firebase";
+import { getVisibleProjects, getNotifications, markAllNotifications } from "../../Firebase";
 import TopBar from "./TopBar";
 
 class SelectionBase extends React.Component {
@@ -181,6 +181,7 @@ class Selection extends React.Component {
 
     this.setProjects = this.setProjects.bind(this);
     this.setNotifications = this.setNotifications.bind(this);
+    this.markNotifications = this.markNotifications.bind(this);
   }
 
   async setProjects() {
@@ -193,9 +194,29 @@ class Selection extends React.Component {
     this.setState({ notifications, notifsLoading: false });
   }
 
+  async markNotifications(number) {
+    this.setState({notifsLoading: true});
+    await markAllNotifications(this.props.authUser.uid, number);
+    this.setNotifications();
+  }
+
   componentDidMount() {
     this.setProjects();
     this.setNotifications();
+    this.initialInterval = setInterval(_ => {
+      if (!this.state.loading) clearInterval(this.initialInterval);
+      this.setProjects();
+      this.setNotifications();
+    }, 1500);
+    this.interval = setInterval(_ => {
+      this.setNotifications();
+      this.setProjects();
+    }, 30000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+    clearInterval(this.initialInterval);
   }
 
   render() {
@@ -206,7 +227,7 @@ class Selection extends React.Component {
     return (
       <div>
         <div style={{ position: "relative", height: "100vh", display: "flex", flexDirection: "column" }}>
-          <TopBar notifs={this.state.notifications} loading={this.state.notifsLoading} />
+          <TopBar notifs={this.state.notifications} loading={this.state.notifsLoading} markNotifications={this.markNotifications} />
           <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
             <Sidebar width={width} authUser={this.props.authUser} />
             <div
