@@ -18,9 +18,7 @@ import { Bell, User, Loader } from "react-feather";
 import Loading from "../../../Loading";
 import "./index.module.css";
 
-const styles = (theme) => {
-  console.log(theme);
-  return ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1
   },
@@ -63,7 +61,7 @@ const styles = (theme) => {
   link: {
     color: theme.palette.primary.light
   }
-});}
+});
 
 class Notifications extends React.Component {
   constructor(props) {
