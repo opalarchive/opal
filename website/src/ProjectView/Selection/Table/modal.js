@@ -23,14 +23,14 @@ export default function Modal(props) {
           <DialogTitle id="share-dialog-title">Share</DialogTitle>
           <DialogContent>
             <DialogContentText id="share-dialog-description">
-              To share this project, please enter your desired collaborator's email address.
+              To share this project, please enter your desired collaborator's username.
             </DialogContentText>
             <TextField
               autoFocus
               margin="dense"
               id="name"
-              label="Email Address"
-              type="email"
+              label="Username"
+              type="username"
               value={props.input}
               onChange={props.inputChange}
               fullWidth
