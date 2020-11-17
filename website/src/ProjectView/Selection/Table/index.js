@@ -56,7 +56,7 @@ class ProjectTable extends React.Component {
   componentDidMount() {
     this.setState({
       sort: this.props.defaultSort,
-      sortedProjectKeys: Object.keys(this.props.projects)
+      sortedProjectKeys: this.sortProjectKeys(this.props.defaultSort, Object.keys(this.props.projects))
     });
   }
 
@@ -87,7 +87,11 @@ class ProjectTable extends React.Component {
       key
     ]);
 
+    // cant just subtract because strings :(
     const comp = (a, b) => {
+      if (typeof a === 'string') a = a.toLowerCase();
+      if (typeof b === 'string') b = b.toLowerCase();
+
       if (a < b) return -1;
       if (a > b) return 1;
       return 0;
