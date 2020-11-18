@@ -15,7 +15,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { UserPlus, Trash2, Edit, Star, CornerLeftUp } from "react-feather";
 import { Link } from "react-router-dom";
-import { rowStyles, getDataPoint, formatData, IfDisplay } from "./constants";
+import { rowStyles, dataPointDisplay, IfDisplay } from "./constants";
 
 class ProjectRow extends React.Component {
   constructor(props) {
@@ -145,12 +145,12 @@ class ProjectRow extends React.Component {
                   className={classes.link}
                   to={ROUTES.PROJECT_VIEW.replace(":id", id)}
                 >
-                  {formatData(getDataPoint(proj, dataPoint, username))}
+                  {dataPointDisplay(proj, dataPoint, username, classes)}
                 </Link>
               </TableCell>
             ) : (
               <TableCell align="right" key={`${id}-${dataPoint}`}>
-                {formatData(getDataPoint(proj, dataPoint, username))}
+                {dataPointDisplay(proj, dataPoint, username, classes)}
               </TableCell>
             )
           )}

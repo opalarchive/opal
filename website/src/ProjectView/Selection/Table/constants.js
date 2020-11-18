@@ -6,37 +6,7 @@ export const camelToTitle = (string) => {
   return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
-export const formatTime = (time) => {
-  let months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-  ];
-
-  let date = new Date(time);
-  let now = new Date();
-
-  if (now.getTime() > date.getTime() + 86400000) {
-    return (
-      months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()
-    );
-  }
-  if (now.getTime() < date.getTime()) {
-    return "Hello time traveler! ^-^";
-  }
-
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
-
+const preciseTime = (hours, minutes) => {
   if (minutes === 0) {
     if (hours % 12 === 0) {
       return "12:00 " + (hours === 0 ? "AM" : "PM");
@@ -62,30 +32,83 @@ export const formatTime = (time) => {
   );
 };
 
+export const formatTime = (time) => {
+  let months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+
+  let date = new Date(time);
+  let now = new Date();
+
+  // if its the same day
+  if (now.getFullYear() === date.getFullYear() && now.getMonth() === date.getMonth() && now.getDate() === date.getDate()) {
+    return preciseTime(date.getHours(), date.getMinutes());
+  }
+  // ???
+  if (now.getTime() < date.getTime()) {
+    return "Hello time traveler! ^-^";
+  }
+  return (months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear());
+};
+
 export const getDataPoint = (proj, dataPoint, username) => {
   switch (dataPoint) {
     case "name":
       return proj.name;
     case "owner":
-      return proj.owner === username ? 'me' : proj.owner;
+      return proj.owner;
     case "lastModified":
       return Math.max(
         ...Object.values(proj.editors).map((info) => info.lastEdit)
       );
+    case "lastModifier":
+      return Object.entries(proj.editors).map(([username, info]) => [username, info.lastEdit]).reduce(
+        ([lastUsername, totalLastEdit], [username, lastEdit]) => {
+          if (lastEdit > totalLastEdit) return [username, lastEdit];
+          return [lastUsername, totalLastEdit];
+        }
+      )[0];
     case "shareDate":
       return proj.editors[username].shareDate;
     case "lastModifiedByMe":
+      console.log(' - ' + proj.editors[username].lastEdit)
       return proj.editors[username].lastEdit;
     default:
       return null;
   }
-};
+}
 
-export const formatData = (data) => {
-  if (typeof data === "number") {
-    return formatTime(data);
+export const dataPointDisplay = (proj, dataPoint, username, styles) => {
+  const filterMe = (name) => {
+    return name === username ? <span className={styles.normal}>me</span> : <span className={styles.thin}>{name}</span>;
   }
-  return data;
+
+  let data = getDataPoint(proj, dataPoint, username);
+  switch (dataPoint) {
+    case "name":
+      return <span className={styles.normal}>{data}</span>;
+    case "owner":
+      return filterMe(data);
+    case "lastModified":
+      return <><span className={styles.thin}>{formatTime(data)}</span>&nbsp;{filterMe(getDataPoint(proj, "lastModifier", username))}</>
+    case "shareDate":
+      return <span className={styles.thin}>{formatTime(data)}</span>;
+    case "lastModifiedByMe":
+      return <span className={styles.thin}>{formatTime(data)}</span>;
+    default:
+      return null;
+  }
 };
 
 export const toolbarStyles = makeStyles((theme) => ({
@@ -96,11 +119,11 @@ export const toolbarStyles = makeStyles((theme) => ({
   highlight:
     theme.palette.type === "light"
       ? {
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85)
-        }
+        backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+      }
       : {
-          backgroundColor: theme.palette.secondary.dark
-        },
+        backgroundColor: theme.palette.secondary.dark
+      },
   title: {
     flex: "1 1 100%"
   }
@@ -117,6 +140,13 @@ export const rowStyles = (theme) => ({
   icon: {
     paddingTop: 0,
     paddingBottom: 0,
+  },
+  thin: {
+    color: "rgba(0, 0, 0, 0.64)"
+  },
+  normal: {
+    color: "rgba(0, 0, 0, 0.88)",
+    fontWeight: 500
   }
 });
 
@@ -130,7 +160,7 @@ export const IfDisplay = React.forwardRef((props, ref) => {
   }
   else {
     return (
-      <div ref={ref}/>
+      <div ref={ref} />
     );
   }
 });

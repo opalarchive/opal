@@ -82,8 +82,9 @@ class ProjectTable extends React.Component {
   }
 
   sortProjectKeys(sort, sortedProjectKeys) {
+    console.log(sort.dataPoint);
     let stabilized = sortedProjectKeys.map((key) => [
-      getDataPoint(this.props.projects[key], this.props.authUser.displayName, sort.dataPoint),
+      getDataPoint(this.props.projects[key], sort.dataPoint, this.props.authUser.displayName),
       key
     ]);
 
