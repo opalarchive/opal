@@ -37,7 +37,7 @@ module.exports = {
           if (uid === authuid) {
             return [idToUsername(uid), { shareDate: info.shareDate, lastEdit: info.lastEdit }];
           }
-          return [idToUsername(uid), { shareDate: info.shareDate }];
+          return [idToUsername(uid), { lastEdit: info.lastEdit }];
         })
       );
 
