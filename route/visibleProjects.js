@@ -26,14 +26,22 @@ module.exports = {
     // filter for projects the authuid can access
     publico = Object.fromEntries(Object.entries(publico).filter(proj => Object.keys(proj[1].editors).includes(authuid)));
 
-    // change all the private uids to usernames
     Object.keys(publico).forEach(key => {
       publico[key].starred = publico[key].editors[authuid].starred;
-      publico[key].editors = Object.fromEntries(Object.entries(publico[key].editors).map(editor => [idToUsername(editor[0]), editor[1]]));
-      Object.keys(publico[key].editors).forEach(editorKey => {
-        if (publico[key].owner === authuid) publico[key].editors[editorKey] = { shareDate: publico[key].editors[editorKey].shareDate, lastEdit: publico[key].editors[editorKey].lastEdit };
-        else publico[key].editors[editorKey] = { lastEdit: publico[key].editors[editorKey].lastEdit };
-      });
+
+      // hide share date information except for your own
+      // and change private uids to usernames
+      publico[key].editors = Object.fromEntries(
+        Object.entries(publico[key].editors).map(([uid, info]) => {
+          // if this is you
+          if (uid === authuid) {
+            return [idToUsername(uid), { shareDate: info.shareDate, lastEdit: info.lastEdit }];
+          }
+          return [idToUsername(uid), { shareDate: info.shareDate }];
+        })
+      );
+
+      // change owner uid to username
       publico[key].owner = idToUsername(publico[key].owner);
     });
 
