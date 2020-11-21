@@ -25,7 +25,7 @@ module.exports = {
     let config = await db.ref(`/projectConfigs/${uuid}`).once('value').then(snapshot => snapshot.val());
 
     if (!config) {
-      res.status(404).send('unconfigured');
+      res.status(200).send('unconfigured');
       return;
     }
     config.private_key = config.private_key.replace(/\\n/g, '\n');

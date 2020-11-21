@@ -65,7 +65,7 @@ export const deleteProject = async (uuid, authuid) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const deleteForeverProject = async (uuid, authuid) => {
@@ -73,7 +73,7 @@ export const deleteForeverProject = async (uuid, authuid) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const shareProject = async (username, uuid, authuid) => {
@@ -81,7 +81,7 @@ export const shareProject = async (username, uuid, authuid) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const changeName = async (name, uuid, authuid) => {
@@ -89,7 +89,7 @@ export const changeName = async (name, uuid, authuid) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const restoreProject = async (uuid, authuid) => {
@@ -97,7 +97,7 @@ export const restoreProject = async (uuid, authuid) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const starProject = async (uuid, authuid) => {
@@ -105,7 +105,7 @@ export const starProject = async (uuid, authuid) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const getNotifications = async (authuid) => {
@@ -118,7 +118,7 @@ export const getNotifications = async (authuid) => {
     try {
       notifications = JSON.parse(text);
     }
-    catch(e) {
+    catch (e) {
       notifications = [];
     }
   });
@@ -130,23 +130,23 @@ export const markAllNotifications = async (authuid, number) => {
 
   if (attempt.status !== 201) return attempt.text();
 
-  return {success: true};
+  return { success: true };
 }
 
 export const getProjectPrivate = async (uuid, authuid) => {
   const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
+  const text = await attempt.text();
   let projObject = {};
 
-  if (attempt.status !== 200) return attempt.text();
+  if (attempt.status !== 200 || text === 'unconfigured') {
+    return text;
+  }
 
-  await attempt.text().then(text => {
-    try {
-      projObject = JSON.parse(text);
-    } catch (e) {
-      projObject = {};
-    }
-  });
-
+  try {
+    projObject = JSON.parse(text);
+  } catch (e) {
+    projObject = {};
+  }
   return projObject;
 };
 

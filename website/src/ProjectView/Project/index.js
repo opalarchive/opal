@@ -3,6 +3,8 @@ import { withRouter } from 'react-router-dom';
 import { getProjectPrivate } from '../../Firebase';
 
 import Loading from '../../Loading';
+import { Unconfigured } from './unconfigured';
+import View from './View';
 
 class Project extends React.Component {
   constructor(props) {
@@ -22,13 +24,12 @@ class Project extends React.Component {
 
   render() {
     if (this.state.loading) {
-      return <Loading background="white" />
+      return <Loading background="white" />;
     }
-    return (
-      <div>
-        {JSON.stringify(this.state.project)}
-      </div>
-    );
+    if (this.state.project === 'unconfigured') {
+      return <Unconfigured />;
+    }
+    return <View project={JSON.stringify(this.state.project)} />;
   }
 }
 
