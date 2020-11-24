@@ -15,8 +15,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { Bell, User, Loader } from "react-feather";
-import Loading from "../../../Loading";
-import "./index.module.css";
+import Loading from "../../Loading";
 
 const styles = (theme) => ({
   root: {
@@ -85,7 +84,6 @@ class Notifications extends React.Component {
   render() {
     let { classes, notifs, loading } = this.props;
     const { open } = this.state;
-    let test = ['hi', 'bye'];
 
     if (loading) {
       return (
@@ -326,13 +324,13 @@ class Notifications extends React.Component {
 
 class TopBar extends React.Component {
   render() {
-    const { notifs, classes, markNotifications } = this.props;
+    const { notifs, classes, markNotifications, title } = this.props;
 
     return (
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            foo
+            {title}
           </Typography>
           <Notifications classes={classes} notifs={notifs} markNotifications={markNotifications}/>
           <IconButton

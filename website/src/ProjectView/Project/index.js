@@ -20,6 +20,7 @@ class Project extends React.Component {
     let project = await getProjectPrivate(this.props.match.params.id, this.props.authUser.uid);
 
     this.setState({ project, loading: false });
+    this.props.setTitle(project.name);
   }
 
   render() {

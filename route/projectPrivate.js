@@ -22,6 +22,12 @@ module.exports = {
       return;
     }
 
+    if (projectPublic.trashed) {
+      // trashed
+      res.status(403).send('trashed');
+      return;
+    }
+
     let config = await db.ref(`/projectConfigs/${uuid}`).once('value').then(snapshot => snapshot.val());
 
     if (!config) {
@@ -47,6 +53,7 @@ module.exports = {
     }
 
     const dbstatus = await clientdb.ref('/').once('value').then(snapshot => snapshot.val());
+    dbstatus.name = projectPublic.name;
 
     res.status(200).send(dbstatus);
   }
