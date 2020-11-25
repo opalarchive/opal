@@ -1,6 +1,7 @@
 import React from 'react';
 import MenuBase from '../../MenuBase';
 import Filter from './filter';
+import Problem from './problem';
 
 class View extends React.Component {
   render() {
@@ -12,7 +13,17 @@ class View extends React.Component {
         Sidebar={Filter}
         authUser={this.props.authUser}
       >
-        technboalde {this.props.project}
+        {this.props.project.problems.map((prob, ind) =>
+          <Problem
+            key={ind}
+            ind={ind}
+            text={prob}
+            category={{ name: "Algebra", color: "rgb(241, 37, 30)", contrast: "rgb(255, 255, 255)" }}
+            difficulty={{ name: "0", color: "rgb(0, 200, 100)", contrast: "rgb(0, 0, 0)" }}
+            author="Amol Rama"
+            tags={["testing", "bruh", "wtf"]}
+          />
+        )}
       </MenuBase>
     );
   }
