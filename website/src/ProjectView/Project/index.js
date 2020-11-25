@@ -30,7 +30,7 @@ class Project extends React.Component {
     if (this.state.project === 'unconfigured') {
       return <Unconfigured />;
     }
-    return <View project={JSON.stringify(this.state.project)} />;
+    return <View project={JSON.stringify(this.state.project)} authUser={this.props.authUser} />;
   }
 }
 

@@ -10,6 +10,7 @@ import Loading from "../../Loading";
 import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
 import TopBar from "../TopBar";
+import MenuBase from "../Project/MenuBase";
 
 class SelectionBase extends React.Component {
   constructor(props) {
@@ -206,106 +207,89 @@ class Selection extends React.Component {
   }
 
   render() {
-    let width = 15;
     if (this.state.loading) {
       return <Loading background="white" />;
     }
     return (
-      <>
-        <Sidebar width={width} authUser={this.props.authUser} />
-        <div
-          style={{
-            position: "relative",
-            marginLeft: `${width}rem`,
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Scrollbar
-            disableTracksWidthCompensation
-            noScrollX
-          >
-            <div style={{
-              padding: "1rem 1.5rem 1rem 1rem",
-            }}>
-              <Route
-                exact
-                path={ROUTES.PROJECT}
-                component={() => (
-                  <SelectionBase
-                    refreshProjects={this.setProjects}
-                    type="priority"
-                    visibleProjects={this.state.visibleProjects}
-                    authUser={this.props.authUser}
-                  />
-                )}
-              />
-              <Route
-                exact
-                path={ROUTES.PROJECT_PRIORITY}
-                component={() => (
-                  <SelectionBase
-                    refreshProjects={this.setProjects}
-                    type="priority"
-                    visibleProjects={this.state.visibleProjects}
-                    authUser={this.props.authUser}
-                  />
-                )}
-              />
-              <Route
-                exact
-                path={ROUTES.PROJECT_MY_PROJECTS}
-                component={() => (
-                  <SelectionBase
-                    refreshProjects={this.setProjects}
-                    type="myProjects"
-                    visibleProjects={this.state.visibleProjects}
-                    authUser={this.props.authUser}
-                  />
-                )}
-              />
-              <Route
-                exact
-                path={ROUTES.PROJECT_SHARED_WITH_ME}
-                component={() => (
-                  <SelectionBase
-                    refreshProjects={this.setProjects}
-                    type="sharedWithMe"
-                    visibleProjects={this.state.visibleProjects}
-                    authUser={this.props.authUser}
-                  />
-                )}
-              />
-              <Route
-                exact
-                path={ROUTES.PROJECT_RECENT}
-                component={() => (
-                  <SelectionBase
-                    refreshProjects={this.setProjects}
-                    type="recent"
-                    visibleProjects={this.state.visibleProjects}
-                    authUser={this.props.authUser}
-                  />
-                )}
-              />
-              <Route
-                exact
-                path={ROUTES.PROJECT_TRASH}
-                component={() => (
-                  <SelectionBase
-                    refreshProjects={this.setProjects}
-                    type="trash"
-                    visibleProjects={this.state.visibleProjects}
-                    authUser={this.props.authUser}
-                  />
-                )}
-              />
-            </div>
-          </Scrollbar>
-        </div>
-      </>
+      <MenuBase
+        width={15}
+        background="rgb(0, 0, 0, 0.025)"
+        Sidebar={Sidebar}
+        authUser={this.props.authUser}
+      >
+        <Route
+          exact
+          path={ROUTES.PROJECT}
+          component={() => (
+            <SelectionBase
+              refreshProjects={this.setProjects}
+              type="priority"
+              visibleProjects={this.state.visibleProjects}
+              authUser={this.props.authUser}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.PROJECT_PRIORITY}
+          component={() => (
+            <SelectionBase
+              refreshProjects={this.setProjects}
+              type="priority"
+              visibleProjects={this.state.visibleProjects}
+              authUser={this.props.authUser}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.PROJECT_MY_PROJECTS}
+          component={() => (
+            <SelectionBase
+              refreshProjects={this.setProjects}
+              type="myProjects"
+              visibleProjects={this.state.visibleProjects}
+              authUser={this.props.authUser}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.PROJECT_SHARED_WITH_ME}
+          component={() => (
+            <SelectionBase
+              refreshProjects={this.setProjects}
+              type="sharedWithMe"
+              visibleProjects={this.state.visibleProjects}
+              authUser={this.props.authUser}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.PROJECT_RECENT}
+          component={() => (
+            <SelectionBase
+              refreshProjects={this.setProjects}
+              type="recent"
+              visibleProjects={this.state.visibleProjects}
+              authUser={this.props.authUser}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={ROUTES.PROJECT_TRASH}
+          component={() => (
+            <SelectionBase
+              refreshProjects={this.setProjects}
+              type="trash"
+              visibleProjects={this.state.visibleProjects}
+              authUser={this.props.authUser}
+            />
+          )}
+        />
+      </MenuBase>
     );
   }
 }

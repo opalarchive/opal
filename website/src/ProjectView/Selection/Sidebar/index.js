@@ -12,10 +12,13 @@ const useStyles = width => makeStyles((theme) => ({
     position: "absolute",
     width: `${width}rem`,
     height: '100%',
-    backgroundColor: theme.palette.background.paper,
   },
   buttonWrapper: {
     paddingBottom: theme.spacing(2),
+  },
+  button: {
+    width: "100%",
+    textAlign: "center"
   },
   item: {
     display: "block",
@@ -73,14 +76,15 @@ const Sidebar = (props) => {
   const location = props.location.pathname;
 
   return (
-    <Paper square elevation={3} className={styles.root}>
+    <Paper square elevation={2} className={styles.root}>
       <List component="nav" aria-label="project selection">
         <ListItem className={`${styles.item} ${styles.buttonWrapper}`}>
-          <Button variant="contained" color="secondary" style={{ borderRadius: 1000 }} onClick={() => onClickNewProject(props.authUser.uid, props.history)}>
+          <Button className={styles.button} variant="contained" color="secondary" style={{ borderRadius: 1000 }} onClick={() => onClickNewProject(props.authUser.uid, props.history)}>
             <Plus strokeWidth="1.5" style={{ position: "relative", top: "-0.05rem", marginRight: "0.5rem" }} />
             <span className={styles.linkname}>New Project</span>
           </Button>
         </ListItem>
+        
 
         {navlink(location, styles, Star, 'Priority', ROUTES.PROJECT_PRIORITY, ROUTES.PROJECT, "0.3")}
         {navlink(location, styles, HardDrive, 'My Projects', ROUTES.PROJECT_MY_PROJECTS, null, "0.225")}

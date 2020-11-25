@@ -201,7 +201,7 @@ class ProjectTable extends React.Component {
     );
 
     return (
-      <Paper elevation={3}>
+      <Paper elevation={2}>
         <Modal
           show={this.state.modal.show}
           type={this.state.modal.type}
