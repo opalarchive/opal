@@ -1,5 +1,5 @@
 import React from 'react';
-import MenuBase from '../MenuBase';
+import MenuBase from '../../MenuBase';
 import Filter from './filter';
 
 class View extends React.Component {

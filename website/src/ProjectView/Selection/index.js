@@ -10,7 +10,7 @@ import Loading from "../../Loading";
 import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
 import TopBar from "../TopBar";
-import MenuBase from "../Project/MenuBase";
+import MenuBase from "../MenuBase";
 
 class SelectionBase extends React.Component {
   constructor(props) {
