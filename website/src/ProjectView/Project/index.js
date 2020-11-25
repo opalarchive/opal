@@ -27,6 +27,15 @@ class Project extends React.Component {
     if (this.state.loading) {
       return <Loading background="white" />;
     }
+    if (this.state.project === 'does-not-exist') {
+      return "does not exist";
+    }
+    if (this.state.project === 'forbidden') {
+      return "forbidden";
+    }
+    if (this.state.project === 'trashed') {
+      return "trashed";
+    }
     if (this.state.project === 'unconfigured') {
       return <Unconfigured />;
     }

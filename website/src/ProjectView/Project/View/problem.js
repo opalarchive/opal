@@ -1,29 +1,108 @@
 import React from 'react';
 
 import { Paper, withStyles } from '@material-ui/core';
+import { AlignLeft, ArrowDown, ArrowUp, CornerDownRight, MessageSquare } from 'react-feather';
+import Latex from './latex';
 
 const styles = (category, difficulty) => (theme) => ({
   root: {
     width: "100%",
-    marginBottom: "1rem"
-  },
-  head: {
+    marginBottom: "1rem",
     display: "flex",
-    borderBottom: "solid 0.125rem rgba(0, 0, 0, 0.1)",
-    fontSize: "1.1rem"
   },
-  headIndex: {
-    padding: "0.5rem"
+  left: {
+    display: "flex",
+    flexDirection: "column",
+    fontSize: "1.1rem",
+    minWidth: "3rem"
   },
-  headCategory: {
+  leftIndex: {
+    padding: "1rem 0 0.5rem 0",
+    textAlign: "center"
+  },
+  leftVote: {
     padding: "0.5rem",
+    textAlign: "center"
+  },
+  leftVoteNumber: {
+    position: "relative",
+    fontWeight: 600,
+    top: "-0.25rem"
+  },
+  body: {
+    padding: "0.25rem 0 0.25rem 0",
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: 1
+  },
+  bodyTitle: {
+    padding: "0.5rem 0.5rem 0.1rem 0.5rem",
+    fontSize: "1.25rem"
+  },
+  bodyAuthor: {
+    padding: "0.1rem 0.5rem 0.5rem 0.5rem",
+    fontSize: "0.9rem",
+  },
+  bodyText: {
+    padding: "0.5rem",
+  },
+  bodyFiller: {
+    flexGrow: 1
+  },
+  bodyTags: {
+    padding: "0.5rem",
+  },
+  right: {
+    padding: "0.25rem 0.5rem 0.25rem 0",
+    display: "flex",
+    flexDirection: "column",
+    fontSize: "1.1rem",
+    minWidth: "8rem"
+  },
+  rightCategory: {
+    padding: "0.5rem 0.5rem 0 0.5rem",
+    display: "flex"
+  },
+  rightIcon: {
+    display: "inline-block",
+    flexShrink: 0,
+    position: "relative",
+    top: "0.3rem",
+    height: "1rem",
+    width: "1rem",
+    marginRight: "0.5rem"
+  },
+  rightDot: {
+    height: "0.75rem",
+    width: "0.75rem",
+    top: "0.43rem",
+    borderRadius: "50%",
+    margin: "0 0.6rem 0 0.1rem"
+  },
+  rightCategoryDot: {
     backgroundColor: category.color,
-    color: category.contrast
   },
-  headDifficulty: {
-    padding: "0.5rem",
+  rightDifficulty: {
+    padding: "0.5rem 0.5rem 0 0.5rem",
+    display: "flex"
+  },
+  rightDifficultyDot: {
     backgroundColor: difficulty.color,
-    color: difficulty.contrast
+  },
+  rightFiller: {
+    flexGrow: 1
+  },
+  rightComments: {
+    padding: "0.5rem 0.5rem 0 0.5rem",
+    display: "flex"
+  },
+  rightSolutions: {
+    padding: "0.5rem 0.5rem 0 0.5rem",
+    display: "flex"
+  },
+  rightReply: {
+    padding: "0.5rem",
+    display: "flex"
   },
   tag: {
     marginRight: "0.25rem",
@@ -32,16 +111,6 @@ const styles = (category, difficulty) => (theme) => ({
     borderBottomRightRadius: "1rem",
     borderTopRightRadius: "1rem"
   },
-  headAuthor: {
-    padding: "0.5rem",
-    flexGrow: "1",
-  },
-  body: {
-    padding: "0.5rem"
-  },
-  foot: {
-    padding: "0.5rem"
-  }
 });
 
 const Tag = (props) => {
@@ -55,25 +124,38 @@ class ProblemBase extends React.Component {
     const { classes: styles, ind, text, category, difficulty, author, tags } = this.props;
     return (
       <Paper square elevation={3} className={styles.root}>
-        <div className={styles.head}>
-          <div className={styles.headIndex}>
+        <div className={styles.left}>
+          <div className={styles.leftIndex}>
             #{ind + 1}
           </div>
-          <div className={styles.headCategory}>
-            {category.name}
-          </div>
-          <div className={styles.headDifficulty}>
-            d-{difficulty.name}
-          </div>
-          <div className={styles.headAuthor}>
-            Proposed by {author}
+          <div className={styles.leftVote}>
+            <div><ArrowUp size="1rem" /></div>
+            <div><span className={styles.leftVoteNumber}>2</span></div>
+            <div><ArrowDown size="1rem" /></div>
           </div>
         </div>
         <div className={styles.body}>
-          {text}
+          <div className={styles.bodyTitle}>
+            Epic Problem
+          </div>
+          <div className={styles.bodyAuthor}>
+            Proposed by {author}
+          </div>
+          <div className={styles.bodyText}>
+            <Latex>{text}</Latex>
+          </div>
+          <div className={styles.bodyFiller} />
+          <div className={styles.bodyTags}>
+            Tags: {tags.map(tag => <Tag styles={styles} text={tag} />)}
+          </div>
         </div>
-        <div className={styles.foot}>
-          Tags: {tags.map(tag => <Tag styles={styles} text={tag} />)}
+        <div className={styles.right}>
+          <div className={styles.rightCategory}><div className={`${styles.rightIcon} ${styles.rightDot} ${styles.rightCategoryDot}`}></div>{category.name}</div>
+          <div className={styles.rightDifficulty}><div className={`${styles.rightIcon} ${styles.rightDot} ${styles.rightDifficultyDot}`}></div>d-{difficulty.name}</div>
+          <div className={styles.rightFiller} />
+          <div className={styles.rightComments}><MessageSquare className={styles.rightIcon} />5&nbsp;comments</div>
+          <div className={styles.rightSolutions}><AlignLeft className={styles.rightIcon} />1&nbsp;solution</div>
+          <div className={styles.rightReply}><CornerDownRight className={styles.rightIcon} />Reply</div>
         </div>
       </Paper>
     );

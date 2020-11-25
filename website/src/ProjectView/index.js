@@ -53,7 +53,6 @@ class ProjectView extends React.Component {
           <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
             <Switch>
               <Route
-                exact
                 path={ROUTES.PROJECT_VIEW}
                 render={() =>
                   <Project
