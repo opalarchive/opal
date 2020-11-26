@@ -7,7 +7,6 @@ module.exports = {
     const uuid = req.query.uuid;
     const authuid = req.query.authuid;
 
-
     const projectPublic = await db.ref(`projectPublic/${uuid}`).once('value').then(snapshot => snapshot.val());
 
     if (!projectPublic) {
@@ -54,6 +53,26 @@ module.exports = {
 
     const dbstatus = await clientdb.ref('/').once('value').then(snapshot => snapshot.val());
     dbstatus.name = projectPublic.name;
+
+    const getUsernameInfo = async () => {
+      const usernameInfo = await db.ref(`/userInformation`).once('value').then(snapshot => snapshot.val());
+      return Object.fromEntries(Object.entries(usernameInfo).map(user => [user[0], user[1].username]));
+    }
+
+    const usernameInfo = await getUsernameInfo();
+    const idToUsername = id => {
+      if (usernameInfo[id]) return usernameInfo[id];
+      return '!usernameNotFound';
+    }
+
+    // change private uids to usernames
+    if (!!dbstatus.problems) {
+      dbstatus.problems.forEach(prob => {
+        prob.author = idToUsername(prob.author);
+        prob.votes.down = prob.votes.down.map(id => idToUsername(id));
+        prob.votes.up = prob.votes.up.map(id => idToUsername(id));
+      });
+    }
 
     res.status(200).send(dbstatus);
   }
