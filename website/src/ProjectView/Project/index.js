@@ -41,7 +41,7 @@ class Project extends React.Component {
         maxAttempts: 200
       });
       this.interval = setInterval(_ => {
-        this.setProject();
+        this.setProject(this.props.match.params.id, this.props.authUser.uid);
       }, 30000);
     } catch (e) {
       this.props.fail();

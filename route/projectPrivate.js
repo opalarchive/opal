@@ -7,8 +7,7 @@ const projectPrivateStringfied = async (uuid, authuid) => {
   const trydb = await clientdb(uuid, authuid);
 
   if (trydb[0] !== 200 || trydb[1] === 'unconfigured') {
-    res.status(trydb[0]).send(trydb[1]);
-    return;
+    return trydb;
   }
 
   const dbstatus = await trydb[1].ref('/').once('value').then(snapshot => snapshot.val());
