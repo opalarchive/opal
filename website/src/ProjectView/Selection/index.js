@@ -3,14 +3,14 @@ import React from "react";
 import * as ROUTES from "../../Constants/routes";
 
 import { Route } from "react-router-dom";
-import Scrollbar from "react-scrollbars-custom";
 
 import Sidebar from "./Sidebar";
 import Loading from "../../Loading";
 import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
-import TopBar from "../TopBar";
 import MenuBase from "../MenuBase";
+import { poll } from "../../Constants/poll";
+import Fail from "../../Fail";
 
 class SelectionBase extends React.Component {
   constructor(props) {
@@ -182,28 +182,43 @@ class Selection extends React.Component {
   }
 
   async setProjects() {
-    let visibleProjects = await getVisibleProjects(this.props.authUser.uid);
-    this.setState({ visibleProjects, loading: false });
+    try {
+      let visibleProjects = await getVisibleProjects(this.props.authUser.uid);
+      this.setState({ visibleProjects, loading: false });
+    } catch (e) {
+      return e;
+    }
   }
 
-  componentDidMount() {
-    this.setProjects();
+  async componentDidMount() {
     this.props.setTitle('Project Selection');
-    // this.initialInterval = setInterval(_ => {
-    //   if (!this.state.loading) clearInterval(this.initialInterval);
-    //   this.setProjects();
-    // }, 1500);
-    this.interval = setInterval(_ => {
-      this.setProjects();
-    }, 30000);
+
+    try {
+      await poll({
+        func: this.setProjects,
+        validate: (() => !this.state.loading),
+        interval: 1500,
+        maxAttempts: 200
+      });
+
+      this.interval = setInterval(_ => {
+        this.setProjects();
+      }, 30000);  
+    } catch (e) {
+      this.props.fail();
+    }
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
-    // clearInterval(this.initialInterval);
+    if (!!this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   render() {
+    if (this.state.fail) {
+      return <Fail />;
+    }
     if (this.state.loading) {
       return <Loading background="white" />;
     }

@@ -1,5 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import { poll } from '../../Constants/poll';
+import Fail from '../../Fail';
 import { tryVote } from '../../Firebase';
 import { getProjectPrivate } from '../../Firebase';
 
@@ -19,22 +21,37 @@ class Project extends React.Component {
     this.vote = this.vote.bind(this);
   }
 
-  async setProject() {
-    let project = await getProjectPrivate(this.props.match.params.id, this.props.authUser.uid);
-    this.props.setTitle(project.name);
+  async setProject(id, uid) {
+    try {
+      let project = await getProjectPrivate(id, uid);
+      this.props.setTitle(project.name);
 
-    this.setState({ project, loading: false });
+      this.setState({ project, loading: false });
+    } catch (e) {
+      return e;
+    }
   }
 
-  componentDidMount() {
-    this.setProject();
-    this.interval = setInterval(_ => {
-      this.setProject();
-    }, 30000);
+  async componentDidMount() {
+    try {
+      await poll({
+        func: () => this.setProject(this.props.match.params.id, this.props.authUser.uid),
+        validate: (() => !this.state.loading),
+        interval: 1500,
+        maxAttempts: 200
+      });
+      this.interval = setInterval(_ => {
+        this.setProject();
+      }, 30000);
+    } catch (e) {
+      this.props.fail();
+    }
   }
-  
+
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (!!this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   async vote(id, direction) {
@@ -55,6 +72,9 @@ class Project extends React.Component {
   }
 
   render() {
+    if (this.state.fail) {
+      return <Fail />;
+    }
     if (this.state.loading) {
       return <Loading background="white" />;
     }

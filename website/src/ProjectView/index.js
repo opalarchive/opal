@@ -14,6 +14,8 @@ import { withAuthorization } from '../Session';
 import { compose } from 'recompose';
 import { getNotifications, markAllNotifications, withFirebase } from '../Firebase';
 import TopBar from './TopBar';
+import { poll } from '../Constants/poll';
+import Fail from '../Fail';
 
 class ProjectView extends React.Component {
   constructor(props) {
@@ -22,17 +24,23 @@ class ProjectView extends React.Component {
     this.state = {
       notifsLoading: true,
       notifications: [],
-      title: null
+      title: null,
+      fail: false
     };
 
     this.setNotifications = this.setNotifications.bind(this);
     this.markNotifications = this.markNotifications.bind(this);
     this.setTitle = this.setTitle.bind(this);
+    this.fail = this.fail.bind(this);
   }
 
   async setNotifications() {
-    let notifications = await getNotifications(this.props.authUser.uid);
-    this.setState({ notifications, notifsLoading: false });
+    try {
+      let notifications = await getNotifications(this.props.authUser.uid);
+      this.setState({ notifications, notifsLoading: false });
+    } catch (e) {
+      return e;
+    }
   }
 
   async markNotifications(number) {
@@ -45,18 +53,37 @@ class ProjectView extends React.Component {
     this.setState({ title });
   }
 
-  componentDidMount() {
-    this.setNotifications();
-    this.interval = setInterval(_ => {
-      this.setNotifications();
-    }, 30000);
+  fail() {
+    this.setState({ fail: true });
+  }
+
+  async componentDidMount() {
+    try {
+      await poll({
+        func: this.setNotifications,
+        validate: (() => !this.state.notifsLoading),
+        interval: 1500,
+        maxAttempts: 200
+      });
+      this.interval = setInterval(_ => {
+        this.setNotifications();
+      }, 30000);
+    } catch (e) {
+      this.fail();
+    }
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (!!this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   render() {
+    if (this.state.fail) {
+      return <Fail />;
+    }
+
     return (
       <div>
         <div style={{ position: "relative", height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -70,6 +97,7 @@ class ProjectView extends React.Component {
                     authUser={this.props.authUser}
                     setNotifications={this.setNotifications}
                     setTitle={this.setTitle}
+                    fail={this.fail}
                   />
                 }
               />
@@ -79,6 +107,7 @@ class ProjectView extends React.Component {
                     authUser={this.props.authUser}
                     setNotifications={this.setNotifications}
                     setTitle={this.setTitle}
+                    fail={this.fail}
                   />
                 }
               />
