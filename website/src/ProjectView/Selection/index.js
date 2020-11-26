@@ -188,22 +188,19 @@ class Selection extends React.Component {
 
   componentDidMount() {
     this.setProjects();
-    this.props.setNotifications();
     this.props.setTitle('Project Selection');
-    this.initialInterval = setInterval(_ => {
-      if (!this.state.loading) clearInterval(this.initialInterval);
-      this.setProjects();
-      this.props.setNotifications();
-    }, 1500);
+    // this.initialInterval = setInterval(_ => {
+    //   if (!this.state.loading) clearInterval(this.initialInterval);
+    //   this.setProjects();
+    // }, 1500);
     this.interval = setInterval(_ => {
-      this.props.setNotifications();
       this.setProjects();
     }, 30000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
-    clearInterval(this.initialInterval);
+    // clearInterval(this.initialInterval);
   }
 
   render() {

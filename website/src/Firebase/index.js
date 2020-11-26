@@ -154,6 +154,14 @@ export const newProject = async (uid) => {
   return await fetch(`${fetchLocation}/new-project?uid=${uid}`).then(res => res.text());
 };
 
+export const tryVote = async (uuid, problemId, authuid, direction) => {
+  const attempt = await fetch(`${fetchLocation}/vote?uuid=${uuid}&problemId=${problemId}&authuid=${authuid}&direction=${direction}`);
+
+  if (attempt.status !== 200 && attempt.status !== 201) return attempt.text();
+
+  return { success: true };
+};
+
 export const understandError = e => {
   let error = "";
   switch (e) {

@@ -1,79 +1,46 @@
 const { db } = require('../helpers/firebaseSetup');
-const firebase = require('firebase-admin');
+const { clientdb } = require('../helpers/clientdb');
+
+const projectPrivateStringfied = async (uuid, authuid) => {
+  const projectPublic = await db.ref(`projectPublic/${uuid}`).once('value').then(snapshot => snapshot.val());
+
+  const trydb = await clientdb(uuid, authuid);
+
+  if (trydb[0] !== 200 || trydb[1] === 'unconfigured') {
+    res.status(trydb[0]).send(trydb[1]);
+    return;
+  }
+
+  const dbstatus = await trydb[1].ref('/').once('value').then(snapshot => snapshot.val());
+  dbstatus.name = projectPublic.name;
+
+  const getUsernameInfo = async () => {
+    const usernameInfo = await db.ref(`/userInformation`).once('value').then(snapshot => snapshot.val());
+    return Object.fromEntries(Object.entries(usernameInfo).map(user => [user[0], user[1].username]));
+  }
+
+  const usernameInfo = await getUsernameInfo();
+  const idToUsername = id => {
+    if (usernameInfo[id]) return usernameInfo[id];
+    return '!usernameNotFound';
+  }
+
+  // change private uids to usernames
+  if (!!dbstatus.problems) {
+    dbstatus.problems.forEach(prob => {
+      prob.author = idToUsername(prob.author);
+      prob.votes = Object.fromEntries(Object.entries(prob.votes).map(([id, vote]) => [idToUsername(id), vote]));
+    });
+  }
+  return [200, dbstatus];
+}
 
 module.exports = {
   path: '/project-private',
   execute: async (req, res) => {
-    const uuid = req.query.uuid;
-    const authuid = req.query.authuid;
+    const result = await projectPrivateStringfied(req.query.uuid, req.query.authuid);
 
-    const projectPublic = await db.ref(`projectPublic/${uuid}`).once('value').then(snapshot => snapshot.val());
-
-    if (!projectPublic) {
-      // it doesn't exist
-      res.status(404).send('does-not-exist');
-      return;
-    }
-
-    if (!projectPublic.editors[authuid]) {
-      // you can't access it
-      res.status(403).send('forbidden');
-      return;
-    }
-
-    if (projectPublic.trashed) {
-      // trashed
-      res.status(403).send('trashed');
-      return;
-    }
-
-    let config = await db.ref(`/projectConfigs/${uuid}`).once('value').then(snapshot => snapshot.val());
-
-    if (!config) {
-      res.status(200).send('unconfigured');
-      return;
-    }
-    config.private_key = config.private_key.replace(/\\n/g, '\n');
-
-    let dbURL = config.databaseURL;
-    delete config.databaseURL;
-
-    const existingApps = firebase.apps.map(app => app.name);
-    let cliendb;
-
-    // we don't want to create a new app each time
-    if (existingApps.includes(uuid)) {
-      cliendb = firebase.app(uuid).database();
-    } else {
-      clientdb = firebase.initializeApp({
-        credential: firebase.credential.cert(config),
-        databaseURL: dbURL
-      }, uuid).database();
-    }
-
-    const dbstatus = await clientdb.ref('/').once('value').then(snapshot => snapshot.val());
-    dbstatus.name = projectPublic.name;
-
-    const getUsernameInfo = async () => {
-      const usernameInfo = await db.ref(`/userInformation`).once('value').then(snapshot => snapshot.val());
-      return Object.fromEntries(Object.entries(usernameInfo).map(user => [user[0], user[1].username]));
-    }
-
-    const usernameInfo = await getUsernameInfo();
-    const idToUsername = id => {
-      if (usernameInfo[id]) return usernameInfo[id];
-      return '!usernameNotFound';
-    }
-
-    // change private uids to usernames
-    if (!!dbstatus.problems) {
-      dbstatus.problems.forEach(prob => {
-        prob.author = idToUsername(prob.author);
-        prob.votes.down = prob.votes.down.map(id => idToUsername(id));
-        prob.votes.up = prob.votes.up.map(id => idToUsername(id));
-      });
-    }
-
-    res.status(200).send(dbstatus);
-  }
+    res.status(result[0]).send(result[1]);
+  },
+  projectPrivateStringfied
 }

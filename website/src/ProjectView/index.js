@@ -45,6 +45,17 @@ class ProjectView extends React.Component {
     this.setState({ title });
   }
 
+  componentDidMount() {
+    this.setNotifications();
+    this.interval = setInterval(_ => {
+      this.setNotifications();
+    }, 30000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   render() {
     return (
       <div>

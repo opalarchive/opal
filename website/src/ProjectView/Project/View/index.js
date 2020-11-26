@@ -24,7 +24,7 @@ class View extends React.Component {
         51: [255, 150, 0],
         75: [255, 0, 0],
         100: [0, 0, 0]
-      }
+      },
     }
 
     this.getCategoryColor = this.getCategoryColor.bind(this);
@@ -51,7 +51,7 @@ class View extends React.Component {
   }
 
   render() {
-    const { project, authUser } = this.props;
+    const { project, vote, authUser } = this.props;
     return (
       <MenuBase
         width={20}
@@ -69,8 +69,9 @@ class View extends React.Component {
             difficulty={{ name: prob.difficulty, color: arrToRGBString(this.getDifficultyColor(prob.difficulty)) }}
             author={prob.author}
             tags={prob.tags}
-            votes={prob.votes.up.length - prob.votes.down.length}
-            myVote={prob.votes.up.includes(authUser.uid) - prob.votes.down.includes(authUser.uid)}
+            votes={Object.values(prob.votes).reduce((a, b) => a + b)}
+            myVote={prob.votes[authUser.displayName]}
+            vote={direction => vote(ind, direction)}
             authUser={authUser}
           />
         )}

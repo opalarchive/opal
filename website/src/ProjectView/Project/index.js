@@ -1,5 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import { tryVote } from '../../Firebase';
 import { getProjectPrivate } from '../../Firebase';
 
 import Loading from '../../Loading';
@@ -14,13 +15,43 @@ class Project extends React.Component {
       project: {},
       loading: true
     }
+
+    this.vote = this.vote.bind(this);
   }
 
-  async componentDidMount() {
+  async setProject() {
     let project = await getProjectPrivate(this.props.match.params.id, this.props.authUser.uid);
+    this.props.setTitle(project.name);
 
     this.setState({ project, loading: false });
-    this.props.setTitle(project.name);
+  }
+
+  componentDidMount() {
+    this.setProject();
+    this.interval = setInterval(_ => {
+      this.setProject();
+    }, 30000);
+  }
+  
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  async vote(id, direction) {
+    const oldProject = this.state.project, project = this.state.project;
+    if (project.problems[id].votes[this.props.authUser.displayName] === direction)
+      project.problems[id].votes[this.props.authUser.displayName] = 0;
+    else
+      project.problems[id].votes[this.props.authUser.displayName] = direction;
+
+    this.setState({ project });
+
+    const result = await tryVote(this.props.match.params.id, id, this.props.authUser.uid, direction);
+
+    if (!result.success) {
+      console.log(result);
+      this.setState({ project: oldProject });
+    }
   }
 
   render() {
@@ -39,7 +70,13 @@ class Project extends React.Component {
     if (this.state.project === 'unconfigured') {
       return <Unconfigured />;
     }
-    return <View project={this.state.project} authUser={this.props.authUser} />;
+    return (
+      <View
+        project={this.state.project}
+        vote={this.vote}
+        authUser={this.props.authUser}
+      />
+    );
   }
 }
 
