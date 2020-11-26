@@ -56,6 +56,10 @@ class Project extends React.Component {
 
   async vote(id, direction) {
     const oldProject = this.state.project, project = this.state.project;
+    if (!project.problems[id].votes) {
+      project.problems[id].votes = {};
+    }
+
     if (project.problems[id].votes[this.props.authUser.displayName] === direction)
       project.problems[id].votes[this.props.authUser.displayName] = 0;
     else

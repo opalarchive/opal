@@ -19,10 +19,14 @@ module.exports = {
     }
 
     const problem = await trydb[1].ref(`problems/${problemId}`).once('value').then(snapshot => snapshot.val());
-  
+    
     if (!problem) {
       res.status(404).send('problem-not-found');
       return;
+    }
+
+    if (!problem.votes) {
+      problem.votes = {};
     }
 
     const newVote = (problem.votes[authuid] === direction) ? 0 : direction;

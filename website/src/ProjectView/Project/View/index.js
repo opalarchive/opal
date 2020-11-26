@@ -69,8 +69,8 @@ class View extends React.Component {
             difficulty={{ name: prob.difficulty, color: arrToRGBString(this.getDifficultyColor(prob.difficulty)) }}
             author={prob.author}
             tags={prob.tags}
-            votes={Object.values(prob.votes).reduce((a, b) => a + b)}
-            myVote={prob.votes[authUser.displayName]}
+            votes={!!prob.votes ? Object.values(prob.votes).reduce((a, b) => a + b) : 0}
+            myVote={!!prob.votes ? prob.votes[authUser.displayName] : 0}
             vote={direction => vote(ind, direction)}
             authUser={authUser}
           />

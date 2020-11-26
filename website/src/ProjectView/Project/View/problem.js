@@ -69,7 +69,8 @@ const styles = (category, difficulty) => (theme) => ({
     display: "flex",
     flexDirection: "column",
     fontSize: "1.1rem",
-    minWidth: "8rem"
+    width: "11rem",
+    flexShrink: 0
   },
   rightCategory: {
     padding: "0.5rem 0.5rem 0 0.5rem",
@@ -172,7 +173,7 @@ class ProblemBase extends React.Component {
           </div>
           <div className={styles.bodyFiller} />
           <div className={styles.bodyTags}>
-            Tags: {tags.map(tag => <Tag styles={styles} key={tag} text={tag} />)}
+            Tags: {!!tags ? tags.map(tag => <Tag styles={styles} key={tag} text={tag} />) : null}
           </div>
         </div>
         <div className={styles.right}>

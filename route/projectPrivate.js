@@ -28,7 +28,9 @@ const projectPrivateStringfied = async (uuid, authuid) => {
   if (!!dbstatus.problems) {
     dbstatus.problems.forEach(prob => {
       prob.author = idToUsername(prob.author);
-      prob.votes = Object.fromEntries(Object.entries(prob.votes).map(([id, vote]) => [idToUsername(id), vote]));
+      if (!!prob.votes) {
+        prob.votes = Object.fromEntries(Object.entries(prob.votes).map(([id, vote]) => [idToUsername(id), vote]));
+      }
     });
   }
   return [200, dbstatus];
