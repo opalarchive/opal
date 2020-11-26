@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Paper, withStyles } from '@material-ui/core';
+import { darken, Paper, withStyles } from '@material-ui/core';
 import { AlignLeft, ArrowDown, ArrowUp, CornerDownRight, MessageSquare } from 'react-feather';
 import Latex from './latex';
 
@@ -27,7 +27,19 @@ const styles = (category, difficulty) => (theme) => ({
   leftVoteNumber: {
     position: "relative",
     fontWeight: 600,
-    top: "-0.25rem"
+    top: "-0.15rem"
+  },
+  leftVoteArrow: {
+    color: "black",
+    '&:hover': {
+      color: "rgb(0, 0, 0, 0.4)"
+    }
+  },
+  leftVoteArrowActivated: {
+    color: theme.palette.primary.dark,
+    '&:hover': {
+      color: darken(theme.palette.primary.dark, 0.2)
+    }
   },
   body: {
     padding: "0.25rem 0 0.25rem 0",
@@ -121,7 +133,7 @@ const Tag = (props) => {
 
 class ProblemBase extends React.Component {
   render() {
-    const { classes: styles, ind, text, category, difficulty, author, tags } = this.props;
+    const { classes: styles, ind, text, category, difficulty, author, tags, votes, myVote, authUser } = this.props;
     return (
       <Paper square elevation={3} className={styles.root}>
         <div className={styles.left}>
@@ -129,9 +141,13 @@ class ProblemBase extends React.Component {
             #{ind + 1}
           </div>
           <div className={styles.leftVote}>
-            <div><ArrowUp size="1rem" /></div>
-            <div><span className={styles.leftVoteNumber}>2</span></div>
-            <div><ArrowDown size="1rem" /></div>
+            <div>
+              <ArrowUp size="1rem" strokeWidth={3} className={myVote === 1 ? styles.leftVoteArrowActivated : styles.leftVoteArrow} />
+            </div>
+            <div><span className={styles.leftVoteNumber}>{votes}</span></div>
+            <div>
+              <ArrowDown size="1rem" strokeWidth={3} className={myVote === -1 ? styles.leftVoteArrowActivated : styles.leftVoteArrow} />
+            </div>
           </div>
         </div>
         <div className={styles.body}>
@@ -146,7 +162,7 @@ class ProblemBase extends React.Component {
           </div>
           <div className={styles.bodyFiller} />
           <div className={styles.bodyTags}>
-            Tags: {tags.map(tag => <Tag styles={styles} text={tag} />)}
+            Tags: {tags.map(tag => <Tag styles={styles} key={tag} text={tag} />)}
           </div>
         </div>
         <div className={styles.right}>
