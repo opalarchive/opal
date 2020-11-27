@@ -39,9 +39,9 @@ const styles = (category, difficulty) => (theme) => ({
     }
   },
   leftVoteArrowActivated: {
-    color: theme.palette.primary.dark,
+    color: theme.palette.primary.light,
     '&:hover': {
-      color: darken(theme.palette.primary.dark, 0.2)
+      color: darken(theme.palette.primary.light, 0.2)
     }
   },
   body: {
@@ -71,7 +71,7 @@ const styles = (category, difficulty) => (theme) => ({
     padding: "0.25rem 0.5rem 0.25rem 0",
     display: "flex",
     flexDirection: "column",
-    fontSize: "1.1rem",
+    fontSize: "1.2rem",
     width: "11rem",
     flexShrink: 0
   },
@@ -84,8 +84,8 @@ const styles = (category, difficulty) => (theme) => ({
     flexShrink: 0,
     position: "relative",
     top: "0.28rem",
-    height: "1rem",
-    width: "1rem",
+    height: "1.2rem",
+    width: "1.2rem",
     marginRight: "0.5rem"
   },
   rightDot: {
@@ -93,7 +93,7 @@ const styles = (category, difficulty) => (theme) => ({
     width: "0.75rem",
     top: "0.41rem",
     borderRadius: "50%",
-    margin: "0 0.6rem 0 0.1rem"
+    margin: "0 0.7rem 0 0.2rem"
   },
   rightCategoryDot: {
     backgroundColor: category.color,
@@ -122,10 +122,10 @@ const styles = (category, difficulty) => (theme) => ({
     color: "rgba(0, 0, 0, 0.87)",
     textDecoration: "none",
     '&:hover': {
-      color: darken(theme.palette.secondary.dark, 0.1)
+      color: darken(theme.palette.secondary.light, 0.1)
     },
     '&:focus': {
-      color: darken(theme.palette.secondary.dark, 0.1),
+      color: darken(theme.palette.secondary.light, 0.1),
       outline: "none"
     }
   },
@@ -146,7 +146,7 @@ const Tag = (props) => {
 
 class ProblemBase extends React.Component {
   render() {
-    const { classes: styles, ind, uuid, text, category, difficulty, author, tags, votes, myVote, vote, repliable, authUser } = this.props;
+    const { classes: styles, ind, uuid, text, category, difficulty, author, tags, votes, myVote, vote, replyTypes, repliable, authUser } = this.props;
     return (
       <Paper square elevation={3} className={styles.root}>
         <div className={styles.left}>
@@ -192,8 +192,14 @@ class ProblemBase extends React.Component {
           <div className={styles.rightCategory}><div className={`${styles.rightIcon} ${styles.rightDot} ${styles.rightCategoryDot}`}></div>{category.name}</div>
           <div className={styles.rightDifficulty}><div className={`${styles.rightIcon} ${styles.rightDot} ${styles.rightDifficultyDot}`}></div>d-{difficulty.name}</div>
           <div className={styles.rightFiller} />
-          <div className={styles.rightComments}><MessageSquare className={styles.rightIcon} />5&nbsp;comments</div>
-          <div className={styles.rightSolutions}><AlignLeft className={styles.rightIcon} />1&nbsp;solution</div>
+          <div className={styles.rightComments}>
+            <MessageSquare className={styles.rightIcon} />
+            {replyTypes.comments}&nbsp;comment{replyTypes.comments === 1 ? '' : 's'}
+          </div>
+          <div className={styles.rightSolutions}>
+            <AlignLeft className={styles.rightIcon} />
+            {replyTypes.solutions}&nbsp;solution{replyTypes.solutions === 1 ? '' : 's'}
+          </div>
           {repliable ? <Link className={styles.rightReply} to={`${ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}/p${ind}`}><CornerDownRight className={styles.rightIcon} />Reply</Link> : null}
         </div>
       </Paper>

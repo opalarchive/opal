@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft } from 'react-feather';
-import { darken, withStyles } from '@material-ui/core';
+import { darken, lighten, Paper, withStyles } from '@material-ui/core';
 import Problem from '../problem';
 import { Link } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ import * as ROUTES from '../../../../Constants/routes';
 import { getProblemReplies } from '../../../../Firebase';
 import { poll } from '../../../../Constants';
 import Loading from '../../../../Loading';
+import Reply from './reply';
 
 const detailStyles = (theme) => ({
   top: {
@@ -20,10 +21,10 @@ const detailStyles = (theme) => ({
     color: "rgba(0, 0, 0, 0.87)",
     textDecoration: "none",
     '&:hover': {
-      color: darken(theme.palette.secondary.dark, 0.1)
+      color: darken(theme.palette.secondary.light, 0.1),
     },
     '&:focus': {
-      color: darken(theme.palette.secondary.dark, 0.1),
+      color: darken(theme.palette.secondary.light, 0.1),
       outline: "none"
     }
   },
@@ -35,69 +36,28 @@ const detailStyles = (theme) => ({
   topFiller: {
     flexGrow: 1
   },
+  replyOffset: {
+    position: "relative",
+    marginLeft: "1rem"
+  },
+  replyWrapper: {
+    position: "relative",
+  },
+  replyLine: {
+    position: "absolute",
+    top: "-1rem",
+    left: "0.75rem",
+    // boxShadow: `0 -0.2rem 0.1rem 0.2rem ${lighten(theme.palette.secondary.light, 0.25)}`,
+    backgroundColor: lighten(theme.palette.secondary.light, 0.1),
+    width: "0.5rem",
+    height: "calc(100% + 2rem)",
+    zIndex: -1
+  },
 });
 
-class Replies extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <>
-        {JSON.stringify(this.props.replies)}
-      </>
-    );
-  }
-}
-
 class Details extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      replies: [],
-      replyLoading: true
-    }
-  }
-
-  async setReplies(uuid, ind, authuid) {
-    try {
-      const replies = await getProblemReplies(uuid, ind, authuid);
-
-      this.setState({ replies, replyLoading: false });
-    } catch (e) {
-      console.log(e);
-      return e;
-    }
-  }
-
-  async componentDidMount() {
-    try {
-      await poll({
-        func: () => this.setReplies(this.props.uuid, this.props.ind, this.props.authUser.uid),
-        validate: (() => !this.state.replyLoading),
-        interval: 1500,
-        maxAttempts: 200
-      });
-      this.interval = setInterval(_ => {
-        this.setReplies(this.props.uuid, this.props.ind, this.props.authUser.uid);
-      }, 30000);
-    } catch (e) {
-      this.props.fail();
-    }
-  }
-
-  componentWillUnmount() {
-    if (!!this.interval) {
-      clearInterval(this.interval);
-    }
-  }
-
   render() {
-    const { classes: styles, ...otherProps } = this.props;
-
+    const { classes: styles, replies, comment, ...otherProps } = this.props;
 
     return (
       <>
@@ -108,7 +68,13 @@ class Details extends React.Component {
           <div className={styles.topFiller} />
         </div>
         <Problem {...otherProps} />
-        {this.state.replyLoading ? <Loading background={this.props.loadBackground} /> : <Replies replies={this.state.replies} setReplyLoading={this.props.setReplyLoading} />}
+        <div className={styles.replyOffset}>
+          <div className={styles.replyWrapper}>
+            <div className={styles.replyLine} />
+            {!!replies && replies.map((reply, id) => <Reply key={id} {...reply} id={id}  />)}
+          </div>
+          <Reply type="input" comment={comment} />
+        </div>
       </>
     );
   }

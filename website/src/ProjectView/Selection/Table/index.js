@@ -61,11 +61,11 @@ class ProjectTable extends React.Component {
     });
   }
 
-  onRowClick(event, projID) {
+  onRowClick(event, uuid) {
     event.preventDefault();
 
     let selected = this.state.selected;
-    selected[projID] = !selected[projID];
+    selected[uuid] = !selected[uuid];
 
     this.setState({ selected });
   }
@@ -73,8 +73,8 @@ class ProjectTable extends React.Component {
   onAllClick(event) {
     if (event.target.checked) {
       let selected = {};
-      Object.keys(this.props.projects).forEach((id) => {
-        selected[id] = true;
+      Object.keys(this.props.projects).forEach((uuid) => {
+        selected[uuid] = true;
       });
       this.setState({ selected });
     } else {
@@ -264,18 +264,18 @@ class ProjectTable extends React.Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.sortedProjectKeys.map((id, index) => (
+              {this.state.sortedProjectKeys.map((uuid, index) => (
                 <ProjectRow
-                  id={id}
+                  uuid={uuid}
                   index={index}
                   data={data}
-                  proj={projects[id]}
-                  selected={!!this.state.selected[id]}
+                  proj={projects[uuid]}
+                  selected={!!this.state.selected[uuid]}
                   onRowClick={this.onRowClick}
                   username={this.props.authUser.displayName}
                   showModal={this.showModal}
                   name={name}
-                  key={`project-row-${id}`}
+                  key={`project-row-${uuid}`}
                 />
               ))}
             </TableBody>

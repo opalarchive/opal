@@ -26,7 +26,7 @@ class SpinningBase extends React.Component {
 
 const Loading = props => {
   const theme = useTheme();
-  return <SpinningBase background={props.background} inner={theme.palette.primary.dark} center={theme.palette.primary.light} outer={theme.palette.secondary.light} hideText={props.hideText} />
+  return <SpinningBase background={props.background} inner={theme.palette.primary.light} center={theme.palette.primary.dark} outer={theme.palette.secondary.dark} hideText={props.hideText} />
 }
 
 export default Loading;

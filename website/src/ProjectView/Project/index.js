@@ -1,8 +1,8 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { poll } from '../../Constants';
-import { tryVote } from '../../Firebase';
-import { getProjectProblems, getProjectName } from '../../Firebase';
+import { getProjectPrivate, tryComment, tryVote } from '../../Firebase';
+import { getProjectName } from '../../Firebase';
 
 import Loading from '../../Loading';
 import { Unconfigured } from './unconfigured';
@@ -13,20 +13,21 @@ class Project extends React.Component {
     super(props);
 
     this.state = {
-      problems: [],
+      project: [],
       loading: true
     }
 
     this.vote = this.vote.bind(this);
+    this.comment = this.comment.bind(this);
   }
 
   async setProject(uuid, authuid) {
     try {
-      const problems = await getProjectProblems(uuid, authuid);
+      const project = await getProjectPrivate(uuid, authuid);
       const name = await getProjectName(uuid, authuid);
       this.props.setTitle(name.text);
 
-      this.setState({ problems, loading: false });
+      this.setState({ project, loading: false });
     } catch (e) {
       return e;
     }
@@ -55,23 +56,49 @@ class Project extends React.Component {
   }
 
   async vote(ind, direction) {
-    const oldProblems = this.state.problems, problems = this.state.problems;
-    if (!problems[ind].votes) {
-      problems[ind].votes = {};
+    const oldProject = this.state.project, project = this.state.project;
+    if (!project.problems[ind].votes) {
+      project.problems[ind].votes = {};
     }
 
-    if (problems[ind].votes[this.props.authUser.displayName] === direction)
-      problems[ind].votes[this.props.authUser.displayName] = 0;
+    if (project.problems[ind].votes[this.props.authUser.displayName] === direction)
+      project.problems[ind].votes[this.props.authUser.displayName] = 0;
     else
-      problems[ind].votes[this.props.authUser.displayName] = direction;
+      project.problems[ind].votes[this.props.authUser.displayName] = direction;
 
-    this.setState({ problems });
+    this.setState({ project });
 
     const result = await tryVote(this.props.match.params.uuid, ind, this.props.authUser.uid, direction);
 
     if (!result.success) {
       console.log(result);
-      this.setState({ problems: oldProblems });
+      this.setState({ project: oldProject });
+    }
+  }
+
+  async comment(ind, text) {
+    const oldProject = this.state.project, project = this.state.project;
+
+    console.log(ind);
+
+    if (!project.problems[ind].replies) {
+      project.problems[ind].replies = [];
+    }
+    const now = new Date();
+    project.problems[ind].replies.push({
+      author: this.props.authUser.displayName,
+      text,
+      time: now.getTime(),
+      type: 'comment'
+    })
+
+    this.setState({ project });
+
+    const result = await tryComment(this.props.match.params.uuid, ind, this.props.authUser.uid, text);
+
+    if (!result.success) {
+      console.log(result);
+      this.setState({ project: oldProject });
     }
   }
 
@@ -79,23 +106,24 @@ class Project extends React.Component {
     if (this.state.loading) {
       return <Loading background="white" />;
     }
-    if (this.state.problems === 'does-not-exist') {
+    if (this.state.project === 'does-not-exist') {
       return "does not exist";
     }
-    if (this.state.problems === 'forbidden') {
+    if (this.state.project === 'forbidden') {
       return "forbidden";
     }
-    if (this.state.problems === 'trashed') {
+    if (this.state.project === 'trashed') {
       return "trashed";
     }
-    if (this.state.problems === 'unconfigured') {
+    if (this.state.project === 'unconfigured') {
       return <Unconfigured />;
     }
     return (
       <View
-        problems={this.state.problems}
+        project={this.state.project}
         uuid={this.props.match.params.uuid}
         vote={this.vote}
+        comment={this.comment}
         fail={this.fail}
         authUser={this.props.authUser}
       />

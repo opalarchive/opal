@@ -2,7 +2,7 @@ const { db } = require('../helpers/firebaseSetup');
 const clientdb = require('../helpers/clientdb');
 
 module.exports = {
-  path: '/project-problems',
+  path: '/project-private',
   execute: async (req, res) => {
     const uuid = req.query.uuid;
     const authuid = req.query.authuid;
@@ -14,7 +14,7 @@ module.exports = {
       return;
     }
 
-    const problems = await trydb[1].ref('/problems').once('value').then(snapshot => snapshot.val());
+    const projectPrivate = await trydb[1].ref('/').once('value').then(snapshot => snapshot.val());
 
     const getUsernameInfo = async () => {
       const usernameInfo = await db.ref(`/userInformation`).once('value').then(snapshot => snapshot.val());
@@ -28,14 +28,19 @@ module.exports = {
     }
 
     // change private uids to usernames
-    if (!!problems) {
-      problems.forEach(prob => {
+    if (!!projectPrivate.problems) {
+      projectPrivate.problems.forEach(prob => {
         prob.author = idToUsername(prob.author);
         if (!!prob.votes) {
           prob.votes = Object.fromEntries(Object.entries(prob.votes).map(([id, vote]) => [idToUsername(id), vote]));
         }
+        if (!!prob.replies) {
+          prob.replies.forEach(reply => {
+            reply.author = idToUsername(reply.author);
+          })
+        }
       });
     }
-    res.status(200).send(problems);
+    res.status(200).send(projectPrivate);
   },
 }

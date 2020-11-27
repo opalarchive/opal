@@ -8,6 +8,21 @@ import * as ROUTES from '../../../Constants/routes';
 import Details from './Details';
 import { arrToRGBString, camelToTitle, lerp, lowerBound } from '../../../Constants';
 
+const ProblemDetails = (props) => {
+  const ind = parseInt(props.match.params.ind);
+
+  return <Details {...{
+    replies: props.problems[ind].replies,
+    ...props.problemProps(props.problems[ind], ind, props.uuid, props.vote, props.authUser),
+    repliable: false,
+    comment: text => props.comment(ind, text),
+    fail: props.fail,
+    loadBackground: props.loadBackground,
+  }} />
+};
+
+const RoutedDetails = withRouter(ProblemDetails);
+
 class View extends React.Component {
 
   constructor(props) {
@@ -33,6 +48,7 @@ class View extends React.Component {
 
     this.getCategoryColor = this.getCategoryColor.bind(this);
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
+    this.problemProps = this.problemProps.bind(this);
   }
 
   getCategoryColor(category) {
@@ -54,6 +70,14 @@ class View extends React.Component {
   }
 
   problemProps(prob, ind, uuid, vote, authUser) {
+    const replyTypes = { comments: 0, solutions: 0 };
+    if (!!prob.replies) {
+      prob.replies.forEach(reply => {
+        if (reply.solution) replyTypes.solutions++;
+        else replyTypes.comments++;
+      });
+    }
+
     return {
       key: ind,
       ind: ind,
@@ -66,12 +90,13 @@ class View extends React.Component {
       votes: !!prob.votes ? Object.values(prob.votes).reduce((a, b) => a + b) : 0,
       myVote: !!prob.votes ? prob.votes[authUser.displayName] : 0,
       vote: direction => vote(ind, direction),
+      replyTypes,
       authUser: authUser
     };
   }
 
   render() {
-    const { problems, uuid, vote, fail, authUser } = this.props;
+    const { project, uuid, vote, comment, fail, authUser } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -88,25 +113,24 @@ class View extends React.Component {
             exact
             path={ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}
             render={_ => {
-              return problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, vote, authUser), repliable: true }} />)
+              return project.problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, vote, authUser), repliable: true }} />)
             }}
           />
           <Route
             exact
             path={ROUTES.PROJECT_PROBLEM.replace(':uuid', uuid)}
-            render={_ => {
-              const ProblemDetails = withRouter((props) => {
-                const ind = parseInt(props.match.params.ind);
-
-                return <Details {...{
-                  ...this.problemProps(problems[ind], ind, uuid, vote, authUser),
-                  repliable: false,
-                  fail,
-                  loadBackground,
-                }} />
-              });
-              return <ProblemDetails />;
-            }}
+            render={_ =>
+              <RoutedDetails
+                problemProps={this.problemProps}
+                problems={project.problems}
+                uuid={uuid}
+                vote={vote}
+                comment={comment}
+                fail={fail}
+                authUser={authUser}
+                loadBackground={loadBackground}
+              />
+            }
           />
         </Switch>
       </MenuBase>

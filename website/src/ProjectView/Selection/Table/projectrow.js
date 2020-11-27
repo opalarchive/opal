@@ -77,7 +77,7 @@ class ProjectRow extends React.Component {
   }
 
   render() {
-    const { id, index, data, proj, selected, onRowClick, username, classes } = this.props;
+    const { uuid, index, data, proj, selected, onRowClick, username, classes } = this.props;
     const { contextShowing, mouseX, mouseY } = this.state;
     const { star, share, edit, deleteProject, restore, deleteForever } = this.state.actions;
 
@@ -95,11 +95,11 @@ class ProjectRow extends React.Component {
       <>
       <TableRow
         hover
-        onClick={(event) => !this.state.contextShowing && onRowClick(event, id)}
+        onClick={(event) => !this.state.contextShowing && onRowClick(event, uuid)}
         role="checkbox"
         aria-checked={selected}
         selected={selected}
-        key={id}
+        key={uuid}
         tabIndex={-1}
         onContextMenu={this.displayContextMenu}
       >
@@ -116,8 +116,8 @@ class ProjectRow extends React.Component {
         }
       >
         {actions.map(action => (
-          <IfDisplay condition={action.condition} key={`${id}-contextmenu-${action.display}`}>
-            <MenuItem aria-label={action.display} onClick={(event) => this.closeContextShowModal(event, action.event, id)}>
+          <IfDisplay condition={action.condition} key={`${uuid}-contextmenu-${action.display}`}>
+            <MenuItem aria-label={action.display} onClick={(event) => this.closeContextShowModal(event, action.event, uuid)}>
               <ListItemIcon>
                 {action.icon}
               </ListItemIcon>
@@ -137,19 +137,19 @@ class ProjectRow extends React.Component {
               <TableCell
                 component="th"
                 scope="row"
-                id={labelId}
+                uuid={labelId}
                 padding="none"
-                key={`${id}-${dataPoint}`}
+                key={`${uuid}-${dataPoint}`}
               >
                 <Link
                   className={classes.link}
-                  to={ROUTES.PROJECT_VIEW.replace(":id", id)}
+                  to={ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}
                 >
                   {dataPointDisplay(proj, dataPoint, username, classes)}
                 </Link>
               </TableCell>
             ) : (
-              <TableCell align="right" key={`${id}-${dataPoint}`}>
+              <TableCell align="right" key={`${uuid}-${dataPoint}`}>
                 {dataPointDisplay(proj, dataPoint, username, classes)}
               </TableCell>
             )
