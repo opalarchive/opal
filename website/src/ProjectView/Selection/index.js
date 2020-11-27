@@ -9,7 +9,7 @@ import Loading from "../../Loading";
 import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
 import MenuBase from "../MenuBase";
-import { poll } from "../../Constants/poll";
+import { poll } from "../../Constants";
 
 class SelectionBase extends React.Component {
   constructor(props) {

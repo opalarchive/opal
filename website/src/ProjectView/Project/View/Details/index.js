@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 import * as ROUTES from '../../../../Constants/routes';
 import { getProblemReplies } from '../../../../Firebase';
-import { poll } from '../../../../Constants/poll';
+import { poll } from '../../../../Constants';
 import Loading from '../../../../Loading';
 
 const detailStyles = (theme) => ({
@@ -42,10 +42,6 @@ class Replies extends React.Component {
     super(props);
   }
 
-  componentDidMount() {
-    this.props.setReplyLoading(false, true);
-  }
-
   render() {
     return (
       <>
@@ -78,7 +74,6 @@ class Details extends React.Component {
   }
 
   async componentDidMount() {
-    this.props.setReplyLoading(true, true);
     try {
       await poll({
         func: () => this.setReplies(this.props.uuid, this.props.ind, this.props.authUser.uid),
@@ -86,7 +81,6 @@ class Details extends React.Component {
         interval: 1500,
         maxAttempts: 200
       });
-      console.log(this.state.replies);
       this.interval = setInterval(_ => {
         this.setReplies(this.props.uuid, this.props.ind, this.props.authUser.uid);
       }, 30000);
@@ -114,7 +108,7 @@ class Details extends React.Component {
           <div className={styles.topFiller} />
         </div>
         <Problem {...otherProps} />
-        {this.state.replyLoading ? null : <Replies replies={this.state.replies} setReplyLoading={this.props.setReplyLoading} />}
+        {this.state.replyLoading ? <Loading background={this.props.loadBackground} /> : <Replies replies={this.state.replies} setReplyLoading={this.props.setReplyLoading} />}
       </>
     );
   }

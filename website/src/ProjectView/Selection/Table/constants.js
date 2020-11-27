@@ -1,66 +1,6 @@
 import React from 'react';
 import { makeStyles, lighten, darken } from "@material-ui/core";
-
-export const camelToTitle = (string) => {
-  let result = string.replace(/([A-Z])/g, " $1");
-  return result.charAt(0).toUpperCase() + result.slice(1);
-};
-
-const preciseTime = (hours, minutes) => {
-  if (minutes === 0) {
-    if (hours % 12 === 0) {
-      return "12:00 " + (hours === 0 ? "AM" : "PM");
-    }
-    return (hours % 12) + ":00" + (hours < 12 ? "AM" : "PM");
-  }
-  if (hours % 12 === 0) {
-    return (
-      "12:" +
-      (minutes < 10 ? "0" : "") +
-      minutes +
-      " " +
-      (hours < 12 ? "AM" : "PM")
-    );
-  }
-  return (
-    (hours % 12) +
-    ":" +
-    (minutes < 10 ? "0" : "") +
-    minutes +
-    " " +
-    (hours < 12 ? "AM" : "PM")
-  );
-};
-
-export const formatTime = (time) => {
-  let months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-  ];
-
-  let date = new Date(time);
-  let now = new Date();
-
-  // if its the same day
-  if (now.getFullYear() === date.getFullYear() && now.getMonth() === date.getMonth() && now.getDate() === date.getDate()) {
-    return preciseTime(date.getHours(), date.getMinutes());
-  }
-  // ???
-  if (now.getTime() < date.getTime()) {
-    return "Hello time traveler! ^-^";
-  }
-  return (months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear());
-};
+import { formatTime } from '../../../Constants';
 
 export const getDataPoint = (proj, dataPoint, username) => {
   switch (dataPoint) {

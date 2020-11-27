@@ -14,7 +14,7 @@ import { withAuthorization } from '../Session';
 import { compose } from 'recompose';
 import { getNotifications, markAllNotifications, withFirebase } from '../Firebase';
 import TopBar from './TopBar';
-import { poll } from '../Constants/poll';
+import { poll } from '../Constants';
 import Fail from '../Fail';
 
 class ProjectView extends React.Component {

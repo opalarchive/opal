@@ -1,7 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { poll } from '../../Constants/poll';
-import Fail from '../../Fail';
+import { poll } from '../../Constants';
 import { tryVote } from '../../Firebase';
 import { getProjectProblems, getProjectName } from '../../Firebase';
 
@@ -18,11 +17,7 @@ class Project extends React.Component {
       loading: true
     }
 
-    this.replyLoading = true;
-    this.replyLoadingStarted = false;
-
     this.vote = this.vote.bind(this);
-    this.setReplyLoading = this.setReplyLoading.bind(this);
   }
 
   async setProject(uuid, authuid) {
@@ -80,20 +75,7 @@ class Project extends React.Component {
     }
   }
 
-  setReplyLoading(replyLoading, update) {
-    if (replyLoading === this.replyLoading) return;
-    if (replyLoading && this.replyLoadingStarted) return;
-
-    console.log(replyLoading);
-    this.replyLoading = replyLoading;
-
-    if (replyLoading) this.replyLoadingStarted = true;
-    
-    if (update) this.setState({});
-  }
-
   render() {
-    console.log('-' + this.replyLoading);
     if (this.state.loading) {
       return <Loading background="white" />;
     }
@@ -110,21 +92,13 @@ class Project extends React.Component {
       return <Unconfigured />;
     }
     return (
-      <>
-        {this.state.replyLoading ? <Loading background="white" /> : null}
-        {/* we want it to exist (and load), but not be visible*/}
-        <div style={this.state.replyLoading ? { position: "relative", top: "-200vh", height: "100%" } : { height: "100%" }}>
-          <View
-            problems={this.state.problems}
-            uuid={this.props.match.params.uuid}
-            vote={this.vote}
-            fail={this.fail}
-            replyLoading={this.replyLoading}
-            setReplyLoading={this.setReplyLoading}
-            authUser={this.props.authUser}
-          />
-        </div>
-      </>
+      <View
+        problems={this.state.problems}
+        uuid={this.props.match.params.uuid}
+        vote={this.vote}
+        fail={this.fail}
+        authUser={this.props.authUser}
+      />
     );
   }
 }

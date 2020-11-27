@@ -1,12 +1,12 @@
 import React from 'react';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import MenuBase from '../../MenuBase';
-import { arrToRGBString, camelToTitle, lerp, lowerBound } from './constants';
 import Filter from './filter';
 import Problem from './problem';
 
 import * as ROUTES from '../../../Constants/routes';
 import Details from './Details';
+import { arrToRGBString, camelToTitle, lerp, lowerBound } from '../../../Constants';
 
 class View extends React.Component {
 
@@ -88,7 +88,6 @@ class View extends React.Component {
             exact
             path={ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}
             render={_ => {
-              this.props.setReplyLoading(false, false);
               return problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, vote, authUser), repliable: true }} />)
             }}
           />
@@ -104,8 +103,6 @@ class View extends React.Component {
                   repliable: false,
                   fail,
                   loadBackground,
-                  replyLoading: this.props.replyLoading,
-                  setReplyLoading: this.props.setReplyLoading
                 }} />
               });
               return <ProblemDetails />;

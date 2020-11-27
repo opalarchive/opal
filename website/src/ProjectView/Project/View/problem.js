@@ -2,7 +2,7 @@ import React from 'react';
 
 import { darken, Paper, withStyles } from '@material-ui/core';
 import { AlignLeft, ArrowDown, ArrowUp, CornerDownRight, MessageSquare } from 'react-feather';
-import Latex from './latex';
+import Latex from '../../../Constants/latex';
 import { Link } from 'react-router-dom';
 
 import * as ROUTES from '../../../Constants/routes';

@@ -11,7 +11,7 @@ import {
   Checkbox,
   TableSortLabel
 } from "@material-ui/core";
-import { camelToTitle, getDataPoint } from "./constants.js";
+import { getDataPoint } from "./constants.js";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
@@ -23,6 +23,7 @@ import {
   restoreProject,
   starProject
 } from "../../../Firebase";
+import { camelToTitle } from "../../../Constants/index.js";
 
 class ProjectTable extends React.Component {
   constructor(props) {
