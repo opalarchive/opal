@@ -48,6 +48,8 @@ class View extends React.Component {
       defaultScroll: 0
     }
 
+    this.scrollSet = 0;
+
     this.getCategoryColor = this.getCategoryColor.bind(this);
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
     this.problemProps = this.problemProps.bind(this);
@@ -109,13 +111,18 @@ class View extends React.Component {
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
+    // don't set the scroll again if you've already done it once
+    if (!!this.state.defaultScroll) {
+      this.scrollSet++;
+    }
+
     return (
       <MenuBase
         width={20}
         right
         background={loadBackground}
         Sidebar={Filter}
-        defaultScroll={this.state.defaultScroll}
+        defaultScroll={this.scrollSet > 1 ? null : this.state.defaultScroll}
         authUser={authUser}
       >
         <Switch>
