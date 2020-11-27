@@ -122,7 +122,7 @@ class View extends React.Component {
         right
         background={loadBackground}
         Sidebar={Filter}
-        defaultScroll={this.scrollSet > 1 ? null : this.state.defaultScroll}
+        defaultScroll={this.scrollSet > 1 ? undefined : this.state.defaultScroll}
         authUser={authUser}
       >
         <Switch>
