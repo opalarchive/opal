@@ -133,8 +133,8 @@ export const markAllNotifications = async (authuid, number) => {
   return { success: true };
 }
 
-export const getProjectPrivate = async (uuid, authuid) => {
-  const attempt = await fetch(`${fetchLocation}/project-private?uuid=${uuid}&authuid=${authuid}`);
+export const getProjectProblems = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/project-problems?uuid=${uuid}&authuid=${authuid}`);
   const text = await attempt.text();
   let projObject = {};
 
@@ -150,12 +150,36 @@ export const getProjectPrivate = async (uuid, authuid) => {
   return projObject;
 };
 
+export const getProblemReplies = async (uuid, ind, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/problem-replies?uuid=${uuid}&ind=${ind}&authuid=${authuid}`);
+  const text = await attempt.text();
+  let projObject = {};
+
+  if (attempt.status !== 200 || text === 'unconfigured') {
+    return text;
+  }
+
+  try {
+    projObject = JSON.parse(text);
+  } catch (e) {
+    projObject = {};
+  }
+  return projObject;
+};
+
+export const getProjectName = async (uuid, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/project-name?uuid=${uuid}&authuid=${authuid}`);
+  const text = await attempt.text();
+
+  return { success: (attempt.status === 200 && text !== 'unconfigured'), text };
+};
+
 export const newProject = async (uid) => {
   return await fetch(`${fetchLocation}/new-project?uid=${uid}`).then(res => res.text());
 };
 
 export const tryVote = async (uuid, problemId, authuid, direction) => {
-  const attempt = await fetch(`${fetchLocation}/vote?uuid=${uuid}&problemId=${problemId}&authuid=${authuid}&direction=${direction}`);
+  const attempt = await fetch(`${fetchLocation}/project-vote?uuid=${uuid}&problemId=${problemId}&authuid=${authuid}&direction=${direction}`);
 
   if (attempt.status !== 200 && attempt.status !== 201) return attempt.text();
 

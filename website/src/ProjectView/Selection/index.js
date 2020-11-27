@@ -10,7 +10,6 @@ import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
 import MenuBase from "../MenuBase";
 import { poll } from "../../Constants/poll";
-import Fail from "../../Fail";
 
 class SelectionBase extends React.Component {
   constructor(props) {
@@ -216,9 +215,6 @@ class Selection extends React.Component {
   }
 
   render() {
-    if (this.state.fail) {
-      return <Fail />;
-    }
     if (this.state.loading) {
       return <Loading background="white" />;
     }

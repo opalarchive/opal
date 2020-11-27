@@ -1,8 +1,12 @@
 import React from 'react';
+import { Route, Switch, withRouter } from 'react-router-dom';
 import MenuBase from '../../MenuBase';
 import { arrToRGBString, camelToTitle, lerp, lowerBound } from './constants';
 import Filter from './filter';
 import Problem from './problem';
+
+import * as ROUTES from '../../../Constants/routes';
+import Details from './Details';
 
 class View extends React.Component {
 
@@ -15,7 +19,7 @@ class View extends React.Component {
         geometry: [35, 141, 25],
         combinatorics: [21, 52, 224],
         numberTheory: [173, 19, 179],
-        miscellaneous: [100, 100, 110]      
+        miscellaneous: [100, 100, 110]
       },
       difficultyColors: {
         0: [0, 200, 100],
@@ -32,7 +36,6 @@ class View extends React.Component {
   }
 
   getCategoryColor(category) {
-    console.log(category);
     return this.state.categoryColors[category];
   }
 
@@ -50,31 +53,65 @@ class View extends React.Component {
     return difficultyColor.map((value, ind) => lerp(keys[top - 1], keys[top], colors[keys[top - 1]][ind], colors[keys[top]][ind], difficulty));
   }
 
+  problemProps(prob, ind, uuid, vote, authUser) {
+    return {
+      key: ind,
+      ind: ind,
+      uuid: uuid,
+      text: prob.text,
+      category: { name: camelToTitle(prob.category), color: arrToRGBString(this.getCategoryColor(prob.category)) },
+      difficulty: { name: prob.difficulty, color: arrToRGBString(this.getDifficultyColor(prob.difficulty)) },
+      author: prob.author,
+      tags: prob.tags,
+      votes: !!prob.votes ? Object.values(prob.votes).reduce((a, b) => a + b) : 0,
+      myVote: !!prob.votes ? prob.votes[authUser.displayName] : 0,
+      vote: direction => vote(ind, direction),
+      authUser: authUser
+    };
+  }
+
   render() {
-    const { project, vote, authUser } = this.props;
+    const { problems, uuid, vote, fail, authUser } = this.props;
+
+    const loadBackground = "rgb(0, 0, 0, 0.025)";
+
     return (
       <MenuBase
         width={20}
         right
-        background="rgb(0, 0, 0, 0.025)"
+        background={loadBackground}
         Sidebar={Filter}
         authUser={authUser}
       >
-        {project.problems.map((prob, ind) =>
-          <Problem
-            key={ind}
-            ind={ind}
-            text={prob.text}
-            category={{ name: camelToTitle(prob.category), color: arrToRGBString(this.getCategoryColor(prob.category)) }}
-            difficulty={{ name: prob.difficulty, color: arrToRGBString(this.getDifficultyColor(prob.difficulty)) }}
-            author={prob.author}
-            tags={prob.tags}
-            votes={!!prob.votes ? Object.values(prob.votes).reduce((a, b) => a + b) : 0}
-            myVote={!!prob.votes ? prob.votes[authUser.displayName] : 0}
-            vote={direction => vote(ind, direction)}
-            authUser={authUser}
+        <Switch>
+          <Route
+            exact
+            path={ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}
+            render={_ => {
+              this.props.setReplyLoading(false, false);
+              return problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, vote, authUser), repliable: true }} />)
+            }}
           />
-        )}
+          <Route
+            exact
+            path={ROUTES.PROJECT_PROBLEM.replace(':uuid', uuid)}
+            render={_ => {
+              const ProblemDetails = withRouter((props) => {
+                const ind = parseInt(props.match.params.ind);
+
+                return <Details {...{
+                  ...this.problemProps(problems[ind], ind, uuid, vote, authUser),
+                  repliable: false,
+                  fail,
+                  loadBackground,
+                  replyLoading: this.props.replyLoading,
+                  setReplyLoading: this.props.setReplyLoading
+                }} />
+              });
+              return <ProblemDetails />;
+            }}
+          />
+        </Switch>
       </MenuBase>
     );
   }

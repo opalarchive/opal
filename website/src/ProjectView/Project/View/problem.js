@@ -3,6 +3,9 @@ import React from 'react';
 import { darken, Paper, withStyles } from '@material-ui/core';
 import { AlignLeft, ArrowDown, ArrowUp, CornerDownRight, MessageSquare } from 'react-feather';
 import Latex from './latex';
+import { Link } from 'react-router-dom';
+
+import * as ROUTES from '../../../Constants/routes';
 
 const styles = (category, difficulty) => (theme) => ({
   root: {
@@ -14,7 +17,7 @@ const styles = (category, difficulty) => (theme) => ({
     display: "flex",
     flexDirection: "column",
     fontSize: "1.1rem",
-    minWidth: "3rem"
+    minWidth: "4rem"
   },
   leftIndex: {
     padding: "1rem 0 0.5rem 0",
@@ -80,7 +83,7 @@ const styles = (category, difficulty) => (theme) => ({
     display: "inline-block",
     flexShrink: 0,
     position: "relative",
-    top: "0.3rem",
+    top: "0.28rem",
     height: "1rem",
     width: "1rem",
     marginRight: "0.5rem"
@@ -88,7 +91,7 @@ const styles = (category, difficulty) => (theme) => ({
   rightDot: {
     height: "0.75rem",
     width: "0.75rem",
-    top: "0.43rem",
+    top: "0.41rem",
     borderRadius: "50%",
     margin: "0 0.6rem 0 0.1rem"
   },
@@ -96,7 +99,7 @@ const styles = (category, difficulty) => (theme) => ({
     backgroundColor: category.color,
   },
   rightDifficulty: {
-    padding: "0.5rem 0.5rem 0 0.5rem",
+    padding: "0.5rem",
     display: "flex"
   },
   rightDifficultyDot: {
@@ -106,16 +109,25 @@ const styles = (category, difficulty) => (theme) => ({
     flexGrow: 1
   },
   rightComments: {
-    padding: "0.5rem 0.5rem 0 0.5rem",
+    padding: "0 0.5rem 0.5rem 0.5rem",
     display: "flex"
   },
   rightSolutions: {
-    padding: "0.5rem 0.5rem 0 0.5rem",
+    padding: "0 0.5rem 0.5rem 0.5rem",
     display: "flex"
   },
   rightReply: {
-    padding: "0.5rem",
-    display: "flex"
+    padding: "0 0.5rem 0.5rem 0.5rem",
+    display: "flex",
+    color: "rgba(0, 0, 0, 0.87)",
+    textDecoration: "none",
+    '&:hover': {
+      color: darken(theme.palette.secondary.dark, 0.1)
+    },
+    '&:focus': {
+      color: darken(theme.palette.secondary.dark, 0.1),
+      outline: "none"
+    }
   },
   tag: {
     marginRight: "0.25rem",
@@ -134,7 +146,7 @@ const Tag = (props) => {
 
 class ProblemBase extends React.Component {
   render() {
-    const { classes: styles, ind, text, category, difficulty, author, tags, votes, myVote, vote, authUser } = this.props;
+    const { classes: styles, ind, uuid, text, category, difficulty, author, tags, votes, myVote, vote, repliable, authUser } = this.props;
     return (
       <Paper square elevation={3} className={styles.root}>
         <div className={styles.left}>
@@ -182,7 +194,7 @@ class ProblemBase extends React.Component {
           <div className={styles.rightFiller} />
           <div className={styles.rightComments}><MessageSquare className={styles.rightIcon} />5&nbsp;comments</div>
           <div className={styles.rightSolutions}><AlignLeft className={styles.rightIcon} />1&nbsp;solution</div>
-          <div className={styles.rightReply}><CornerDownRight className={styles.rightIcon} />Reply</div>
+          {repliable ? <Link className={styles.rightReply} to={`${ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}/p${ind}`}><CornerDownRight className={styles.rightIcon} />Reply</Link> : null}
         </div>
       </Paper>
     );

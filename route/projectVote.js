@@ -1,7 +1,7 @@
-const { clientdb } = require('../helpers/clientdb');
+const clientdb = require('../helpers/clientdb');
 
 module.exports = {
-  path: '/vote',
+  path: '/project-vote',
   execute: async (req, res) => {
     const uuid = req.query.uuid;
     const problemId = req.query.problemId;
