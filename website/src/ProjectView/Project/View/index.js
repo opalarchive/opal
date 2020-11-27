@@ -17,6 +17,7 @@ const ProblemDetails = (props) => {
     repliable: false,
     comment: text => props.comment(ind, text),
     fail: props.fail,
+    setDefaultScroll: props.setDefaultScroll,
     loadBackground: props.loadBackground,
   }} />
 };
@@ -44,11 +45,13 @@ class View extends React.Component {
         75: [255, 0, 0],
         100: [0, 0, 0]
       },
+      defaultScroll: 0
     }
 
     this.getCategoryColor = this.getCategoryColor.bind(this);
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
     this.problemProps = this.problemProps.bind(this);
+    this.setDefaultScroll = this.setDefaultScroll.bind(this);
   }
 
   getCategoryColor(category) {
@@ -79,7 +82,6 @@ class View extends React.Component {
         replyTypes[reply.type]++;
       });
     }
-    console.log(replyTypes);
 
     return {
       key: ind,
@@ -98,6 +100,10 @@ class View extends React.Component {
     };
   }
 
+  setDefaultScroll(defaultScroll) {
+    this.setState({ defaultScroll });
+  }
+
   render() {
     const { project, uuid, vote, comment, fail, authUser } = this.props;
 
@@ -109,6 +115,7 @@ class View extends React.Component {
         right
         background={loadBackground}
         Sidebar={Filter}
+        defaultScroll={this.state.defaultScroll}
         authUser={authUser}
       >
         <Switch>
@@ -121,7 +128,7 @@ class View extends React.Component {
           />
           <Route
             exact
-            path={ROUTES.PROJECT_PROBLEM.replace(':uuid', uuid)}
+            path={[ROUTES.PROJECT_PROBLEM.replace(':uuid', uuid), ROUTES.PROJECT_PROBLEM_REPLY.replace(':uuid', uuid)]}
             render={_ =>
               <RoutedDetails
                 problemProps={this.problemProps}
@@ -130,6 +137,7 @@ class View extends React.Component {
                 vote={vote}
                 comment={comment}
                 fail={fail}
+                setDefaultScroll={this.setDefaultScroll}
                 authUser={authUser}
                 loadBackground={loadBackground}
               />

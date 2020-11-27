@@ -79,8 +79,6 @@ class Project extends React.Component {
   async comment(ind, text) {
     const oldProject = this.state.project, project = this.state.project;
 
-    console.log(ind);
-
     if (!project.problems[ind].replies) {
       project.problems[ind].replies = [];
     }

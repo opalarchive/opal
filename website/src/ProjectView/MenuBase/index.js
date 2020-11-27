@@ -2,7 +2,7 @@ import React from 'react';
 import Scrollbar from 'react-scrollbars-custom';
 
 const MenuBase = (props) => {
-  const { width, right, background, Sidebar, authUser, children } = props;
+  const { width, right, background, Sidebar, defaultScroll, authUser, children } = props;
 
   return (
     <>
@@ -21,6 +21,7 @@ const MenuBase = (props) => {
         <Scrollbar
           disableTracksWidthCompensation
           noScrollX
+          scrollTop={defaultScroll}
         >
           <div style={{
             padding: "1rem",

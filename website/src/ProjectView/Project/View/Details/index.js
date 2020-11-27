@@ -2,12 +2,10 @@ import React from 'react';
 import { ChevronLeft } from 'react-feather';
 import { darken, lighten, Paper, withStyles } from '@material-ui/core';
 import Problem from '../problem';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import { compose } from 'recompose';
 
 import * as ROUTES from '../../../../Constants/routes';
-import { getProblemReplies } from '../../../../Firebase';
-import { poll } from '../../../../Constants';
-import Loading from '../../../../Loading';
 import Reply from './reply';
 
 const detailStyles = (theme) => ({
@@ -56,22 +54,51 @@ const detailStyles = (theme) => ({
 });
 
 class Details extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.commentRefs = [];
+  }
+
+  componentDidMount() {
+    let reply = this.props.match.params.reply;
+    if (!reply) return;
+
+    reply = parseInt(reply);
+
+    if (this.commentRefs.length <= reply) return;
+
+    const rem = parseInt(window.getComputedStyle(this.top).fontSize.replace("px", ""));
+
+    const Reply0 = rem * 2 + this.top.clientHeight + this.prob.clientHeight;
+
+    if (reply === 0) {
+      this.props.setDefaultScroll(Reply0);
+    } else {
+      this.props.setDefaultScroll(Reply0 + [...Array(reply).keys()].reduce((acc, cur) => acc + this.commentRefs[cur].clientHeight + rem, 0));
+    }
+  }
+
   render() {
     const { classes: styles, replies, comment, ...otherProps } = this.props;
 
     return (
       <>
-        <div className={styles.top}>
+        <div className={styles.top} ref={ref => { this.top = ref }}>
           <Link className={styles.topLink} to={ROUTES.PROJECT_VIEW.replace(':uuid', otherProps.uuid)} >
             <ChevronLeft className={styles.topIcon} />Back
-        </Link>
+          </Link>
           <div className={styles.topFiller} />
         </div>
-        <Problem {...otherProps} />
+
+        <div ref={ref => { this.prob = ref }}>
+          <Problem  {...otherProps} />
+        </div>
+
         <div className={styles.replyOffset}>
           <div className={styles.replyWrapper}>
             <div className={styles.replyLine} />
-            {!!replies && replies.map((reply, id) => <Reply key={id} {...reply} id={id}  />)}
+            {!!replies && replies.map((reply, id) => <div key={id} ref={ref => { this.commentRefs[id] = ref }}><Reply {...reply} /></div>)}
           </div>
           <Reply type="input" comment={comment} />
         </div>
@@ -80,4 +107,4 @@ class Details extends React.Component {
   }
 }
 
-export default withStyles(detailStyles)(Details);
+export default compose(withStyles(detailStyles), withRouter)(Details);
