@@ -70,13 +70,16 @@ class View extends React.Component {
   }
 
   problemProps(prob, ind, uuid, vote, authUser) {
-    const replyTypes = { comments: 0, solutions: 0 };
+    const replyTypes = {}
     if (!!prob.replies) {
       prob.replies.forEach(reply => {
-        if (reply.solution) replyTypes.solutions++;
-        else replyTypes.comments++;
+        if (!replyTypes[reply.type]) {
+          replyTypes[reply.type] = 0;
+        }
+        replyTypes[reply.type]++;
       });
     }
+    console.log(replyTypes);
 
     return {
       key: ind,

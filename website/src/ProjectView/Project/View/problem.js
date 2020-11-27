@@ -194,11 +194,11 @@ class ProblemBase extends React.Component {
           <div className={styles.rightFiller} />
           <div className={styles.rightComments}>
             <MessageSquare className={styles.rightIcon} />
-            {replyTypes.comments}&nbsp;comment{replyTypes.comments === 1 ? '' : 's'}
+            {replyTypes.comment}&nbsp;comment{replyTypes.comment === 1 ? '' : 's'}
           </div>
           <div className={styles.rightSolutions}>
             <AlignLeft className={styles.rightIcon} />
-            {replyTypes.solutions}&nbsp;solution{replyTypes.solutions === 1 ? '' : 's'}
+            {replyTypes.solution}&nbsp;solution{replyTypes.solution === 1 ? '' : 's'}
           </div>
           {repliable ? <Link className={styles.rightReply} to={`${ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}/p${ind}`}><CornerDownRight className={styles.rightIcon} />Reply</Link> : null}
         </div>
