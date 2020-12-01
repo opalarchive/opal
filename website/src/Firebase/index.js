@@ -161,21 +161,14 @@ export const newProject = async (uid) => {
   return await fetch(`${fetchLocation}/new-project?uid=${uid}`).then(res => res.text());
 };
 
-export const tryVote = async (uuid, problemId, authuid, direction) => {
-  const attempt = await fetch(`${fetchLocation}/project-vote?uuid=${uuid}&problemId=${problemId}&authuid=${authuid}&direction=${direction}`);
+export const tryProblemAction = async (uuid, problemId, data, type, authuid) => {
+  const attempt = await fetch(`${fetchLocation}/problem-action?uuid=${uuid}&problemId=${problemId}&data=${data}&type=${type}&authuid=${authuid}`);
 
   if (attempt.status !== 200 && attempt.status !== 201) return attempt.text();
 
   return { success: true };
 };
 
-export const tryComment = async (uuid, problemId, authuid, text) => {
-  const attempt = await fetch(`${fetchLocation}/project-write-comment?uuid=${uuid}&problemId=${problemId}&authuid=${authuid}&text=${text}`);
-
-  if (attempt.status !== 200 && attempt.status !== 201) return attempt.text();
-
-  return { success: true };
-};
 
 export const understandError = e => {
   let error = "";

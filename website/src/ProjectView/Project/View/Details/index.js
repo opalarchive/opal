@@ -80,7 +80,7 @@ class Details extends React.Component {
   }
 
   render() {
-    const { classes: styles, replies, comment, ...otherProps } = this.props;
+    const { classes: styles, replies, ...otherProps } = this.props;
 
     return (
       <>
@@ -100,7 +100,7 @@ class Details extends React.Component {
             <div className={styles.replyLine} />
             {!!replies && replies.map((reply, id) => <div key={id} ref={ref => { this.commentRefs[id] = ref }}><Reply {...reply} /></div>)}
           </div>
-          <Reply type="input" comment={comment} />
+          <Reply type="input" problemAction={otherProps.problemAction} />
         </div>
       </>
     );

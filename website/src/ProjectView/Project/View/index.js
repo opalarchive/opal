@@ -13,9 +13,8 @@ const ProblemDetails = (props) => {
 
   return <Details {...{
     replies: props.problems[ind].replies,
-    ...props.problemProps(props.problems[ind], ind, props.uuid, props.vote, props.authUser),
+    ...props.problemProps(props.problems[ind], ind, props.uuid, props.problemAction, props.authUser),
     repliable: false,
-    comment: text => props.comment(ind, text),
     fail: props.fail,
     setDefaultScroll: props.setDefaultScroll,
     loadBackground: props.loadBackground,
@@ -74,7 +73,7 @@ class View extends React.Component {
     return difficultyColor.map((value, ind) => lerp(keys[top - 1], keys[top], colors[keys[top - 1]][ind], colors[keys[top]][ind], difficulty));
   }
 
-  problemProps(prob, ind, uuid, vote, authUser) {
+  problemProps(prob, ind, uuid, problemAction, authUser) {
     const replyTypes = {}
     if (!!prob.replies) {
       prob.replies.forEach(reply => {
@@ -96,7 +95,7 @@ class View extends React.Component {
       tags: prob.tags,
       votes: !!prob.votes ? Object.values(prob.votes).reduce((a, b) => a + b) : 0,
       myVote: !!prob.votes ? prob.votes[authUser.displayName] : 0,
-      vote: direction => vote(ind, direction),
+      problemAction: (data, type) => problemAction(ind, data, type),
       replyTypes,
       authUser: authUser
     };
@@ -107,7 +106,7 @@ class View extends React.Component {
   }
 
   render() {
-    const { project, uuid, vote, comment, fail, authUser } = this.props;
+    const { project, uuid, problemAction, fail, authUser } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -130,7 +129,7 @@ class View extends React.Component {
             exact
             path={ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}
             render={_ => {
-              return project.problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, vote, authUser), repliable: true }} />)
+              return project.problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, problemAction, authUser), repliable: true }} />)
             }}
           />
           <Route
@@ -141,8 +140,7 @@ class View extends React.Component {
                 problemProps={this.problemProps}
                 problems={project.problems}
                 uuid={uuid}
-                vote={vote}
-                comment={comment}
+                problemAction={problemAction}
                 fail={fail}
                 setDefaultScroll={this.setDefaultScroll}
                 authUser={authUser}

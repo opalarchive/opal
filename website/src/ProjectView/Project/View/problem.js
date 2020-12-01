@@ -146,7 +146,7 @@ const Tag = (props) => {
 
 class ProblemBase extends React.Component {
   render() {
-    const { classes: styles, ind, uuid, text, category, difficulty, author, tags, votes, myVote, vote, replyTypes, repliable, authUser } = this.props;
+    const { classes: styles, ind, uuid, text, category, difficulty, author, tags, votes, myVote, problemAction, replyTypes, repliable, authUser } = this.props;
     return (
       <Paper square elevation={3} className={styles.root}>
         <div className={styles.left}>
@@ -159,7 +159,7 @@ class ProblemBase extends React.Component {
                 size="1.2rem"
                 strokeWidth={3}
                 className={myVote === 1 ? styles.leftVoteArrowActivated : styles.leftVoteArrow}
-                onClick={_ => vote(1)}
+                onClick={_ => problemAction(1, 'vote')}
               />
             </div>
             <div><span className={styles.leftVoteNumber}>{votes}</span></div>
@@ -168,7 +168,7 @@ class ProblemBase extends React.Component {
                 size="1.2rem"
                 strokeWidth={3}
                 className={myVote === -1 ? styles.leftVoteArrowActivated : styles.leftVoteArrow}
-                onClick={_ => vote(-1)}
+                onClick={_ => problemAction(-1, 'vote')}
               />
             </div>
           </div>

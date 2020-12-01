@@ -112,7 +112,7 @@ class Reply extends React.Component {
 
     if (this.state.input.length < 8) return;
 
-    this.props.comment(this.state.input);
+    this.props.problemAction(this.state.input, 'comment');
     this.setState({ input: '' });
   }
 

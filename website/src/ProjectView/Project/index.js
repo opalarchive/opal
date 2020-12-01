@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { poll } from '../../Constants';
-import { getProjectPrivate, tryComment, tryVote } from '../../Firebase';
+import { getProjectPrivate, tryProblemAction } from '../../Firebase';
 import { getProjectName } from '../../Firebase';
 
 import Loading from '../../Loading';
@@ -17,8 +17,7 @@ class Project extends React.Component {
       loading: true
     }
 
-    this.vote = this.vote.bind(this);
-    this.comment = this.comment.bind(this);
+    this.problemAction = this.problemAction.bind(this);
   }
 
   async setProject(uuid, authuid) {
@@ -55,44 +54,48 @@ class Project extends React.Component {
     }
   }
 
-  async vote(ind, direction) {
-    const oldProject = this.state.project, project = this.state.project;
-    if (!project.problems[ind].votes) {
-      project.problems[ind].votes = {};
-    }
+  clientSideAction(ind, data, type) {
+    let project = this.state.project;
+    const displayName = this.props.authUser.displayName;
 
-    if (project.problems[ind].votes[this.props.authUser.displayName] === direction)
-      project.problems[ind].votes[this.props.authUser.displayName] = 0;
-    else
-      project.problems[ind].votes[this.props.authUser.displayName] = direction;
+    switch (type) {
+      case 'vote':
+        if (!project.problems[ind].votes) {
+          project.problems[ind].votes = {}
+        }
+        const newVote = (project.problems[ind].votes[displayName] === data) ? 0 : data;
+        project.problems[ind].votes[displayName] = newVote;
 
-    this.setState({ project });
+        return project;
+      case 'comment':
+        let index = 0;
+        if (!!project.problems[ind].replies) {
+          index = project.problems[ind].replies.length;
+        } else {
+          project.problems[ind].replies = [];
+        }
 
-    const result = await tryVote(this.props.match.params.uuid, ind, this.props.authUser.uid, direction);
+        console.log(project.problems[ind].replies);
 
-    if (!result.success) {
-      console.log(result);
-      this.setState({ project: oldProject });
+        const now = new Date();
+        project.problems[ind].replies[index] = {
+          author: displayName,
+          text: data,
+          time: now.getTime(),
+          type: 'comment'
+        };
+
+        return project;
+      default:
+        return project;
     }
   }
 
-  async comment(ind, text) {
-    const oldProject = this.state.project, project = this.state.project;
+  async problemAction(ind, data, type) {
+    const oldProject = this.state.project;
+    this.setState({ project: this.clientSideAction(ind, data, type) });
 
-    if (!project.problems[ind].replies) {
-      project.problems[ind].replies = [];
-    }
-    const now = new Date();
-    project.problems[ind].replies.push({
-      author: this.props.authUser.displayName,
-      text,
-      time: now.getTime(),
-      type: 'comment'
-    })
-
-    this.setState({ project });
-
-    const result = await tryComment(this.props.match.params.uuid, ind, this.props.authUser.uid, text);
+    const result = await tryProblemAction(this.props.match.params.uuid, ind, data, type, this.props.authUser.uid);
 
     if (!result.success) {
       console.log(result);
@@ -120,8 +123,7 @@ class Project extends React.Component {
       <View
         project={this.state.project}
         uuid={this.props.match.params.uuid}
-        vote={this.vote}
-        comment={this.comment}
+        problemAction={this.problemAction}
         fail={this.fail}
         authUser={this.props.authUser}
       />
