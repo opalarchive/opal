@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft } from 'react-feather';
-import { darken, lighten, Paper, withStyles } from '@material-ui/core';
+import { darken, lighten, withStyles } from '@material-ui/core';
 import Problem from '../problem';
 import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
@@ -98,7 +98,7 @@ class Details extends React.Component {
         <div className={styles.replyOffset}>
           <div className={styles.replyWrapper}>
             <div className={styles.replyLine} />
-            {!!replies && replies.map((reply, id) => <div key={id} ref={ref => { this.commentRefs[id] = ref }}><Reply {...reply} /></div>)}
+            {!!replies && replies.map((reply, id) => <div key={id} ref={ref => { this.commentRefs[id] = ref }}><Reply {...reply} uuid={otherProps.uuid} ind={otherProps.ind} id={id} isHighlighted={parseInt(this.props.match.params.reply) === id} /></div>)}
           </div>
           <Reply type="input" problemAction={otherProps.problemAction} />
         </div>

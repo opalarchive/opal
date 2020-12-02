@@ -13,6 +13,16 @@ const styles = (category, difficulty) => (theme) => ({
     marginBottom: "1rem",
     display: "flex",
   },
+  icon: {
+    display: "inline-block",
+    flexShrink: 0,
+    position: "relative",
+    top: "0.28rem",
+    fontSize: "1.2rem",
+    height: "1.2rem",
+    width: "1.2rem",
+    marginRight: "0.5rem"
+  },
   left: {
     display: "flex",
     flexDirection: "column",
@@ -67,6 +77,21 @@ const styles = (category, difficulty) => (theme) => ({
   bodyTags: {
     padding: "0.5rem",
   },
+  bodyReply: {
+    padding: "0.5rem 0.5rem 0.5rem 0.5rem",
+    display: "flex",
+  },
+  bodyReplyLink: {
+    color: "rgba(0, 0, 0, 0.87)",
+    textDecoration: "none",
+    '&:hover': {
+      color: darken(theme.palette.secondary.light, 0.1)
+    },
+    '&:focus': {
+      color: darken(theme.palette.secondary.light, 0.1),
+      outline: "none"
+    }
+  },
   right: {
     padding: "0.25rem 0.5rem 0.25rem 0",
     display: "flex",
@@ -79,19 +104,10 @@ const styles = (category, difficulty) => (theme) => ({
     padding: "0.5rem 0.5rem 0 0.5rem",
     display: "flex"
   },
-  rightIcon: {
-    display: "inline-block",
-    flexShrink: 0,
-    position: "relative",
-    top: "0.28rem",
-    height: "1.2rem",
-    width: "1.2rem",
-    marginRight: "0.5rem"
-  },
   rightDot: {
     height: "0.75rem",
     width: "0.75rem",
-    top: "0.41rem",
+    top: "0.48rem",
     borderRadius: "50%",
     margin: "0 0.7rem 0 0.2rem"
   },
@@ -115,19 +131,6 @@ const styles = (category, difficulty) => (theme) => ({
   rightSolutions: {
     padding: "0 0.5rem 0.5rem 0.5rem",
     display: "flex"
-  },
-  rightReply: {
-    padding: "0 0.5rem 0.5rem 0.5rem",
-    display: "flex",
-    color: "rgba(0, 0, 0, 0.87)",
-    textDecoration: "none",
-    '&:hover': {
-      color: darken(theme.palette.secondary.light, 0.1)
-    },
-    '&:focus': {
-      color: darken(theme.palette.secondary.light, 0.1),
-      outline: "none"
-    }
   },
   tag: {
     marginRight: "0.25rem",
@@ -187,20 +190,20 @@ class ProblemBase extends React.Component {
           <div className={styles.bodyTags}>
             Tags: {!!tags ? tags.map(tag => <Tag styles={styles} key={tag} text={tag} />) : null}
           </div>
+          {repliable ? <div className={styles.bodyReply}><Link className={styles.bodyReplyLink} to={`${ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}/p${ind}`}><CornerDownRight className={styles.icon} />Reply</Link></div> : null}
         </div>
         <div className={styles.right}>
-          <div className={styles.rightCategory}><div className={`${styles.rightIcon} ${styles.rightDot} ${styles.rightCategoryDot}`}></div>{category.name}</div>
-          <div className={styles.rightDifficulty}><div className={`${styles.rightIcon} ${styles.rightDot} ${styles.rightDifficultyDot}`}></div>d-{difficulty.name}</div>
+          <div className={styles.rightCategory}><div className={`${styles.icon} ${styles.rightDot} ${styles.rightCategoryDot}`}></div>{category.name}</div>
+          <div className={styles.rightDifficulty}><div className={`${styles.icon} ${styles.rightDot} ${styles.rightDifficultyDot}`}></div>d-{difficulty.name}</div>
           <div className={styles.rightFiller} />
           <div className={styles.rightComments}>
-            <MessageSquare className={styles.rightIcon} />
+            <MessageSquare className={styles.icon} />
             {replyTypes.comment}&nbsp;comment{replyTypes.comment === 1 ? '' : 's'}
           </div>
           <div className={styles.rightSolutions}>
-            <AlignLeft className={styles.rightIcon} />
+            <AlignLeft className={styles.icon} />
             {replyTypes.solution}&nbsp;solution{replyTypes.solution === 1 ? '' : 's'}
           </div>
-          {repliable ? <Link className={styles.rightReply} to={`${ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}/p${ind}`}><CornerDownRight className={styles.rightIcon} />Reply</Link> : null}
         </div>
       </Paper>
     );

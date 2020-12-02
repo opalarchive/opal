@@ -1,9 +1,11 @@
 import React from 'react';
 
-import { Button, darken, Paper, TextField, withStyles } from '@material-ui/core';
-import { AlignLeft, Circle, CornerRightUp, Edit2, MessageSquare } from 'react-feather';
+import { Button, darken, IconButton, Paper, TextField, Tooltip, withStyles, withTheme } from '@material-ui/core';
+import { AlignLeft, Circle, CornerRightUp, Edit2, Link2, MessageSquare } from 'react-feather';
 import Latex from '../../../../Constants/latex';
 import { formatTime } from '../../../../Constants';
+import * as ROUTES from '../../../../Constants/routes';
+import { compose } from 'recompose';
 
 const styles = (theme) => ({
   root: {
@@ -46,9 +48,24 @@ const styles = (theme) => ({
   time: {
     color: "rgba(0, 0, 0, 0.64)"
   },
+  filler: {
+    flexGrow: 1
+  },
+  actions: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center"
+  },
+  linkIcon: {
+    padding: 0,
+    display: "inline-block"
+  },
   text: {
     paddingTop: "0.5rem"
   },
+  // highlightPaper: {
+  //   boxShadow: `0 0.3rem 0.3rem 0 ${darken(fade(theme.palette.primary.main, 0.4), 0.2)}, 0 0.3rem 0.2rem 0.1rem ${darken(fade(theme.palette.secondary.main, 0.24), 0.2)}, 0 0.1rem 0.6rem 0.1rem ${darken(fade(theme.palette.secondary.main, 0.28), 0.2)}`
+  // },
   reveal: {
     color: darken(theme.palette.secondary.main, 0.25),
     cursor: "pointer",
@@ -176,21 +193,33 @@ class Reply extends React.Component {
   }
 
   render() {
-    const { classes: styles, type, author, time, text, id } = this.props;
+    const { classes: styles, theme, type, author, time, text, uuid, ind, id, isHighlighted } = this.props;
 
     const Icon = this.getIcon(type);
+    const linkPrefix = window.location.href.substr(0, window.location.href.indexOf(window.location.pathname)) 
+    const link = linkPrefix + ROUTES.PROJECT_PROBLEM_REPLY.replace(':uuid', uuid).replace(':ind', ind).replace(':reply', id);
     return (
-      <div className={styles.root} id={`c${id}`}>
-        <Paper square elevation={3} className={styles.reply}>
+      <div className={styles.root}>
+        <Paper square elevation={3} className={`${styles.reply} ${isHighlighted ? styles.highlightPaper : null}`}>
           {!!author && <div className={styles.top}>
             <div className={styles.author}>{author}</div>
             <div className={styles.time}>{formatTime(time)}</div>
+            <div className={styles.filler} />
+            <div className={styles.actions}>
+              <Tooltip title="Get Link" aria-label="get link">
+                <IconButton className={styles.linkIcon} onClick={() => {
+                  navigator.clipboard.writeText(link)
+                }}>
+                  <Link2 size="1.2rem" />
+                </IconButton>
+              </Tooltip>
+            </div>
           </div>}
           {this.getText(type, styles, text)}
         </Paper>
 
-        <Paper square elevation={3} className={styles.iconPaper}>
-          <Icon className={styles.icon} />
+        <Paper square elevation={3} className={`${styles.iconPaper} ${isHighlighted ? styles.highlightPaper : null}`}>
+          <Icon className={styles.icon} stroke={isHighlighted ? darken(theme.palette.secondary.main, 0.1) : "currentColor"} fill={isHighlighted ? darken(theme.palette.secondary.main, 0.1) : "none"} />
           <div className={styles.iconBodge} />
         </Paper>
       </div>
@@ -198,4 +227,4 @@ class Reply extends React.Component {
   }
 }
 
-export default withStyles(styles)(Reply);;
+export default compose(withStyles(styles), withTheme)(Reply);;
