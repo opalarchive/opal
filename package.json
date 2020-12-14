@@ -1,34 +1,10 @@
 {
-  "name": "math-oly",
+  "name": "opal",
   "version": "1.0.0",
-  "description": "A website for the Mathematical Olympiad Competition.",
-  "main": "index.js",
   "scripts": {
-    "start": "concurrently -n 'server,client' -c 'green,red' -i \"npm test\" \"cd website && npm start\"",
-    "test": "npx nodemon index.js"
+    "start": "concurrently -n 'client,server' -c 'red,green' \"cd client & npm start\" \"cd server & npm start\""
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "concurrently": "^5.3.0",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-recaptcha": "^5.0.2",
-    "firebase-admin": "^9.2.0",
-    "googleapis": "^61.0.0",
-    "nodemailer": "^6.4.14",
-    "nodemon": "^2.0.4",
-    "uuid": "^8.3.1"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AmoleR/opal.git"
-  },
-  "bugs": {
-    "url": "https://github.com/AmoleR/opal/issues"
-  },
-  "homepage": "https://github.com/AmoleR/opal#readme"
+    "concurrently": "^5.3.0"
+  }
 }
