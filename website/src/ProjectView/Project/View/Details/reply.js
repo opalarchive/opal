@@ -200,7 +200,7 @@ class Reply extends React.Component {
     const link = linkPrefix + ROUTES.PROJECT_PROBLEM_REPLY.replace(':uuid', uuid).replace(':ind', ind).replace(':reply', id);
     return (
       <div className={styles.root}>
-        <Paper square elevation={3} className={`${styles.reply} ${isHighlighted ? styles.highlightPaper : null}`}>
+        <Paper elevation={3} className={`${styles.reply} ${isHighlighted ? styles.highlightPaper : null}`}>
           {!!author && <div className={styles.top}>
             <div className={styles.author}>{author}</div>
             <div className={styles.time}>{formatTime(time)}</div>
@@ -218,7 +218,7 @@ class Reply extends React.Component {
           {this.getText(type, styles, text)}
         </Paper>
 
-        <Paper square elevation={3} className={`${styles.iconPaper} ${isHighlighted ? styles.highlightPaper : null}`}>
+        <Paper elevation={3} className={`${styles.iconPaper} ${isHighlighted ? styles.highlightPaper : null}`}>
           <Icon className={styles.icon} stroke={isHighlighted ? darken(theme.palette.secondary.main, 0.1) : "currentColor"} fill={isHighlighted ? darken(theme.palette.secondary.main, 0.1) : "none"} />
           <div className={styles.iconBodge} />
         </Paper>

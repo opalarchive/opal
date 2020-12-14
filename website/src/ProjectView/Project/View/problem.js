@@ -151,7 +151,7 @@ class ProblemBase extends React.Component {
   render() {
     const { classes: styles, ind, uuid, text, category, difficulty, author, tags, votes, myVote, problemAction, replyTypes, repliable, authUser } = this.props;
     return (
-      <Paper square elevation={3} className={styles.root}>
+      <Paper elevation={3} className={styles.root}>
         <div className={styles.left}>
           <div className={styles.leftIndex}>
             #{ind + 1}

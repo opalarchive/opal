@@ -19,7 +19,6 @@ const MenuBase = (props) => {
         }}
       >
         <Scrollbar
-          disableTracksWidthCompensation
           noScrollX
           scrollTop={defaultScroll}
         >
