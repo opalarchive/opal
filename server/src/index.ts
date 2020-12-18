@@ -92,25 +92,31 @@
  * contents of the request, while the port is where our server runs. Lastly, the
  * CORS is required to access the server in development.
  */
-const express = require('express');
+
+import express from "express";
+import fs from "fs";
+import path from "path";
+import cors from "cors";
+import bodyParser from "body-parser";
+
 const app = express();
 const port = 2718;
-const bodyParser = require('body-parser');
-const urlEncoded = bodyParser.urlencoded({ extended: false });
-const cors = require('cors');
-
-const fs = require('fs');
+const jsonEncoded = bodyParser.json();
 
 app.use(cors());
 
-const routes = fs.readdirSync("./route").filter(file => file.endsWith(".js"));
+const routes = fs
+  .readdirSync(path.resolve(__dirname, "./route"))
+  .filter((file) => file.endsWith(".js"));
 
-for (const file of routes) {
-  const route = require(`./route/${file}`);
+routes.forEach((route) => {
+  const file = require(`./route/${route}`);
 
-  app.all(route.path, urlEncoded, (req, res) => route.execute(req, res));
-}
+  app.all(`/${route.substring(0, route.length - 3)}`, jsonEncoded, (req, res) =>
+    file.execute(req, res)
+  );
+});
 
-app.listen(port, _ => {
+app.listen(port, (_) => {
   console.log(`Listening at http://localhost:${port}`);
-})
+});

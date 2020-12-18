@@ -18,7 +18,6 @@
  * @since October 20, 2020
  */
 
-
 /*
  * Get the environment variables. In this instance, we need the following:
  *     - MAILING_SERVICE_CLIENT_ID
@@ -26,23 +25,24 @@
  *     - MAILING_SERVICE_REFRESH_TOKEN
  * In addition, get NodeMailer and the google OAuth2 Client
  */
-const env = require('./envSetup');
-const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
+import env from "./envSetup";
+import * as nodemailer from "nodemailer";
+import { google } from "googleapis";
+
 const OAuth2 = google.auth.OAuth2;
 
 /*
  * Create an OAuth2 Client Instance, using the one set up on the console. This
  * allows us to connect to the Google STMP server.
  */
-const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground';
+const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
 const oauth2Client = new OAuth2(
   env.MAILING_SERVICE_CLIENT_ID,
   env.MAILING_SERVICE_CLIENT_SECRET,
   OAUTH_PLAYGROUND
 );
 oauth2Client.setCredentials({
-  refresh_token: env.MAILING_SERVICE_REFRESH_TOKEN
+  refresh_token: env.MAILING_SERVICE_REFRESH_TOKEN,
 });
 
 /*
@@ -58,13 +58,12 @@ oauth2Client.setCredentials({
  *
  * Note that the function is asynchronous
  */
-const sendEmail = data => {
-
+export const sendEmail = (data) => {
   const accessToken = oauth2Client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
-      type: 'OAuth2',
+      type: "OAuth2",
       user: "onlineproblemarchivallocation@gmail.com",
       clientId: env.MAILING_SERVICE_CLIENT_ID,
       clientSecret: env.MAILING_SERVICE_CLIENT_SECRET,
@@ -77,7 +76,7 @@ const sendEmail = data => {
     from: "onlineproblemarchivallocation@gmail.com",
     to: data.email,
     subject: data.subject,
-    html: data.content
+    html: data.content,
   };
 
   smtpTransport.sendMail(mailOptions, (err, info) => {
@@ -85,5 +84,3 @@ const sendEmail = data => {
     return info;
   });
 };
-
-module.exports = sendEmail;

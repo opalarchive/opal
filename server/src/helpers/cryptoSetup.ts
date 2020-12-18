@@ -29,43 +29,44 @@
  * @since October 20, 2020
  */
 
-
 /*
  * Get the environment variables. In this instance, we need the following:
  *     - ENCRYPTION_KEY
  *     - ENCRYPTION_IV
  * In addition, get the CryptoJS module
  */
-const env = require('./envSetup');
-const crypto = require('crypto');
 
-const encrypt = ((val) => {
-  let cipher = crypto.createCipheriv('aes-256-cbc', env.ENCRYPTION_KEY, env.ENCRYPTION_IV);
-  let encrypted = cipher.update(val, 'utf8', 'base64');
-  encrypted += cipher.final('base64');
+import env from "./envSetup";
+import * as crypto from "crypto";
+
+export const encrypt = (val) => {
+  let cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    env.ENCRYPTION_KEY,
+    env.ENCRYPTION_IV
+  );
+  let encrypted = cipher.update(val, "utf8", "base64");
+  encrypted += cipher.final("base64");
   return encrypted;
-});
+};
 
-const decrypt = ((encrypted) => {
-  let decipher = crypto.createDecipheriv('aes-256-cbc', env.ENCRYPTION_KEY, env.ENCRYPTION_IV);
-  let decrypted = decipher.update(encrypted, 'base64', 'utf8');
-  return (decrypted + decipher.final('utf8'));
-});
+export const decrypt = (encrypted) => {
+  let decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    env.ENCRYPTION_KEY,
+    env.ENCRYPTION_IV
+  );
+  let decrypted = decipher.update(encrypted, "base64", "utf8");
+  return decrypted + decipher.final("utf8");
+};
 
-const convertToURL = (toEncrypt => {
+export const convertToURL = (toEncrypt) => {
   let string = encrypt(toEncrypt);
-  return string.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
-});
+  return string.replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/g, "");
+};
 
-const convertFromURL = (toDecrypt => {
-  let string = toDecrypt.replace(/\-/g, '+').replace(/\_/g, '\/');
-  while (string.length % 4 !== 0) string += '=';
+export const convertFromURL = (toDecrypt) => {
+  let string = toDecrypt.replace(/\-/g, "+").replace(/\_/g, "/");
+  while (string.length % 4 !== 0) string += "=";
   return decrypt(string);
-});
-
-module.exports = {
-  encrypt,
-  decrypt,
-  convertToURL,
-  convertFromURL
 };

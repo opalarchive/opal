@@ -9,10 +9,9 @@
  * Documentation (https://firebase.google.com/docs/reference/admin) for more
  * information on how to use such functions.
  *
- * @author Amol Rama
+ * @author Amol Rama, Anthony Wang
  * @since October 20, 2020
  */
-
 
 /*
  * Get the environment variables. In this instance, we need the following:
@@ -30,24 +29,26 @@
  *     - FIREBASE_ADMIN_CLIENT_X509_CERT_URL
  * In addition, get the firebase-admin module to sign in
  */
-const env = require('./envSetup');
-const firebase = require('firebase-admin');
+import env from "./envSetup";
+import * as firebase from "firebase-admin";
 
 /*
  * Create an object that sets up the admin configurations with all the
  * information necessary there, so then we can initialize the firebase app.
  */
 const adminConfig = {
-  "type": env.FIREBASE_ADMIN_TYPE,
-  "project_id": env.FIREBASE_ADMIN_PROJECT_ID,
-  "private_key_id": env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
-  "private_key": env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'),
-  "client_email": env.FIREBASE_ADMIN_CLIENT_EMAIL,
-  "client_id": env.FIREBASE_ADMIN_CLIENT_ID,
-  "auth_uri": env.FIREBASE_ADMIN_AUTH_URI,
-  "token_uri": env.FIREBASE_ADMIN_TOKEN_URI,
-  "auth_provider_x509_cert_url": env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
-  "client_x509_cert_url": env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL
+  type: env.FIREBASE_ADMIN_TYPE,
+  project_id: env.FIREBASE_ADMIN_PROJECT_ID,
+  private_key_id: env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
+  private_key: !!env.FIREBASE_ADMIN_PRIVATE_KEY
+    ? env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, "\n")
+    : undefined,
+  client_email: env.FIREBASE_ADMIN_CLIENT_EMAIL,
+  client_id: env.FIREBASE_ADMIN_CLIENT_ID,
+  auth_uri: env.FIREBASE_ADMIN_AUTH_URI,
+  token_uri: env.FIREBASE_ADMIN_TOKEN_URI,
+  auth_provider_x509_cert_url: env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: env.FIREBASE_ADMIN_X509_CERT_URL,
 };
 
 /*
@@ -55,9 +56,9 @@ const adminConfig = {
  * credential certificate
  */
 firebase.initializeApp({
-  credential: firebase.credential.cert(adminConfig),
-  databaseURL: 'https://opal-5625e.firebaseio.com/'
+  credential: firebase.credential.cert(adminConfig as firebase.ServiceAccount),
+  databaseURL: "https://opal-5625e.firebaseio.com/",
 });
 
-module.exports.db = firebase.database();
-module.exports.auth = firebase.auth();
+export const db = firebase.database();
+export const auth = firebase.auth();

@@ -4,11 +4,12 @@
   "description": "Opal backend",
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon index.js"
+    "start": "concurrently -i \"npx nodemon -w ./built-src built-src/index.js\" \"tsc -w & rs\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^14.14.14",
     "body-parser": "^1.19.0",
     "concurrently": "^5.3.0",
     "cors": "^2.8.5",
