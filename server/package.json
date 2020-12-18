@@ -1,10 +1,10 @@
 {
   "name": "opal-server",
   "version": "1.0.0",
-  "description": "Opal backend",
+  "description": "Opal Backend",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently -i \"npx nodemon -w ./built-src built-src/index.js\" \"tsc -w & rs\""
+    "start": "concurrently -n 'js,ts' -c 'green,red' -i \"nodemon -w ./built-src built-src/index.js\" \"tsc -w\""
   },
   "author": "",
   "license": "ISC",

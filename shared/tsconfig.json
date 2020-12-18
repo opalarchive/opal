@@ -3,6 +3,7 @@
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
+    "composite": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -14,10 +15,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "outDir": "built-src",
-    "rootDir": "src"
+    "resolveJsonModule": true
   },
-  "include": ["src"],
-  "references": [{ "path": "../shared" }]
+  "include": ["types.ts"]
 }

@@ -1,18 +1,19 @@
+import { Publico, UserInfo } from "../../../shared/types";
 import { db } from "../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
   const getUsernameInfo = async () => {
-    const usernameInfo = await db
+    const usernameInfo: UserInfo[] = await db
       .ref(`/userInformation`)
       .once("value")
       .then((snapshot) => snapshot.val());
     return Object.fromEntries(
-      Object.entries(usernameInfo).map((user) => [user[0], user[1].username])
+      Object.entries(usernameInfo).map(([key, user]) => [key, user.username])
     );
   };
 
   const authuid = req.query.authuid;
-  let publico = await db
+  let publico: Publico = await db
     .ref(`/projectPublic`)
     .once("value")
     .then((snapshot) => snapshot.val());
@@ -31,8 +32,8 @@ export const execute = async (req, res) => {
 
   // filter for projects the authuid can access
   publico = Object.fromEntries(
-    Object.entries(publico).filter((proj) =>
-      Object.keys(proj[1].editors).includes(authuid)
+    Object.entries(publico).filter(([key, proj]) =>
+      Object.keys(proj.editors).includes(authuid)
     )
   );
 
