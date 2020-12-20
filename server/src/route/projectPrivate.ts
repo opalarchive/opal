@@ -1,50 +1,39 @@
+import { Problem } from "../../../.shared/src/types";
 import { clientdb } from "../helpers/clientdb";
-import { db } from "../helpers/firebaseSetup";
+import { getIdToUsername } from "../helpers/idToUsername";
 
 export const execute = async (req, res) => {
-  const uuid = req.query.uuid;
-  const authuid = req.query.authuid;
+  const uuid: string = req.query.uuid;
+  const authuid: string = req.query.authuid;
 
   const trydb = await clientdb(uuid, authuid);
 
-  if (trydb[0] !== 200 || trydb[1] === "unconfigured") {
-    res.status(trydb[0]).send(trydb[1]);
+  if (trydb.status !== 200 || typeof trydb.value === "string") {
+    res.status(trydb.status).send(trydb.value);
     return;
   }
 
-  const projectPrivate = await trydb[1]
+  let projectPrivate: { problems: Problem[] } = await trydb.value
     .ref("/")
     .once("value")
     .then((snapshot) => snapshot.val());
 
-  const getUsernameInfo = async () => {
-    const usernameInfo = await db
-      .ref(`/userInformation`)
-      .once("value")
-      .then((snapshot) => snapshot.val());
-    return Object.fromEntries(
-      Object.entries(usernameInfo).map((user) => [user[0], user[1].username])
-    );
-  };
-
-  const usernameInfo = await getUsernameInfo();
-  const idToUsername = (id) => {
-    if (usernameInfo[id]) return usernameInfo[id];
-    return "!usernameNotFound";
-  };
+  const idToUsername = await getIdToUsername();
 
   // change private uids to usernames
   if (!!projectPrivate.problems) {
     projectPrivate.problems.forEach((prob) => {
       prob.author = idToUsername(prob.author);
+      // the uid is a key, so we have to turn the object into an array and back
       if (!!prob.votes) {
         prob.votes = Object.fromEntries(
-          Object.entries(prob.votes).map(([id, vote]) => [
-            idToUsername(id),
+          Object.entries(prob.votes).map(([uid, vote]) => [
+            idToUsername(uid),
             vote,
           ])
         );
       }
+      // uid is a value, so it can do directly changed
       if (!!prob.replies) {
         prob.replies.forEach((reply) => {
           reply.author = idToUsername(reply.author);

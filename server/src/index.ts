@@ -110,13 +110,15 @@ const routes = fs
   .filter((file) => file.endsWith(".js"));
 
 routes.forEach((route) => {
-  const file = require(`./route/${route}`);
+  const file: {
+    execute: (req: any, res: any) => void;
+  } = require(`./route/${route}`);
 
   app.all(`/${route.substring(0, route.length - 3)}`, jsonEncoded, (req, res) =>
     file.execute(req, res)
   );
 });
 
-app.listen(port, (_) => {
+app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });

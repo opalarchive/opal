@@ -1,25 +1,17 @@
 import { db } from "./firebaseSetup";
 import * as firebase from "firebase-admin";
 import { dbaccess } from "./dbaccess";
+import { Result } from "./types";
+import { Config } from "../../../.shared/src/types";
 
-export const clientdb = async (uuid, authuid) => {
+export const clientdb = async (
+  uuid: string,
+  authuid: string
+): Promise<Result<string | firebase.database.Database>> => {
   const tryAccess = await dbaccess(uuid, authuid);
-  if (tryAccess[0] !== 200) {
+  if (tryAccess.status !== 200) {
     return tryAccess;
   }
-
-  let config = await db
-    .ref(`/projectConfigs/${uuid}`)
-    .once("value")
-    .then((snapshot) => snapshot.val());
-
-  if (!config) {
-    return [200, "unconfigured"];
-  }
-  config.private_key = config.private_key.replace(/\\n/g, "\n");
-
-  let dbURL = config.databaseURL;
-  delete config.databaseURL;
 
   const existingApps = firebase.apps.map((app) => (!!app ? app.name : null));
   let privatedb;
@@ -28,16 +20,30 @@ export const clientdb = async (uuid, authuid) => {
   if (existingApps.includes(uuid)) {
     privatedb = firebase.app(uuid).database();
   } else {
+    let config: Config | null = await db
+      .ref(`/projectConfigs/${uuid}`)
+      .once("value")
+      .then((snapshot) => snapshot.val());
+
+    if (!config) {
+      return { status: 200, value: "unconfigured" };
+    }
+    config.private_key = config.private_key.replace(/\\n/g, "\n");
+
+    const { databaseURL, ...normalConfig } = config;
+
     privatedb = firebase
       .initializeApp(
         {
-          credential: firebase.credential.cert(config),
-          databaseURL: dbURL,
+          credential: firebase.credential.cert(
+            normalConfig as firebase.ServiceAccount
+          ),
+          databaseURL,
         },
         uuid
       )
       .database();
   }
 
-  return [200, privatedb];
+  return { status: 200, value: privatedb };
 };

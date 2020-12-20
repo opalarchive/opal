@@ -15,7 +15,8 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "outDir": "built-src"
   },
-  "include": ["types.ts"]
+  "include": ["src"]
 }

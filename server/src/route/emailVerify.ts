@@ -2,14 +2,15 @@ import { convertFromURL } from "../helpers/cryptoSetup";
 import { auth, db } from "../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
-  let encryptedUID = req.url.replace("/verify/", "");
-  let uid;
+  let encryptedUID: string = req.url.replace("/verify/", "");
+  let uid: string;
   try {
     uid = convertFromURL(encryptedUID);
   } catch (e) {
-    res.status(400).send("Invalid ID");
+    res.status(400).send("invalid-ID");
     return;
   }
+
   auth
     .updateUser(uid, { emailVerified: true })
     .then(async (userRecord) => {

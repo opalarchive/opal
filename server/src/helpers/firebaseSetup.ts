@@ -48,7 +48,7 @@ const adminConfig = {
   auth_uri: env.FIREBASE_ADMIN_AUTH_URI,
   token_uri: env.FIREBASE_ADMIN_TOKEN_URI,
   auth_provider_x509_cert_url: env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
-  client_x509_cert_url: env.FIREBASE_ADMIN_X509_CERT_URL,
+  client_x509_cert_url: env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL,
 };
 
 /*

@@ -1,63 +1,56 @@
-import { Publico, UserInfo } from "../../../shared/types";
+import { Client, Server, UserInfo } from "../../../.shared/src/types";
 import { db } from "../helpers/firebaseSetup";
+import { getIdToUsername } from "../helpers/idToUsername";
 
 export const execute = async (req, res) => {
-  const getUsernameInfo = async () => {
-    const usernameInfo: UserInfo[] = await db
-      .ref(`/userInformation`)
-      .once("value")
-      .then((snapshot) => snapshot.val());
-    return Object.fromEntries(
-      Object.entries(usernameInfo).map(([key, user]) => [key, user.username])
-    );
-  };
-
-  const authuid = req.query.authuid;
-  let publico: Publico = await db
+  const authuid: string = req.query.authuid;
+  let serverPublico: Server.Publico = await db
     .ref(`/projectPublic`)
     .once("value")
     .then((snapshot) => snapshot.val());
 
-  if (!publico) {
+  if (!serverPublico) {
     res.status(200).send(null);
     return;
   }
 
-  const usernameInfo = await getUsernameInfo();
-
-  const idToUsername = (id) => {
-    if (usernameInfo[id]) return usernameInfo[id];
-    return "!usernameNotFound";
-  };
+  const idToUsername = await getIdToUsername();
 
   // filter for projects the authuid can access
-  publico = Object.fromEntries(
-    Object.entries(publico).filter(([key, proj]) =>
+  serverPublico = Object.fromEntries(
+    Object.entries(serverPublico).filter(([uuid, proj]) =>
       Object.keys(proj.editors).includes(authuid)
     )
   );
 
-  Object.keys(publico).forEach((key) => {
-    publico[key].starred = publico[key].editors[authuid].starred;
+  // Map Server.Publico to Client.Publico
+  const clientPublico: Client.Publico = Object.fromEntries(
+    Object.entries(serverPublico).map(([uuid, proj]) => {
+      // hide share date information except for your own
+      // and change private uids to usernames
+      const editors: Client.Editors = Object.fromEntries(
+        Object.entries(proj.editors).map(
+          ([uid, editStatus]: [string, Server.EditStatus]) => {
+            return [
+              idToUsername(uid),
+              { lastEdit: editStatus.lastEdit } as Client.EditStatus,
+            ];
+          }
+        )
+      );
 
-    // hide share date information except for your own
-    // and change private uids to usernames
-    publico[key].editors = Object.fromEntries(
-      Object.entries(publico[key].editors).map(([uid, info]) => {
-        // if this is you
-        if (uid === authuid) {
-          return [
-            idToUsername(uid),
-            { shareDate: info.shareDate, lastEdit: info.lastEdit },
-          ];
-        }
-        return [idToUsername(uid), { lastEdit: info.lastEdit }];
-      })
-    );
+      let projectPublic: Client.ProjectPublic = {
+        editors,
+        name: proj.name,
+        owner: idToUsername(proj.owner),
+        trashed: proj.trashed,
+        starred: proj.editors[authuid].starred,
+        shareDate: proj.editors[authuid].shareDate,
+      };
 
-    // change owner uid to username
-    publico[key].owner = idToUsername(publico[key].owner);
-  });
+      return [uuid, projectPublic];
+    })
+  );
 
-  res.status(200).send(publico);
+  res.status(200).send(serverPublico);
 };

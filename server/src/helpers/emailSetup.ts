@@ -14,7 +14,7 @@
  * return an error in the case of an authentication error (and possibly if
  * the email bounces)
  *
- * @author Amol Rama
+ * @author Amol Rama, Anthony Wang
  * @since October 20, 2020
  */
 
@@ -28,6 +28,9 @@
 import env from "./envSetup";
 import * as nodemailer from "nodemailer";
 import { google } from "googleapis";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
+import SMTPConnection from "nodemailer/lib/smtp-connection";
+import { EmailInput } from "./types";
 
 const OAuth2 = google.auth.OAuth2;
 
@@ -58,8 +61,8 @@ oauth2Client.setCredentials({
  *
  * Note that the function is asynchronous
  */
-export const sendEmail = (data) => {
-  const accessToken = oauth2Client.getAccessToken();
+export const sendEmail = async (data: EmailInput) => {
+  const accessToken = await oauth2Client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -69,12 +72,12 @@ export const sendEmail = (data) => {
       clientSecret: env.MAILING_SERVICE_CLIENT_SECRET,
       refreshToken: env.MAILING_SERVICE_REFRESH_TOKEN,
       accessToken,
-    },
-  });
+    } as SMTPConnection.AuthenticationType,
+  } as SMTPTransport.Options);
 
   const mailOptions = {
     from: "onlineproblemarchivallocation@gmail.com",
-    to: data.email,
+    to: data.targetEmail,
     subject: data.subject,
     html: data.content,
   };

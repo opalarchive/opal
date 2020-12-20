@@ -39,18 +39,18 @@
 import env from "./envSetup";
 import * as crypto from "crypto";
 
-export const encrypt = (val) => {
+export const encrypt = (val: string): string => {
   let cipher = crypto.createCipheriv(
     "aes-256-cbc",
     env.ENCRYPTION_KEY,
     env.ENCRYPTION_IV
   );
-  let encrypted = cipher.update(val, "utf8", "base64");
+  let encrypted: string = cipher.update(val, "utf8", "base64");
   encrypted += cipher.final("base64");
   return encrypted;
 };
 
-export const decrypt = (encrypted) => {
+export const decrypt = (encrypted: string): string => {
   let decipher = crypto.createDecipheriv(
     "aes-256-cbc",
     env.ENCRYPTION_KEY,
@@ -60,13 +60,13 @@ export const decrypt = (encrypted) => {
   return decrypted + decipher.final("utf8");
 };
 
-export const convertToURL = (toEncrypt) => {
+export const convertToURL = (toEncrypt: string): string => {
   let string = encrypt(toEncrypt);
   return string.replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/g, "");
 };
 
-export const convertFromURL = (toDecrypt) => {
-  let string = toDecrypt.replace(/\-/g, "+").replace(/\_/g, "/");
+export const convertFromURL = (toDecrypt: string): string => {
+  let string: string = toDecrypt.replace(/\-/g, "+").replace(/\_/g, "/");
   while (string.length % 4 !== 0) string += "=";
   return decrypt(string);
 };
