@@ -3,8 +3,8 @@ import { clientdb } from "../helpers/clientdb";
 import { getIdToUsername } from "../helpers/idToUsername";
 
 export const execute = async (req, res) => {
-  const uuid: string = req.query.uuid;
-  const authuid: string = req.query.authuid;
+  const uuid: string = req.body.uuid;
+  const authuid: string = req.body.authuid;
 
   const trydb = await clientdb(uuid, authuid);
 

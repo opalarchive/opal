@@ -47,11 +47,11 @@ const tryAction = async (
 };
 
 export const execute = async (req, res) => {
-  const uuid: string = req.query.uuid;
-  const problemId: string = req.query.problemId;
-  let data: data = req.query.data;
-  const type: string = req.query.type;
-  const authuid: string = req.query.authuid;
+  const uuid: string = req.body.uuid;
+  const problemId: string = req.body.problemId;
+  let data: data = req.body.data;
+  const type: string = req.body.type;
+  const authuid: string = req.body.authuid;
 
   if (!data) {
     res.status(404).send("action-not-found");

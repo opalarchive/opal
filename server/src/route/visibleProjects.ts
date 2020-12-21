@@ -3,7 +3,7 @@ import { db } from "../helpers/firebaseSetup";
 import { getIdToUsername } from "../helpers/idToUsername";
 
 export const execute = async (req, res) => {
-  const authuid: string = req.query.authuid;
+  const authuid: string = req.body.authuid;
   let serverPublico: Server.Publico = await db
     .ref(`/projectPublic`)
     .once("value")
@@ -52,5 +52,5 @@ export const execute = async (req, res) => {
     })
   );
 
-  res.status(200).send(serverPublico);
+  res.status(200).send(clientPublico);
 };

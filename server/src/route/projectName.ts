@@ -2,8 +2,8 @@ import { dbaccess } from "../helpers/dbaccess";
 import { db } from "../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
-  const uuid: string = req.query.uuid;
-  const authuid: string = req.query.authuid;
+  const uuid: string = req.body.uuid;
+  const authuid: string = req.body.authuid;
 
   const tryAccess = await dbaccess(uuid, authuid);
   if (tryAccess.status !== 200) {

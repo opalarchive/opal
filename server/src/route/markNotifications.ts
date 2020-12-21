@@ -3,8 +3,8 @@ import { db } from "../helpers/firebaseSetup";
 import { getNotifications } from "../helpers/notification";
 
 export const execute = async (req, res) => {
-  const authuid: string = req.query.authuid;
-  const number: number = req.query.number;
+  const authuid: string = req.body.authuid;
+  const number: number = req.body.number;
 
   const user: UserInfo | null = await db
     .ref(`/userInformation/${authuid}`)
@@ -12,7 +12,7 @@ export const execute = async (req, res) => {
     .then((snapshot) => snapshot.val());
 
   if (!user) {
-    res.status(404).send("The user with the said id does not exist.");
+    res.status(404).send("user-not-found");
     return;
   }
 
@@ -22,5 +22,5 @@ export const execute = async (req, res) => {
   }
   await db.ref(`/userInformation/${authuid}/notifications`).set(notifications);
 
-  res.status(201).send("Success");
+  res.status(201).send("success");
 };

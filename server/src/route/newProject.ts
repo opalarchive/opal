@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { db } from "../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
-  const uid: string = req.query.uid;
+  const uid: string = req.body.uid;
   let uuid = "";
 
   const projectIds: string[] =

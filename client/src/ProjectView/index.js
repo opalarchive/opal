@@ -1,21 +1,21 @@
-import React from 'react';
+import React from "react";
 
-import * as ROUTES from '../Constants/routes';
+import * as ROUTES from "../Constants/routes";
 
+import { Route, Switch, withRouter } from "react-router-dom";
+
+import Project from "./Project";
+import Selection from "./Selection";
+import { withAuthorization } from "../Session";
+import { compose } from "recompose";
 import {
-  Route,
-  Switch,
-  withRouter
-} from "react-router-dom";
-
-import Project from './Project';
-import Selection from './Selection';
-import { withAuthorization } from '../Session';
-import { compose } from 'recompose';
-import { getNotifications, markAllNotifications, withFirebase } from '../Firebase';
-import TopBar from './TopBar';
-import { poll } from '../Constants';
-import Fail from '../Fail';
+  getNotifications,
+  markAllNotifications,
+  withFirebase,
+} from "../Firebase";
+import TopBar from "./TopBar";
+import { poll } from "../Constants";
+import Fail from "../Fail";
 
 class ProjectView extends React.Component {
   constructor(props) {
@@ -25,7 +25,7 @@ class ProjectView extends React.Component {
       notifsLoading: true,
       notifications: [],
       title: null,
-      fail: false
+      fail: false,
     };
 
     this.setNotifications = this.setNotifications.bind(this);
@@ -37,7 +37,10 @@ class ProjectView extends React.Component {
   async setNotifications() {
     try {
       let notifications = await getNotifications(this.props.authUser.uid);
-      this.setState({ notifications, notifsLoading: false });
+      this.setState({
+        notifications: notifications.value,
+        notifsLoading: false,
+      });
     } catch (e) {
       return e;
     }
@@ -61,11 +64,11 @@ class ProjectView extends React.Component {
     try {
       await poll({
         func: this.setNotifications,
-        validate: (() => !this.state.notifsLoading),
+        validate: () => !this.state.notifsLoading,
         interval: 1500,
-        maxAttempts: 200
+        maxAttempts: 200,
       });
-      this.interval = setInterval(_ => {
+      this.interval = setInterval((_) => {
         this.setNotifications();
       }, 30000);
     } catch (e) {
@@ -86,30 +89,44 @@ class ProjectView extends React.Component {
 
     return (
       <div>
-        <div style={{ position: "relative", height: "100vh", display: "flex", flexDirection: "column" }}>
-          <TopBar notifs={this.state.notifications} loading={this.state.notifsLoading} markNotifications={this.markNotifications} title={this.state.title} />
-          <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
+        <div
+          style={{
+            position: "relative",
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <TopBar
+            notifs={this.state.notifications}
+            loading={this.state.notifsLoading}
+            markNotifications={this.markNotifications}
+            title={this.state.title}
+          />
+          <div
+            style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}
+          >
             <Switch>
               <Route
                 path={ROUTES.PROJECT_VIEW}
-                render={() =>
+                render={() => (
                   <Project
                     authUser={this.props.authUser}
                     setNotifications={this.setNotifications}
                     setTitle={this.setTitle}
                     fail={this.fail}
                   />
-                }
+                )}
               />
               <Route
-                render={() =>
+                render={() => (
                   <Selection
                     authUser={this.props.authUser}
                     setNotifications={this.setNotifications}
                     setTitle={this.setTitle}
                     fail={this.fail}
                   />
-                }
+                )}
               />
             </Switch>
           </div>
@@ -119,10 +136,10 @@ class ProjectView extends React.Component {
   }
 }
 
-const condition = authUser => !!authUser;
+const condition = (authUser) => !!authUser;
 
 export default compose(
   withAuthorization(condition),
   withFirebase,
-  withRouter,
+  withRouter
 )(ProjectView);

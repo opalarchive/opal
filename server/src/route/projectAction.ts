@@ -129,10 +129,10 @@ const tryAction = async (
 };
 
 export const execute = async (req, res) => {
-  const data: string = req.query.data;
-  const uuid: string = req.query.uuid;
-  const authuid: string = req.query.authuid;
-  const type: string = req.query.type;
+  const data: string = req.body.data;
+  const uuid: string = req.body.uuid;
+  const authuid: string = req.body.authuid;
+  const type: string = req.body.type;
 
   const projectPublic: Server.ProjectPublic = await db
     .ref(`projectPublic/${uuid}`)

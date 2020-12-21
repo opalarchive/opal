@@ -2,8 +2,8 @@ import { Server } from "../../../.shared/src/types";
 import { db } from "../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
-  const uuid = req.query.uuid;
-  const authuid = req.query.authuid;
+  const uuid: string = req.body.uuid;
+  const authuid: string = req.body.authuid;
 
   const projectPublic: Server.ProjectPublic | null = await db
     .ref(`projectPublic/${uuid}`)

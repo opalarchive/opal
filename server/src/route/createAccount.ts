@@ -6,9 +6,9 @@ import { sendEmail } from "../helpers/emailSetup";
 import { auth, db } from "../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
-  const email: string = req.query.email;
-  const username: string = req.query.username;
-  const password: string = req.query.password;
+  const email: string = req.body.email;
+  const username: string = req.body.username;
+  const password: string = req.body.password;
 
   if (!username.match(/^[A-Za-z0-9\_]+$/)) {
     res.status(400).send("auth/incorrect-username-syntax");
