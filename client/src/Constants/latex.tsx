@@ -1,22 +1,35 @@
-// blame amoler if this is bad 
+// blame amoler if this is bad
 
 import katex from "katex";
-import 'katex/dist/katex.min.css';
+import "katex/dist/katex.min.css";
 // Eslint doesn't like react being in peerDependencies
 import React from "react"; //eslint-disable-line
 
-export const latexify = (string, options) => {
-  string = string.split(`\\begin{equation*}`).join('\\\[').split(`\\end{equation*}`).join('\\\]').split(`\\begin{align*}`).join('\\[\\begin{aligned}').split(`\\end{align*}`).join('\\end{aligned}\\]');
+interface Block {
+  string: string;
+  type: "text" | "inline" | "block";
+}
+
+export const latexify = (string: string, options: katex.KatexOptions) => {
+  string = string
+    .split(`\\begin{equation*}`)
+    .join("\\[")
+    .split(`\\end{equation*}`)
+    .join("\\]")
+    .split(`\\begin{align*}`)
+    .join("\\[\\begin{aligned}")
+    .split(`\\end{align*}`)
+    .join("\\end{aligned}\\]");
   const regularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^\$\\]*(?:\\.[^\$\\]*)*\$/g;
   const blockRegularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]/g;
 
   const stripDollars = (stringToStrip) =>
-    (stringToStrip[0] === "$" && stringToStrip[1] !== "$"
+    stringToStrip[0] === "$" && stringToStrip[1] !== "$"
       ? stringToStrip.slice(1, -1)
-      : stringToStrip.slice(2, -2));
+      : stringToStrip.slice(2, -2);
 
   const getDisplay = (stringToDisplay) =>
-    (stringToDisplay.match(blockRegularExpression) ? "block" : "inline");
+    stringToDisplay.match(blockRegularExpression) ? "block" : "inline";
 
   const renderLatexString = (s, t) => {
     let renderedString;
@@ -24,15 +37,11 @@ export const latexify = (string, options) => {
       let newOptions = options;
       if (t === "block") {
         newOptions.displayMode = true;
-      }
-      else {
+      } else {
         newOptions.displayMode = false;
       }
       // returns HTML markup
-      renderedString = katex.renderToString(
-        s,
-        newOptions
-      );
+      renderedString = katex.renderToString(s, newOptions);
     } catch (err) {
       let error = "Couldn't convert " + s + " to a string. Check your syntax.";
       return { error: error, string: s };
@@ -40,7 +49,7 @@ export const latexify = (string, options) => {
     return renderedString;
   };
 
-  const result = [];
+  const result: Block[] = [];
 
   const latexMatch = string.match(regularExpression);
   const stringWithoutLatex = string.split(regularExpression);
@@ -65,7 +74,7 @@ export const latexify = (string, options) => {
     });
   }
 
-  const processResult = (resultToProcess) => {
+  const processResult = (resultToProcess: Block[]) => {
     const newResult = resultToProcess.map((r) => {
       if (r.type === "text") {
         return r.string;
@@ -75,7 +84,7 @@ export const latexify = (string, options) => {
         return rendered;
       }
 
-      return (<span dangerouslySetInnerHTML={{ __html: rendered }} />);
+      return <span dangerouslySetInnerHTML={{ __html: rendered }} />;
     });
 
     for (let i = 0; i < newResult.length; i++) {
@@ -88,10 +97,14 @@ export const latexify = (string, options) => {
   // Returns list of spans with latex and non-latex strings.
   let toReturn = processResult(result);
   return toReturn;
-}
+};
 
-class Latex extends React.Component {
+type LatexProps = katex.KatexOptions & {
+  id?: string;
+  children: string;
+};
 
+class Latex extends React.Component<LatexProps> {
   static defaultProps = {
     children: "",
     displayMode: false,
@@ -104,7 +117,7 @@ class Latex extends React.Component {
     minRuleThickness: 0.06,
     colorIsTextColor: false,
     strict: "warn",
-    trust: false
+    trust: false,
   };
 
   render() {
@@ -121,7 +134,7 @@ class Latex extends React.Component {
       maxSize,
       maxExpand,
       strict,
-      trust
+      trust,
     } = this.props;
     const id = this.props.id ? this.props.id : "";
 
@@ -137,20 +150,25 @@ class Latex extends React.Component {
       maxSize,
       maxExpand,
       strict,
-      trust
+      trust,
     });
     if (!!renderUs.error) {
       return <div style={{ color: "red" }}>Error: {renderUs.error}</div>;
     }
     return (
       <span>
-        {renderUs.map((render, index) =>
+        {renderUs.map((render, index) => (
           <span key={id + index}>
-            {(typeof (render) !== 'string') ? render : render.split('\\\\').map((string, idx) =>
-              <span key={id + index + idx}>{string}{idx + 1 !== render.split('\\\\').length && <br />}</span>
-            )}
+            {typeof render !== "string"
+              ? render
+              : render.split("\\\\").map((string, idx) => (
+                  <span key={id + index + idx}>
+                    {string}
+                    {idx + 1 !== render.split("\\\\").length && <br />}
+                  </span>
+                ))}
           </span>
-        )}
+        ))}
       </span>
     );
   }

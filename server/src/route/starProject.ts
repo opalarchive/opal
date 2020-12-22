@@ -20,5 +20,5 @@ export const execute = async (req, res) => {
     .ref(`projectPublic/${uuid}/editors/${authuid}/starred`)
     .set(!isStarred);
 
-  res.status(201).send(`Success. Project is now starred.`);
+  res.status(201).send("success");
 };

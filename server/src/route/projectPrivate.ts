@@ -1,4 +1,4 @@
-import { Problem } from "../../../.shared/src/types";
+import { ProjectPrivate } from "../../../.shared/src/types";
 import { clientdb } from "../helpers/clientdb";
 import { getIdToUsername } from "../helpers/idToUsername";
 
@@ -13,7 +13,7 @@ export const execute = async (req, res) => {
     return;
   }
 
-  let projectPrivate: { problems: Problem[] } = await trydb.value
+  let projectPrivate: ProjectPrivate = await trydb.value
     .ref("/")
     .once("value")
     .then((snapshot) => snapshot.val());

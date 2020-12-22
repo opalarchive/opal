@@ -1,39 +1,34 @@
-import React from 'react';
+import React from "react";
 
-import * as ROUTES from '../Constants/routes';
+import * as ROUTES from "../Constants/routes";
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import Home from '../Home';
-import SignUp from '../SignUp';
-import ProjectView from '../ProjectView';
+import Home from "../Home";
+import SignUp from "../SignUp";
+import ProjectView from "../ProjectView";
 
-import AuthProvider from '../Providers/AuthProvider.js';
+import AuthProvider from "../Providers/AuthProvider";
 
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { withAuthentication } from '../Session';
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import { withAuthentication } from "../Session";
 
 const theme = createMuiTheme({
   palette: {
     primary: {
-      light: '#4dabf5',
-      main: '#2196f3',
-      dark: '#1769aa',
-      contrastText: '#fff',
+      light: "#4dabf5",
+      main: "#2196f3",
+      dark: "#1769aa",
+      contrastText: "#fff",
     },
     secondary: {
-      light: '#33eb91',
-      main: '#00e676',
-      dark: '#00a152',
-      contrastText: '#000',
+      light: "#33eb91",
+      main: "#00e676",
+      dark: "#00a152",
+      contrastText: "#000",
     },
   },
 });
-
 
 class App extends React.Component {
   render() {

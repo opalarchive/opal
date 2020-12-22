@@ -1,30 +1,44 @@
-import React from 'react';
-import { Route, Switch, withRouter } from 'react-router-dom';
-import MenuBase from '../../MenuBase';
-import Filter from './filter';
-import Problem from './problem';
+import React from "react";
+import { Route, Switch, withRouter } from "react-router-dom";
+import MenuBase from "../../MenuBase";
+import Filter from "./filter";
+import Problem from "./problem";
 
-import * as ROUTES from '../../../Constants/routes';
-import Details from './Details';
-import { arrToRGBString, camelToTitle, lerp, lowerBound } from '../../../Constants';
+import * as ROUTES from "../../../Constants/routes";
+import Details from "./Details";
+import {
+  tupleToRGBString,
+  camelToTitle,
+  lerp,
+  lowerBound,
+} from "../../../Constants";
 
 const ProblemDetails = (props) => {
   const ind = parseInt(props.match.params.ind);
 
-  return <Details {...{
-    replies: props.problems[ind].replies,
-    ...props.problemProps(props.problems[ind], ind, props.uuid, props.problemAction, props.authUser),
-    repliable: false,
-    fail: props.fail,
-    setDefaultScroll: props.setDefaultScroll,
-    loadBackground: props.loadBackground,
-  }} />
+  return (
+    <Details
+      {...{
+        replies: props.problems[ind].replies,
+        ...props.problemProps(
+          props.problems[ind],
+          ind,
+          props.uuid,
+          props.problemAction,
+          props.authUser
+        ),
+        repliable: false,
+        fail: props.fail,
+        setDefaultScroll: props.setDefaultScroll,
+        loadBackground: props.loadBackground,
+      }}
+    />
+  );
 };
 
 const RoutedDetails = withRouter(ProblemDetails);
 
 class View extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -34,7 +48,7 @@ class View extends React.Component {
         geometry: [35, 141, 25],
         combinatorics: [21, 52, 224],
         numberTheory: [173, 19, 179],
-        miscellaneous: [100, 100, 110]
+        miscellaneous: [100, 100, 110],
       },
       difficultyColors: {
         0: [0, 200, 100],
@@ -42,10 +56,10 @@ class View extends React.Component {
         50: [150, 50, 255],
         51: [255, 150, 0],
         75: [255, 0, 0],
-        100: [0, 0, 0]
+        100: [0, 0, 0],
       },
-      defaultScroll: 0
-    }
+      defaultScroll: 0,
+    };
 
     this.scrollSet = 0;
 
@@ -62,7 +76,7 @@ class View extends React.Component {
   // linearlly interpolate the difficulty color using keyframesque colors
   getDifficultyColor(difficulty) {
     const colors = this.state.difficultyColors;
-    const keys = Object.keys(colors).map(key => parseInt(key));
+    const keys = Object.keys(colors).map((key) => parseInt(key));
 
     let top = lowerBound(keys, difficulty);
     const difficultyColor = colors[keys[top]];
@@ -70,13 +84,21 @@ class View extends React.Component {
     if (top === 0) {
       return difficultyColor;
     }
-    return difficultyColor.map((value, ind) => lerp(keys[top - 1], keys[top], colors[keys[top - 1]][ind], colors[keys[top]][ind], difficulty));
+    return difficultyColor.map((value, ind) =>
+      lerp(
+        keys[top - 1],
+        keys[top],
+        colors[keys[top - 1]][ind],
+        colors[keys[top]][ind],
+        difficulty
+      )
+    );
   }
 
   problemProps(prob, ind, uuid, problemAction, authUser) {
-    const replyTypes = {}
+    const replyTypes = {};
     if (!!prob.replies) {
-      prob.replies.forEach(reply => {
+      prob.replies.forEach((reply) => {
         if (!replyTypes[reply.type]) {
           replyTypes[reply.type] = 0;
         }
@@ -89,15 +111,23 @@ class View extends React.Component {
       ind: ind,
       uuid: uuid,
       text: prob.text,
-      category: { name: camelToTitle(prob.category), color: arrToRGBString(this.getCategoryColor(prob.category)) },
-      difficulty: { name: prob.difficulty, color: arrToRGBString(this.getDifficultyColor(prob.difficulty)) },
+      category: {
+        name: camelToTitle(prob.category),
+        color: tupleToRGBString(this.getCategoryColor(prob.category)),
+      },
+      difficulty: {
+        name: prob.difficulty,
+        color: tupleToRGBString(this.getDifficultyColor(prob.difficulty)),
+      },
       author: prob.author,
       tags: prob.tags,
-      votes: !!prob.votes ? Object.values(prob.votes).reduce((a, b) => a + b) : 0,
+      votes: !!prob.votes
+        ? Object.values(prob.votes).reduce((a, b) => a + b)
+        : 0,
       myVote: !!prob.votes ? prob.votes[authUser.displayName] : 0,
       problemAction: (data, type) => problemAction(ind, data, type),
       replyTypes,
-      authUser: authUser
+      authUser: authUser,
     };
   }
 
@@ -121,21 +151,39 @@ class View extends React.Component {
         right
         background={loadBackground}
         Sidebar={Filter}
-        defaultScroll={this.scrollSet > 1 ? undefined : this.state.defaultScroll}
+        defaultScroll={
+          this.scrollSet > 1 ? undefined : this.state.defaultScroll
+        }
         authUser={authUser}
       >
         <Switch>
           <Route
             exact
-            path={ROUTES.PROJECT_VIEW.replace(':uuid', uuid)}
-            render={_ => {
-              return project.problems.map((prob, ind) => <Problem {...{ ...this.problemProps(prob, ind, uuid, problemAction, authUser), repliable: true }} />)
+            path={ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}
+            render={(_) => {
+              return project.problems.map((prob, ind) => (
+                <Problem
+                  {...{
+                    ...this.problemProps(
+                      prob,
+                      ind,
+                      uuid,
+                      problemAction,
+                      authUser
+                    ),
+                    repliable: true,
+                  }}
+                />
+              ));
             }}
           />
           <Route
             exact
-            path={[ROUTES.PROJECT_PROBLEM.replace(':uuid', uuid), ROUTES.PROJECT_PROBLEM_REPLY.replace(':uuid', uuid)]}
-            render={_ =>
+            path={[
+              ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid),
+              ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid),
+            ]}
+            render={(_) => (
               <RoutedDetails
                 problemProps={this.problemProps}
                 problems={project.problems}
@@ -146,7 +194,7 @@ class View extends React.Component {
                 authUser={authUser}
                 loadBackground={loadBackground}
               />
-            }
+            )}
           />
         </Switch>
       </MenuBase>

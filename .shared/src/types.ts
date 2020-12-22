@@ -111,3 +111,7 @@ export interface Problem {
   title: string;
   votes: Votes;
 }
+
+export interface ProjectPrivate {
+  problems: Problem[];
+}

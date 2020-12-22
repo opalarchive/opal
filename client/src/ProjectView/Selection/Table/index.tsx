@@ -9,9 +9,9 @@ import {
   Paper,
   TableBody,
   Checkbox,
-  TableSortLabel
+  TableSortLabel,
 } from "@material-ui/core";
-import { getDataPoint } from "./constants.js";
+import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
@@ -21,9 +21,9 @@ import {
   shareProject,
   changeName,
   restoreProject,
-  starProject
+  starProject,
 } from "../../../Firebase";
-import { camelToTitle } from "../../../Constants/index.js";
+import { camelToTitle } from "../../../Constants";
 
 class ProjectTable extends React.Component {
   constructor(props) {
@@ -34,14 +34,14 @@ class ProjectTable extends React.Component {
       sortedProjectKeys: [],
       sort: {
         dataPoint: "name",
-        direction: "asc"
+        direction: "asc",
       },
       modal: {
         show: false,
         type: "share",
         input: "",
-        activeProject: ""
-      }
+        activeProject: "",
+      },
     };
 
     this.onRowClick = this.onRowClick.bind(this);
@@ -57,7 +57,10 @@ class ProjectTable extends React.Component {
   componentDidMount() {
     this.setState({
       sort: this.props.defaultSort,
-      sortedProjectKeys: this.sortProjectKeys(this.props.defaultSort, Object.keys(this.props.projects))
+      sortedProjectKeys: this.sortProjectKeys(
+        this.props.defaultSort,
+        Object.keys(this.props.projects)
+      ),
     });
   }
 
@@ -85,14 +88,18 @@ class ProjectTable extends React.Component {
   sortProjectKeys(sort, sortedProjectKeys) {
     console.log(sort.dataPoint);
     let stabilized = sortedProjectKeys.map((key) => [
-      getDataPoint(this.props.projects[key], sort.dataPoint, this.props.authUser.displayName),
-      key
+      getDataPoint(
+        this.props.projects[key],
+        sort.dataPoint,
+        this.props.authUser.displayName
+      ),
+      key,
     ]);
 
     // cant just subtract because strings :(
     const comp = (a, b) => {
-      if (typeof a === 'string') a = a.toLowerCase();
-      if (typeof b === 'string') b = b.toLowerCase();
+      if (typeof a === "string") a = a.toLowerCase();
+      if (typeof b === "string") b = b.toLowerCase();
 
       if (a < b) return -1;
       if (a > b) return 1;
@@ -113,7 +120,7 @@ class ProjectTable extends React.Component {
     if (dataPoint === this.state.sort.dataPoint) {
       sort = {
         dataPoint,
-        direction: this.state.sort.direction === "asc" ? "desc" : "asc"
+        direction: this.state.sort.direction === "asc" ? "desc" : "asc",
       };
     }
     this.setState({
@@ -121,7 +128,7 @@ class ProjectTable extends React.Component {
       sortedProjectKeys: this.sortProjectKeys(
         sort,
         this.state.sortedProjectKeys
-      )
+      ),
     });
   }
 
@@ -135,7 +142,7 @@ class ProjectTable extends React.Component {
     event.preventDefault();
 
     this.setState({
-      modal: { ...this.state.modal, input: event.target.value }
+      modal: { ...this.state.modal, input: event.target.value },
     });
   }
 
@@ -143,7 +150,7 @@ class ProjectTable extends React.Component {
     event.preventDefault();
 
     this.setState({
-      modal: { ...this.state.modal, show: !this.state.modal.show }
+      modal: { ...this.state.modal, show: !this.state.modal.show },
     });
   }
 
@@ -184,13 +191,16 @@ class ProjectTable extends React.Component {
         );
         break;
       case "star":
-        const tryToStar = await starProject(this.state.modal.activeProject, this.props.authUser.uid);
+        const tryToStar = await starProject(
+          this.state.modal.activeProject,
+          this.props.authUser.uid
+        );
         break;
       default:
         console.log("Undefined");
     }
 
-    this.closeModal({preventDefault: () => {}});
+    this.closeModal({ preventDefault: () => {} });
     this.props.refreshProjects();
   }
 

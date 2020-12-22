@@ -1,6 +1,12 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import FirebaseContext, { withFirebase } from "./context";
+import {
+  UsernameInfo,
+  ProjectPrivate,
+  Notification,
+  Client,
+} from "../../../.shared//src/types";
 
 export { FirebaseContext, withFirebase };
 
@@ -18,7 +24,19 @@ var firebaseConfig = {
 const fetchLocation =
   process.env.NODE_ENV === "production" ? "" : "http://localhost:2718";
 
-const post = async (url, data) => {
+/**
+ * Fetches from the server using a POST request.
+ * @param Output expected output on success
+ * @param url url to fetch from
+ * @param data body of the POST request
+ * @returns A promise returning a Result of type Output or string.
+ * It is guaranteed that result.value is of type Output when result.success is true,
+ * and result.value is of type string when result.success is false.
+ */
+async function post<Output>(
+  url: string,
+  data: object
+): Promise<Result<Output | string>> {
   const attempt = await fetch(`${fetchLocation}/${url}`, {
     method: "POST",
     headers: {
@@ -27,158 +45,101 @@ const post = async (url, data) => {
     body: JSON.stringify(data),
   });
 
-  let value = await attempt.text();
+  let value: string | Output = await attempt.text();
 
   try {
     value = JSON.parse(value);
   } finally {
-    return { status: attempt.status >= 200 && attempt.status < 300, value };
+    return { success: attempt.status >= 200 && attempt.status < 300, value };
   }
-};
+}
 
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
 
-export const getUsernames = async (_) => {
-  const usernamesObject = await post("getAllUsernames", {});
-  return Object.keys(usernamesObject);
+export const getUsernames = async (): Promise<Result<string[]>> => {
+  const usernamesObject = await post<UsernameInfo[]>("getAllUsernames", {});
+  return { success: true, value: Object.keys(usernamesObject.value) };
 };
 
-export const createUser = async (username, password, email) => {
-  const works = await post("createAccount", { username, password, email });
-  if (works.status !== 201) return works.value;
+export const createUser = async (
+  username: string,
+  password: string,
+  email: string
+): Promise<Result<null>> => {
+  const works = await post<null>("createAccount", {
+    username,
+    password,
+    email,
+  });
+  if (!works.success) return { success: false, value: null };
 
   // immediately sign them in
-  auth.signInWithEmailAndPassword(email, password).catch((error) => {
-    console.log(error.code);
-  });
-
-  return;
-};
-
-export const getVisibleProjects = async (uid) => {
-  return (
-    await post("visibleProjects", {
-      authuid: uid,
+  return auth
+    .signInWithEmailAndPassword(email, password)
+    .then((_) => {
+      return { success: true, value: null };
     })
-  ).value;
+    .catch((error) => {
+      console.log(error.code);
+      return { success: false, value: null };
+    });
 };
 
-export const changeName = async (name, uuid, authuid) => {
-  const attempt = await post("projectAction", {
-    data: name,
-    uuid,
-    authuid,
-    type: "changeName",
-  });
-
-  if (attempt.status) return attempt.value;
-
-  return { success: true };
+export const getVisibleProjects = async (authuid: string) => {
+  return await post<Client.ProjectPublic>("visibleProjects", { authuid });
 };
 
-export const restoreProject = async (uuid, authuid) => {
-  const attempt = await post("projectAction", {
-    data: "",
-    uuid,
-    authuid,
-    type: "restore",
-  });
-
-  if (attempt.status) return attempt.value;
-
-  return { success: true };
+export const tryProjectAction = async (
+  uuid: string,
+  authuid: string,
+  type: string,
+  data?: string
+): Promise<Result<string>> => {
+  return await post("projectAction", { uuid, authuid, type, data });
 };
 
-export const deleteProject = async (uuid, authuid) => {
-  const attempt = await post("projectAction", {
-    data: "",
-    uuid,
-    authuid,
-    type: "delete",
-  });
-
-  if (attempt.status) return attempt.value;
-
-  return { success: true };
+export const starProject = async (uuid: string, authuid: string) => {
+  return await post("starProject", { uuid, authuid });
 };
 
-export const deleteForeverProject = async (uuid, authuid) => {};
-
-export const shareProject = async (username, uuid, authuid) => {
-  const attempt = await post("projectAction", {
-    data: username,
-    uuid,
-    authuid,
-    type: "share",
-  });
-
-  if (attempt.status) return attempt.value;
-
-  return { success: true };
+export const getNotifications = async (authuid: string) => {
+  return await post<Notification[]>("getNotifications", { authuid });
 };
 
-export const starProject = async (uuid, authuid) => {
-  const attempt = await post("starProject", { uuid, authuid });
-
-  if (attempt.status) return attempt.value;
-
-  return { success: true };
+export const markAllNotifications = async (authuid: string, number: string) => {
+  return await post<string>("markNotifications", { authuid, number });
 };
 
-export const getNotifications = async (authuid) => {
-  return await post("getNotifications", { authuid });
+export const getProjectPrivate = async (uuid: string, authuid: string) => {
+  return await post<ProjectPrivate>("projectPrivate", { uuid, authuid });
 };
 
-export const markAllNotifications = async (authuid, number) => {
-  const attempt = await post("markNotifications", { authuid, number });
-
-  if (attempt.status) return attempt.value;
-
-  return { success: true };
+export const getProjectName = async (uuid: string, authuid: string) => {
+  return await post<string>("projectName", { uuid, authuid });
 };
 
-export const getProjectPrivate = async (uuid, authuid) => {
-  const attempt = await post("projectPrivate", { uuid, authuid });
-
-  return attempt.value;
-};
-
-export const getProjectName = async (uuid, authuid) => {
-  const attempt = await post("projectName", { uuid, authuid });
-
-  return {
-    success: attempt.status && attempt.value !== "unconfigured",
-    value: attempt.value,
-  };
-};
-
-export const newProject = async (uid) => {
-  return await (await post("newProject"), { uid }).value();
+export const newProject = async (uid: string) => {
+  return await post<string>("newProject", { uid });
 };
 
 export const tryProblemAction = async (
-  uuid,
-  problemId,
-  data,
-  type,
-  authuid
+  uuid: string,
+  problemId: string,
+  data: string,
+  type: string,
+  authuid: string
 ) => {
-  const attempt = await post("problemAction", {
+  return await post<string>("problemAction", {
     uuid,
     problemId,
     data,
     type,
     authuid,
   });
-
-  if (!attempt.status || attempt.value === "unconfigured") {
-    return attempt.value;
-  }
-  return { success: true };
 };
 
-export const understandError = (e) => {
+export const understandError = (e: string) => {
   let error = "";
   switch (e) {
     case "auth/email-already-exists":
