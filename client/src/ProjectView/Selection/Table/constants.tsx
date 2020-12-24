@@ -1,7 +1,7 @@
 import React from "react";
 import { lighten, darken, createStyles, Theme } from "@material-ui/core";
 import { formatTime } from "../../../Constants";
-import { Client } from "../../../../../.shared/src/types";
+import { Client } from "../../../../../.shared";
 import { ProjectDataPoint } from "../../../Constants/types";
 
 export const getDataPoint = (

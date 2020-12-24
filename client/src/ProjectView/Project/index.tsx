@@ -7,7 +7,7 @@ import {
   vote,
   problemAction,
   ReplyType,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
 import { getProjectPrivate, tryProblemAction } from "../../Firebase";

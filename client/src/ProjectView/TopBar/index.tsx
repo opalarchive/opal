@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { Bell, User, Loader } from "react-feather";
-import { Notification } from "../../../../.shared/src/types";
+import { Notification } from "../../../../.shared";
 import { Result } from "../../Constants/types";
 import Loading from "../../Loading";
 import styles from "./index.css";

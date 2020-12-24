@@ -23,11 +23,7 @@ import Latex from "../../../../../Constants/latex";
 import { formatTime } from "../../../../../Constants";
 import * as ROUTES from "../../../../../Constants/routes";
 import { compose } from "recompose";
-import {
-  problemAction,
-  reply,
-  ReplyType,
-} from "../../../../../../../.shared/src/types";
+import { problemAction, reply, ReplyType } from "../../../../../../../.shared";
 import styles from "./index.css";
 
 type ReplyProps = WithStyles<typeof styles> &

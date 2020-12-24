@@ -20,10 +20,9 @@ import { camelToTitle } from "../../../Constants";
 import {
   Client,
   projectAction,
-  ProjectActionProtected,
   isProjectActionProtected,
   isProjectActionTrivial,
-} from "../../../../../.shared/src/types";
+} from "../../../../../.shared";
 import {
   ProjectDataPoint,
   ProjectViewSort,

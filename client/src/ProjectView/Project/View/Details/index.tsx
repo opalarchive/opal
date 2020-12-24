@@ -7,7 +7,7 @@ import { compose } from "recompose";
 
 import * as ROUTES from "../../../../Constants/routes";
 import Reply from "./Reply";
-import { reply as replyType } from "../../../../../../.shared/src/types";
+import { reply as replyType } from "../../../../../../.shared";
 import styles from "./index.css";
 import { ProblemDetails } from "../../../../Constants/types";
 

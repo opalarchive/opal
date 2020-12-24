@@ -12,7 +12,7 @@ import TopBar from "./TopBar";
 import { poll } from "../Constants";
 import Fail from "../Fail";
 import { WithAuthorization } from "../Session/withAuthorization";
-import { Notification } from "../../../.shared/src/types";
+import { Notification } from "../../../.shared";
 import { Result } from "../Constants/types";
 
 interface ProjectViewProps extends WithAuthorization {}

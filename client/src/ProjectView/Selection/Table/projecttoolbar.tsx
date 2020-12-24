@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { Filter, Trash2 } from "react-feather";
 import { toolbarStyles } from "./constants";
-import { projectAction } from "../../../../../.shared/src/types";
+import { projectAction } from "../../../../../.shared";
 
 interface ProjectToolbarProps extends WithStyles<typeof toolbarStyles> {
   selected: string[];

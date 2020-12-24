@@ -1,0 +1,8 @@
+{
+  "references": [
+    {
+      "path": "./.shared"
+    }
+  ],
+  "files": []
+}

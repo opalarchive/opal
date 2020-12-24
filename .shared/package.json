@@ -2,6 +2,6 @@
   "name": "opal-shared",
   "version": "1.0.0",
   "scripts": {
-    "start": "tsc -w"
+    "start": "tsc -b -w"
   }
 }

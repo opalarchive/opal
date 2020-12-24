@@ -8,7 +8,7 @@ import {
   Client,
   projectActionProtected,
   data,
-} from "../../../.shared//src/types";
+} from "../../../.shared/";
 import { Result } from "../Constants/types";
 
 export { FirebaseContext, withFirebase };

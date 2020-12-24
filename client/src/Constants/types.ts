@@ -1,9 +1,4 @@
-import {
-  data,
-  problemAction,
-  reply,
-  ReplyType,
-} from "../../../.shared/src/types";
+import { data, problemAction, ReplyType } from "../../../.shared";
 
 /*
  * The idea here is that if success is true, the value must be of type output.

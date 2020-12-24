@@ -16,7 +16,7 @@ import { WithStyles, withStyles } from "@material-ui/core/styles";
 import { UserPlus, Trash2, Edit, Star, CornerLeftUp } from "react-feather";
 import { Link } from "react-router-dom";
 import { rowStyles, dataPointDisplay, IfDisplay } from "./constants";
-import { Client, projectAction } from "../../../../../.shared/src/types";
+import { Client, projectAction } from "../../../../../.shared";
 import { ProjectDataPoint } from "../../../Constants/types";
 
 interface ProjectRowProps extends WithStyles<typeof rowStyles> {
