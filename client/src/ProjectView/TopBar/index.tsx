@@ -12,72 +12,45 @@ import {
   List,
   ListItem,
   Divider,
+  WithStyles,
 } from "@material-ui/core";
 import React from "react";
 import { Bell, User, Loader } from "react-feather";
+import { Notification } from "../../../../.shared/src/types";
+import { Result } from "../../Constants/types";
 import Loading from "../../Loading";
+import styles from "./index.css";
 
-const styles = (theme) => ({
-  root: {
-    flexGrow: 1
-  },
-  menuButton: {
-    marginLeft: theme.spacing(1)
-  },
-  title: {
-    flexGrow: 1
-  },
-  paper: {
-    transformOrigin: "top right",
-    backgroundColor: theme.palette.info.light
-  },
-  list: {
-    width: theme.spacing(40),
-    maxHeight: theme.spacing(40),
-    overflow: "auto"
-  },
-  listItem: {
-    display: "flex",
-    flexDirection: "column"
-  },
-  loading: {
-    display: "flex",
-    justifyContent: "center",
-    margin: theme.spacing(1, 0)
-  },
-  divider: {
-    margin: theme.spacing(1, 0)
-  },
-  centeredSpace: {
-    padding: theme.spacing(1),
-    textAlign: "center"
-  },
-  notificationDot: {
-    fontSize: "4rem",
-    marginLeft: "0.2em",
-    color: theme.palette.primary.light
-  },
-  link: {
-    color: theme.palette.primary.light
-  }
-});
+interface NotificationsProps extends WithStyles<typeof styles> {
+  notifs: Result<Notification[]>;
+  loading: boolean;
+  markNotifications: (number: number) => Promise<void>;
+}
 
-class Notifications extends React.Component {
-  constructor(props) {
+interface NotificationsState {
+  open: boolean;
+}
+
+class Notifications extends React.Component<
+  NotificationsProps,
+  NotificationsState
+> {
+  state = {
+    open: false,
+  };
+
+  private notificationButton = React.createRef<HTMLButtonElement>();
+
+  constructor(props: NotificationsProps) {
     super(props);
 
-    this.state = {
-      open: false
-    };
-
     this.setOpen = this.setOpen.bind(this);
-    this.notificationButton = React.createRef();
   }
 
-  setOpen(value) {
+  setOpen(value: boolean) {
     this.setState({ open: value });
-    if (!value && Array.isArray(this.props.notifs)) {
-      this.props.markNotifications(this.props.notifs.length);
+    if (!value && this.props.notifs.success) {
+      this.props.markNotifications(this.props.notifs.value.length);
     }
   }
 
@@ -85,145 +58,134 @@ class Notifications extends React.Component {
     let { classes, notifs, loading } = this.props;
     const { open } = this.state;
 
+    const notificationBox = (
+      read: boolean,
+      Title: JSX.Element | string,
+      Body: JSX.Element | string,
+      Caption?: JSX.Element | string
+    ): JSX.Element => {
+      return (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span
+            role="img"
+            aria-label="unread-dot"
+            style={{ opacity: read ? "0" : "1" }}
+            className={classes.notificationDot}
+          >
+            ·
+          </span>
+          <ListItem alignItems="flex-start" className={classes.listItem}>
+            <Typography gutterBottom>{Title}</Typography>
+            <Typography gutterBottom variant="body2">
+              {Body}
+            </Typography>
+            {!!Caption && (
+              <Typography variant="caption" color="textSecondary">
+                {Caption}
+              </Typography>
+            )}
+          </ListItem>
+        </div>
+      );
+    };
+
+    let ariaLabel = "";
+    let icon: JSX.Element | string = <div />;
+    let popOut = <div />;
+
     if (loading) {
-      return (
+      ariaLabel = "the notifications are still loading";
+      icon = <Loader size={10} />;
+      popOut = (
         <>
-          <IconButton
-            aria-label={`the notifications are still loading`}
-            color="inherit"
-            className={classes.menuButton}
-            onClick={(_) => this.setOpen(true)}
-            ref={this.notificationButton}
+          <Loading background="" hideText={true} />
+          We're loading your notifications! Hang in there.
+        </>
+      );
+    } else if (!notifs.success) {
+      ariaLabel = "an error occured when getting the number of notifications";
+      icon = "!";
+      popOut = notificationBox(
+        false,
+        "There was an Error!",
+        <span>
+          There was an error, and we were unable to fetch your notifications.
+          Please reload the page to try again.
+        </span>,
+        <>
+          We check every 15 seconds for notifications. If this problem persists,
+          email us at{" "}
+          <a
+            className={classes.link}
+            href="mailto:onlineproblemarchivallocation@gmail.com"
           >
-            <Badge badgeContent={<Loader size={10}/>} color="secondary">
-              <Bell />
-            </Badge>
-          </IconButton>
-          <Popper
-            id="notifications-popup"
-            anchorEl={this.notificationButton.current}
-            open={open}
-            placement="bottom-end"
-            transition
-            disablePortal
-            role={undefined}
-          >
-            {({ TransitionProps }) => (
-              <ClickAwayListener
-                onClickAway={() => {
-                  this.setOpen(false);
-                }}
-              >
-                <Grow in={open} {...TransitionProps}>
-                  <Paper className={classes.paper}>
-                    <List
-                      className={`${classes.list} ${classes.centeredSpace}`}
-                    >
-                      <Loading hideText={true} />
-                      We're loading your notifications! Hang in there.
-                    </List>
-                  </Paper>
-                </Grow>
-              </ClickAwayListener>
-            )}
-          </Popper>
+            onlineproblemarchivallocation@gmail.com
+          </a>{" "}
+          so we can investigate the issue.
+        </>
+      );
+    } else {
+      let unreadNotifs = 0;
+      if (notifs.success) {
+        notifs.value.forEach((notif: Notification) => {
+          if (!notif.read) unreadNotifs++;
+        });
+        notifs.value.sort((a, b) => {
+          return b.timestamp - a.timestamp;
+        });
+      }
+      ariaLabel = `show ${unreadNotifs} new notifications`;
+      icon = `${unreadNotifs}`;
+      popOut = (
+        <>
+          {notifs.value.map((notif, index) => (
+            <React.Fragment key={`notif-${index}`}>
+              {notificationBox(
+                notif.read,
+                <a className={classes.link} href={notif.link}>
+                  {notif.title}
+                </a>,
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: notif.content.replace(
+                      /\<a href/g,
+                      `<a class=${classes.link} href`
+                    ),
+                  }}
+                />,
+                new Date(notif.timestamp).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              )}
+              <Divider className={classes.divider} />
+            </React.Fragment>
+          ))}
+          {notificationBox(
+            false,
+            <>
+              No more notifications{" "}
+              <span role="img" aria-label="party">
+                🎉
+              </span>
+            </>,
+            "There are no more notifications - you've reached the end of the list!"
+          )}
         </>
       );
     }
-
-    if (!Array.isArray(notifs)) {
-      return (
-        <>
-          <IconButton
-            aria-label={`an error occured when getting the number of notifications`}
-            color="inherit"
-            className={classes.menuButton}
-            onClick={(_) => this.setOpen(true)}
-            ref={this.notificationButton}
-          >
-            <Badge badgeContent="!" color="secondary">
-              <Bell />
-            </Badge>
-          </IconButton>
-          <Popper
-            id="notifications-popup"
-            anchorEl={this.notificationButton.current}
-            open={open}
-            placement="bottom-end"
-            transition
-            disablePortal
-            role={undefined}
-          >
-            {({ TransitionProps }) => (
-              <ClickAwayListener
-                onClickAway={() => {
-                  this.setOpen(false);
-                }}
-              >
-                <Grow in={open} {...TransitionProps}>
-                  <Paper className={classes.paper}>
-                    <List className={classes.list}>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <span
-                          role="img"
-                          aria-label="unread-dot"
-                          style={{ opacity: "0" }}
-                          className={classes.notificationDot}
-                        >
-                          ·
-                        </span>
-                        <ListItem
-                          alignItems="flex-start"
-                          className={classes.listItem}
-                        >
-                          <Typography gutterBottom>
-                            There was an Error!
-                          </Typography>
-                          <Typography gutterBottom variant="body2">
-                            <span>
-                              There was an error, and we were unable to fetch
-                              your notifications. Please reload the page to try
-                              again.
-                            </span>
-                          </Typography>
-                          <Typography variant="caption" color="textSecondary">
-                            We check every 15 seconds for notifications. If this
-                            problem persists, email us at{" "}
-                            <a href="mailto:onlineproblemarchivallocation@gmail.com">
-                              onlineproblemarchivallocation@gmail.com
-                            </a>{" "}
-                            so we can investigate the issue.
-                          </Typography>
-                        </ListItem>
-                      </div>
-                    </List>
-                  </Paper>
-                </Grow>
-              </ClickAwayListener>
-            )}
-          </Popper>
-        </>
-      );
-    }
-
-    let unreadNotifs = 0;
-    notifs.forEach((notif) => {
-      if (!notif.read) unreadNotifs++;
-    });
-    notifs.sort((a, b) => {
-      return b.timestamp - a.timestamp;
-    });
 
     return (
       <>
         <IconButton
-          aria-label={`show ${unreadNotifs} new notifications`}
+          aria-label={ariaLabel}
           color="inherit"
           className={classes.menuButton}
           onClick={(_) => this.setOpen(true)}
           ref={this.notificationButton}
         >
-          <Badge badgeContent={unreadNotifs} color="secondary">
+          <Badge badgeContent={icon} color="secondary">
             <Bell />
           </Badge>
         </IconButton>
@@ -244,74 +206,7 @@ class Notifications extends React.Component {
             >
               <Grow in={open} {...TransitionProps}>
                 <Paper className={classes.paper}>
-                  <List className={classes.list}>
-                    {notifs.map((notif, index) => (
-                      <React.Fragment key={`notif-${index}`}>
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          <span
-                            role="img"
-                            aria-label="unread-dot"
-                            style={{ opacity: notif.read ? "0" : "1" }}
-                            className={classes.notificationDot}
-                          >
-                            ·
-                          </span>
-                          <ListItem
-                            alignItems="flex-start"
-                            className={classes.listItem}
-                            key={`notification-${index}`}
-                          >
-                            <Typography gutterBottom>
-                              <a className={classes.link} href={notif.link}>{notif.title}</a>
-                            </Typography>
-                            <Typography gutterBottom variant="body2">
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: notif.content.replace(/\<a href/g, `<a class=${classes.link} href`)
-                                }}
-                              />
-                            </Typography>
-                            <Typography variant="caption" color="textSecondary">
-                              {new Date(notif.timestamp).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric"
-                                }
-                              )}
-                            </Typography>
-                          </ListItem>
-                        </div>
-                        <Divider className={classes.divider} />
-                      </React.Fragment>
-                    ))}
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <span
-                        role="img"
-                        aria-label="unread-dot"
-                        style={{ opacity: "0" }}
-                        className={classes.notificationDot}
-                      >
-                        ·
-                      </span>
-                      <ListItem
-                        alignItems="flex-start"
-                        className={classes.listItem}
-                      >
-                        <Typography gutterBottom>
-                          No more notifications{" "}
-                          <span role="img" aria-label="party">
-                            🎉
-                          </span>
-                        </Typography>
-                        <Typography gutterBottom variant="body2">
-                          There are no more notifications - you've reached the
-                          end of the list!
-                        </Typography>
-                      </ListItem>
-                    </div>
-                  </List>
+                  <List className={classes.list}>{popOut}</List>
                 </Paper>
               </Grow>
             </ClickAwayListener>
@@ -322,9 +217,11 @@ class Notifications extends React.Component {
   }
 }
 
-class TopBar extends React.Component {
+type TopBarProps = NotificationsProps & { title: string };
+
+class TopBar extends React.Component<TopBarProps> {
   render() {
-    const { notifs, classes, markNotifications, title } = this.props;
+    const { notifs, loading, markNotifications, title, classes } = this.props;
 
     return (
       <AppBar position="static">
@@ -332,7 +229,12 @@ class TopBar extends React.Component {
           <Typography variant="h6" className={classes.title}>
             {title}
           </Typography>
-          <Notifications classes={classes} notifs={notifs} markNotifications={markNotifications}/>
+          <Notifications
+            classes={classes}
+            loading={loading}
+            notifs={notifs}
+            markNotifications={markNotifications}
+          />
           <IconButton
             edge="end"
             aria-label="account of current user"

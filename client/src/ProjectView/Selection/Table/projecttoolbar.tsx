@@ -1,24 +1,53 @@
-import React from 'react';
-import { Typography, Tooltip, IconButton, Toolbar } from '@material-ui/core';
-import { Filter, Trash2 } from 'react-feather';
-import { toolbarStyles } from './constants';
+import React from "react";
+import {
+  Typography,
+  Tooltip,
+  IconButton,
+  Toolbar,
+  withStyles,
+  WithStyles,
+} from "@material-ui/core";
+import { Filter, Trash2 } from "react-feather";
+import { toolbarStyles } from "./constants";
+import { projectAction } from "../../../../../.shared/src/types";
 
-export default function ProjectToolbar(props) {
-  const { selected } = props;
+interface ProjectToolbarProps extends WithStyles<typeof toolbarStyles> {
+  selected: string[];
+  name: string;
+  showModal: (type: projectAction) => void;
+}
+
+const ProjectToolbar: React.FC<ProjectToolbarProps> = ({
+  selected,
+  name,
+  showModal,
+  classes,
+}) => {
   const numSelected = selected.length;
-  const styles = toolbarStyles();
 
   return (
-    <Toolbar className={`${styles.root} ${numSelected > 0 ? styles.highlight : ""}`}>
+    <Toolbar
+      className={`${classes.root} ${numSelected > 0 ? classes.highlight : ""}`}
+    >
       {numSelected > 0 ? (
-        <Typography className={styles.title} color="inherit" variant="subtitle1" component="div">
+        <Typography
+          className={classes.title}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
           {numSelected} selected
         </Typography>
       ) : (
-          <Typography className={styles.title} variant="h6" id="tableTitle" component="div">
-            {props.name}
-          </Typography>
-        )}
+        <Typography
+          className={classes.title}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          {name}
+        </Typography>
+      )}
 
       {numSelected > 0 ? (
         <>
@@ -29,12 +58,14 @@ export default function ProjectToolbar(props) {
           </Tooltip>
         </>
       ) : (
-          <Tooltip title="Filter list">
-            <IconButton aria-label="filter list">
-              <Filter />
-            </IconButton>
-          </Tooltip>
-        )}
+        <Tooltip title="Filter list">
+          <IconButton aria-label="filter list">
+            <Filter />
+          </IconButton>
+        </Tooltip>
+      )}
     </Toolbar>
   );
-}
+};
+
+export default withStyles(toolbarStyles)(ProjectToolbar);

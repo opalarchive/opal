@@ -1,110 +1,104 @@
-import React from 'react';
-import { ChevronLeft } from 'react-feather';
-import { darken, lighten, withStyles } from '@material-ui/core';
-import Problem from '../problem';
-import { Link, withRouter } from 'react-router-dom';
-import { compose } from 'recompose';
+import React, { RefObject } from "react";
+import { ChevronLeft } from "react-feather";
+import { withStyles, WithStyles } from "@material-ui/core";
+import Problem from "../Problem";
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
+import { compose } from "recompose";
 
-import * as ROUTES from '../../../../Constants/routes';
-import Reply from './reply';
+import * as ROUTES from "../../../../Constants/routes";
+import Reply from "./Reply";
+import { reply as replyType } from "../../../../../../.shared/src/types";
+import styles from "./index.css";
+import { ProblemDetails } from "../../../../Constants/types";
 
-const detailStyles = (theme) => ({
-  top: {
-    fontSize: "1.2rem",
-    display: "flex"
-  },
-  topLink: {
-    paddingBottom: "1rem",
-    display: "flex",
-    color: "rgba(0, 0, 0, 0.87)",
-    textDecoration: "none",
-    '&:hover': {
-      color: darken(theme.palette.secondary.light, 0.1),
-    },
-    '&:focus': {
-      color: darken(theme.palette.secondary.light, 0.1),
-      outline: "none"
-    }
-  },
-  topIcon: {
-    position: "relative",
-    top: "0.12em",
-    marginRight: "0.25em"
-  },
-  topFiller: {
-    flexGrow: 1
-  },
-  replyOffset: {
-    position: "relative",
-    marginLeft: "1rem"
-  },
-  replyWrapper: {
-    position: "relative",
-  },
-  replyLine: {
-    position: "absolute",
-    top: "-1rem",
-    left: "0.75rem",
-    // boxShadow: `0 -0.2rem 0.1rem 0.2rem ${lighten(theme.palette.secondary.light, 0.25)}`,
-    backgroundColor: lighten(theme.palette.secondary.light, 0.1),
-    width: "0.5rem",
-    height: "calc(100% + 2rem)",
-    zIndex: -1
-  },
-});
+interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
+  replies: replyType[];
+  setDefaultScroll: (scroll: number) => void;
+  reply?: number;
+}
 
-class Details extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.commentRefs = [];
-  }
+class Details extends React.Component<DetailProps> {
+  private top = React.createRef<HTMLDivElement>();
+  private prob = React.createRef<HTMLDivElement>();
+  private commentRefs: RefObject<HTMLDivElement>[] = [];
 
   componentDidMount() {
-    let reply = this.props.match.params.reply;
-    if (!reply) return;
+    if (!this.props.reply) return;
+    if (this.commentRefs.length <= this.props.reply) return;
 
-    reply = parseInt(reply);
+    const rem = parseInt(
+      getComputedStyle(this.top.current as Element).fontSize.replace("px", "")
+    );
 
-    if (this.commentRefs.length <= reply) return;
+    const Reply0 =
+      rem * 2 +
+      (this.top.current as Element).clientHeight +
+      (this.prob.current as Element).clientHeight;
 
-    const rem = parseInt(window.getComputedStyle(this.top).fontSize.replace("px", ""));
-
-    const Reply0 = rem * 2 + this.top.clientHeight + this.prob.clientHeight;
-
-    if (reply === 0) {
+    if (this.props.reply === 0) {
       this.props.setDefaultScroll(Reply0);
     } else {
-      this.props.setDefaultScroll(Reply0 + [...Array(reply).keys()].reduce((acc, cur) => acc + this.commentRefs[cur].clientHeight + rem, 0));
+      this.props.setDefaultScroll(
+        Reply0 +
+          [...Array(this.props.reply).keys()].reduce(
+            (acc, cur) =>
+              acc +
+              (this.commentRefs[cur].current as Element).clientHeight +
+              rem,
+            0
+          )
+      );
     }
   }
 
   render() {
-    const { classes: styles, replies, ...otherProps } = this.props;
+    const { classes, replies, reply: replyNumber, ...otherProps } = this.props;
 
     return (
       <>
-        <div className={styles.top} ref={ref => { this.top = ref }}>
-          <Link className={styles.topLink} to={ROUTES.PROJECT_VIEW.replace(':uuid', otherProps.uuid)} >
-            <ChevronLeft className={styles.topIcon} />Back
+        <div className={classes.top} ref={this.top}>
+          <Link
+            className={classes.topLink}
+            to={ROUTES.PROJECT_VIEW.replace(":uuid", otherProps.uuid)}
+          >
+            <ChevronLeft className={classes.topIcon} />
+            Back
           </Link>
-          <div className={styles.topFiller} />
+          <div className={classes.topFiller} />
         </div>
 
-        <div ref={ref => { this.prob = ref }}>
-          <Problem  {...otherProps} />
+        <div ref={this.prob}>
+          <Problem {...otherProps} repliable={false} />
         </div>
 
-        <div className={styles.replyOffset}>
-          <div className={styles.replyWrapper}>
-            <div className={styles.replyLine} />
-            {!!replies && replies.map((reply, id) => <div key={id} ref={ref => { this.commentRefs[id] = ref }}><Reply {...reply} uuid={otherProps.uuid} ind={otherProps.ind} id={id} isHighlighted={parseInt(this.props.match.params.reply) === id} /></div>)}
+        <div className={classes.replyOffset}>
+          <div className={classes.replyWrapper}>
+            <div className={classes.replyLine} />
+            {!!replies &&
+              replies.map((reply, id) => (
+                <div key={id} ref={this.commentRefs[id]}>
+                  <Reply
+                    uuid={otherProps.uuid}
+                    ind={otherProps.ind}
+                    reply={id}
+                    content={reply}
+                    isHighlighted={replyNumber === id}
+                    problemAction={otherProps.problemAction}
+                  />
+                </div>
+              ))}
           </div>
-          <Reply type="input" problemAction={otherProps.problemAction} />
+          <Reply
+            uuid={otherProps.uuid}
+            ind={otherProps.ind}
+            reply={-1}
+            isHighlighted={false}
+            problemAction={otherProps.problemAction}
+          />
         </div>
       </>
     );
   }
 }
 
-export default compose(withStyles(detailStyles), withRouter)(Details);
+export default withStyles(styles)(Details);

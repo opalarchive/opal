@@ -1,5 +1,7 @@
-import React from 'react';
+import React from "react";
 
-export const Unconfigured = (props) => {
+const Unconfigured: React.FC = () => {
   return <div>amol rama bruh</div>;
-}
+};
+
+export default Unconfigured;

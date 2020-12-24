@@ -1,9 +1,25 @@
-import React from 'react';
-import Scrollbar from 'react-scrollbars-custom';
+import React from "react";
+import Scrollbar from "react-scrollbars-custom";
 
-const MenuBase = (props) => {
-  const { width, right, background, Sidebar, defaultScroll, authUser, children } = props;
+interface MenuBaseProps {
+  width: number;
+  right?: boolean;
+  background: string;
+  Sidebar: React.ComponentType<{ width: number; authUser: firebase.User }>;
+  defaultScroll?: number;
+  authUser: firebase.User;
+  children: JSX.Element | JSX.Element[];
+}
 
+const MenuBase: React.FC<MenuBaseProps> = ({
+  width,
+  right,
+  background,
+  Sidebar,
+  defaultScroll,
+  authUser,
+  children,
+}) => {
   return (
     <>
       <Sidebar width={width} authUser={authUser} />
@@ -18,19 +34,18 @@ const MenuBase = (props) => {
           flexDirection: "column",
         }}
       >
-        <Scrollbar
-          noScrollX
-          scrollTop={defaultScroll}
-        >
-          <div style={{
-            padding: "1rem",
-          }}>
+        <Scrollbar noScrollX scrollTop={defaultScroll}>
+          <div
+            style={{
+              padding: "1rem",
+            }}
+          >
             {children}
           </div>
         </Scrollbar>
       </div>
     </>
-  )
-}
+  );
+};
 
 export default MenuBase;

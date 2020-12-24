@@ -23,28 +23,29 @@ export const latexify = (string: string, options: katex.KatexOptions) => {
   const regularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^\$\\]*(?:\\.[^\$\\]*)*\$/g;
   const blockRegularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]/g;
 
-  const stripDollars = (stringToStrip) =>
+  const stripDollars = (stringToStrip: string) =>
     stringToStrip[0] === "$" && stringToStrip[1] !== "$"
       ? stringToStrip.slice(1, -1)
       : stringToStrip.slice(2, -2);
 
-  const getDisplay = (stringToDisplay) =>
+  const getDisplay = (stringToDisplay: string) =>
     stringToDisplay.match(blockRegularExpression) ? "block" : "inline";
 
-  const renderLatexString = (s, t) => {
+  const renderLatexString = (string: string, type: string) => {
     let renderedString;
     try {
       let newOptions = options;
-      if (t === "block") {
+      if (type === "block") {
         newOptions.displayMode = true;
       } else {
         newOptions.displayMode = false;
       }
       // returns HTML markup
-      renderedString = katex.renderToString(s, newOptions);
+      renderedString = katex.renderToString(string, newOptions);
     } catch (err) {
-      let error = "Couldn't convert " + s + " to a string. Check your syntax.";
-      return { error: error, string: s };
+      let error =
+        "Couldn't convert " + string + " to a string. Check your syntax.";
+      return { error: error, string: string };
     }
     return renderedString;
   };
@@ -80,23 +81,37 @@ export const latexify = (string: string, options: katex.KatexOptions) => {
         return r.string;
       }
       let rendered = renderLatexString(r.string, r.type);
-      if (rendered.error) {
-        return rendered;
-      }
 
-      return <span dangerouslySetInnerHTML={{ __html: rendered }} />;
+      if (typeof rendered !== "string") {
+        return { valid: false, text: rendered.error };
+      }
+      return { valid: true, text: rendered };
     });
 
-    for (let i = 0; i < newResult.length; i++) {
-      if (newResult[i].error) {
-        return newResult[i];
-      }
-    }
     return newResult;
   };
   // Returns list of spans with latex and non-latex strings.
   let toReturn = processResult(result);
   return toReturn;
+};
+
+type LatexElement = {
+  valid: boolean;
+  text: string;
+};
+
+type RenderedElement = string | LatexElement;
+
+const renderElement = (render: RenderedElement) => {
+  // if its normal text
+  if (typeof render === "string") {
+    return render;
+  }
+  // if the latex compiled without error
+  if (render.valid) {
+    return <span dangerouslySetInnerHTML={{ __html: render.text }} />;
+  }
+  return <span style={{ color: "red" }}>Error: {render.text}</span>;
 };
 
 type LatexProps = katex.KatexOptions & {
@@ -152,22 +167,10 @@ class Latex extends React.Component<LatexProps> {
       strict,
       trust,
     });
-    if (!!renderUs.error) {
-      return <div style={{ color: "red" }}>Error: {renderUs.error}</div>;
-    }
     return (
       <span>
         {renderUs.map((render, index) => (
-          <span key={id + index}>
-            {typeof render !== "string"
-              ? render
-              : render.split("\\\\").map((string, idx) => (
-                  <span key={id + index + idx}>
-                    {string}
-                    {idx + 1 !== render.split("\\\\").length && <br />}
-                  </span>
-                ))}
-          </span>
+          <span key={id + index}>{renderElement(render)}</span>
         ))}
       </span>
     );

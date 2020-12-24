@@ -11,28 +11,54 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@material-ui/core";
-import { withStyles } from '@material-ui/core/styles';
+import { WithStyles, withStyles } from "@material-ui/core/styles";
 
 import { UserPlus, Trash2, Edit, Star, CornerLeftUp } from "react-feather";
 import { Link } from "react-router-dom";
 import { rowStyles, dataPointDisplay, IfDisplay } from "./constants";
+import { Client, projectAction } from "../../../../../.shared/src/types";
+import { ProjectDataPoint } from "../../../Constants/types";
 
-class ProjectRow extends React.Component {
-  constructor(props) {
+interface ProjectRowProps extends WithStyles<typeof rowStyles> {
+  uuid: string;
+  index: number;
+  data: ProjectDataPoint[];
+  proj: Client.ProjectPublic;
+  selected: boolean;
+  onRowClick: (
+    event: React.MouseEvent<HTMLTableRowElement>,
+    uuid: string
+  ) => void;
+  username: string;
+  showModal: (type: projectAction, activeProject: string) => void;
+  name: string;
+}
+
+interface ProjectRowState {
+  contextShowing: boolean;
+  mouseX: number;
+  mouseY: number;
+  actions: {
+    [action in projectAction]: boolean;
+  };
+}
+
+class ProjectRow extends React.Component<ProjectRowProps, ProjectRowState> {
+  state = {
+    contextShowing: false,
+    mouseX: 0,
+    mouseY: 0,
+    actions: {
+      SHARE: false,
+      DELETE: false,
+      CHANGE_NAME: false,
+      RESTORE: false,
+      STAR: false,
+    },
+  };
+
+  constructor(props: ProjectRowProps) {
     super(props);
-    this.state = {
-      contextShowing: false,
-      mouseX: 0,
-      mouseY: 0,
-      actions: {
-        star: false,
-        share: false,
-        edit: false,
-        deleteProject: false,
-        restore: false,
-        deleteForever: false
-      }
-    };
     this.displayContextMenu = this.displayContextMenu.bind(this);
     this.closeContextMenu = this.closeContextMenu.bind(this);
     this.closeContextShowModal = this.closeContextShowModal.bind(this);
@@ -40,104 +66,174 @@ class ProjectRow extends React.Component {
 
   componentDidMount() {
     const { proj, username } = this.props;
-    let share = false, star = false, edit = false, deleteProject = false, restore = false, deleteForever = false;
+    let share = false,
+      deleteProject = false,
+      changeName = false,
+      restore = false,
+      star = false;
 
     if (proj.owner === username) {
-      if (!proj.trashed)
-        share = star = edit = deleteProject = true;
-      else
-        restore = deleteForever = star = true;
-    }
-    else
-      star = true;
-    this.setState({actions: {share, star, edit, deleteProject, restore, deleteForever}});
+      if (!proj.trashed) share = star = changeName = deleteProject = true;
+      else restore = star = true;
+    } else star = true;
+    this.setState({
+      actions: {
+        SHARE: share,
+        DELETE: deleteProject,
+        CHANGE_NAME: changeName,
+        RESTORE: restore,
+        STAR: star,
+      },
+    });
   }
 
-  displayContextMenu(event) {
+  displayContextMenu(event: React.MouseEvent<HTMLTableRowElement>) {
     event.preventDefault();
     if (this.state.contextShowing) {
-      this.closeContextMenu({preventDefault: _ => {}});
+      this.closeContextMenu();
       return;
     }
 
-    this.setState({contextShowing: true, mouseX: event.clientX + 2, mouseY: event.clientY + 4});
+    this.setState({
+      contextShowing: true,
+      mouseX: event.clientX + 2,
+      mouseY: event.clientY + 4,
+    });
   }
 
-  closeContextMenu(event) {
-    event.preventDefault();
+  closeContextMenu(event?: React.MouseEvent<HTMLButtonElement>) {
+    if (!!event) event.preventDefault();
 
-    this.setState({contextShowing: false, mouseX: 0, mouseY: 0});
+    this.setState({ contextShowing: false, mouseX: 0, mouseY: 0 });
   }
 
-  closeContextShowModal(event, type, id) {
+  closeContextShowModal(
+    event: React.MouseEvent<HTMLLIElement>,
+    type: projectAction,
+    uuid: string
+  ) {
     event.preventDefault();
 
-    this.closeContextMenu({preventDefault: _ => {}});
-    this.props.showModal({stopPropagation: _ => {}}, type, id);
+    this.closeContextMenu();
+    this.props.showModal(type, uuid);
   }
 
   render() {
-    const { uuid, index, data, proj, selected, onRowClick, username, classes } = this.props;
+    const {
+      uuid,
+      index,
+      data,
+      proj,
+      selected,
+      onRowClick,
+      username,
+      classes,
+    } = this.props;
     const { contextShowing, mouseX, mouseY } = this.state;
-    const { star, share, edit, deleteProject, restore, deleteForever } = this.state.actions;
+    const {
+      SHARE,
+      DELETE: DELETE_PROJECT,
+      CHANGE_NAME,
+      RESTORE,
+      STAR,
+    } = this.state.actions;
 
     const labelId = `project-table-checkbox-${index}`;
     const actions = [
-      { display: "Share", icon: <UserPlus />, event: "share", condition: share },
-      { display: "Delete", icon: <Trash2 />, event: "delete", condition: deleteProject },
-      { display: "Change Name", icon: <Edit />, event: "change-name", condition: edit },
-      { display: "Restore", icon: <CornerLeftUp />, event: "restore", condition: restore },
-      { display: "Delete Forever", icon: <Trash2 />, event: "delete-forever", condition: deleteForever },
-      { display: "Star", icon: proj.starred ? <Star color='#FFD700' fill='#FFD700' /> : <Star />, event: "star", condition: star },
-    ];
+      {
+        display: "Share",
+        icon: <UserPlus />,
+        event: "SHARE",
+        condition: SHARE,
+      },
+      {
+        display: "Delete",
+        icon: <Trash2 />,
+        event: "DELETE",
+        condition: DELETE_PROJECT,
+      },
+      {
+        display: "Change Name",
+        icon: <Edit />,
+        event: "CHANGE_NAME",
+        condition: CHANGE_NAME,
+      },
+      {
+        display: "Restore",
+        icon: <CornerLeftUp />,
+        event: "RESTORE",
+        condition: RESTORE,
+      },
+      {
+        display: "Star",
+        icon: proj.starred ? <Star color="#FFD700" fill="#FFD700" /> : <Star />,
+        event: "STAR",
+        condition: STAR,
+      },
+    ] as {
+      display: string;
+      icon: JSX.Element;
+      event: projectAction;
+      condition: boolean;
+    }[];
 
     return (
       <>
-      <TableRow
-        hover
-        onClick={(event) => !this.state.contextShowing && onRowClick(event, uuid)}
-        role="checkbox"
-        aria-checked={selected}
-        selected={selected}
-        key={uuid}
-        tabIndex={-1}
-        onContextMenu={this.displayContextMenu}
-      >
-      <Menu
-        className="project-row-context-menu"
-        keepMounted
-        open={contextShowing}
-        onClose={this.closeContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          mouseY !== null && mouseX !== null
-            ? { top: mouseY, left: mouseX }
-            : undefined
-        }
-      >
-        {actions.map(action => (
-          <IfDisplay condition={action.condition} key={`${uuid}-contextmenu-${action.display}`}>
-            <MenuItem aria-label={action.display} onClick={(event) => this.closeContextShowModal(event, action.event, uuid)}>
-              <ListItemIcon>
-                {action.icon}
-              </ListItemIcon>
-              <ListItemText primary={action.display} />
-            </MenuItem>
-          </IfDisplay>
-        ))}
-      </Menu>
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={selected}
-            inputProps={{ "aria-labelledby": labelId }}
-          />
-        </TableCell>
-        {data.map((dataPoint, index) =>
+        <TableRow
+          hover
+          onClick={(event: React.MouseEvent<HTMLTableRowElement>) =>
+            !this.state.contextShowing && onRowClick(event, uuid)
+          }
+          role="checkbox"
+          aria-checked={selected}
+          selected={selected}
+          key={uuid}
+          tabIndex={-1}
+          onContextMenu={this.displayContextMenu}
+        >
+          <Menu
+            className="project-row-context-menu"
+            keepMounted
+            open={contextShowing}
+            onClose={(
+              event: React.MouseEvent<HTMLButtonElement>,
+              reason: "backdropClick" | "escapeKeyDown"
+            ) => this.closeContextMenu(event)}
+            anchorReference="anchorPosition"
+            anchorPosition={
+              mouseY !== null && mouseX !== null
+                ? { top: mouseY, left: mouseX }
+                : undefined
+            }
+          >
+            {actions.map((action) => (
+              <IfDisplay
+                condition={action.condition}
+                key={`${uuid}-contextmenu-${action.display}`}
+              >
+                <MenuItem
+                  aria-label={action.display}
+                  onClick={(event: React.MouseEvent<HTMLLIElement>) =>
+                    this.closeContextShowModal(event, action.event, uuid)
+                  }
+                >
+                  <ListItemIcon>{action.icon}</ListItemIcon>
+                  <ListItemText primary={action.display} />
+                </MenuItem>
+              </IfDisplay>
+            ))}
+          </Menu>
+          <TableCell padding="checkbox">
+            <Checkbox
+              checked={selected}
+              inputProps={{ "aria-labelledby": labelId }}
+            />
+          </TableCell>
+          {data.map((dataPoint, index) =>
             index === 0 ? (
               <TableCell
                 component="th"
                 scope="row"
-                uuid={labelId}
                 padding="none"
                 key={`${uuid}-${dataPoint}`}
               >
@@ -154,7 +250,7 @@ class ProjectRow extends React.Component {
               </TableCell>
             )
           )}
-      </TableRow>
+        </TableRow>
       </>
     );
   }

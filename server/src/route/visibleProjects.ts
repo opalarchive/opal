@@ -10,7 +10,7 @@ export const execute = async (req, res) => {
     .then((snapshot) => snapshot.val());
 
   if (!serverPublico) {
-    res.status(200).send(null);
+    res.status(200).send({});
     return;
   }
 

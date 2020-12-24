@@ -1,49 +1,65 @@
-import { Server, UsernameInfo } from "../../../.shared/src/types";
+import {
+  projectAction,
+  ProjectActionProtected,
+  projectActionProtected,
+  Server,
+  UsernameInfo,
+} from "../../../.shared/src/types";
 import { editProject } from "../helpers/editProject";
 import { sendEmail } from "../helpers/emailSetup";
 import { db } from "../helpers/firebaseSetup";
 import { pushNotification } from "../helpers/notification";
 import { Result } from "../helpers/types";
 
-const validateData = (type: string, data: string): boolean | null => {
-  switch (type) {
-    case "changeName":
+const validateData = (
+  type: projectActionProtected,
+  data: string
+): boolean | null => {
+  switch (ProjectActionProtected[type]) {
+    case ProjectActionProtected.CHANGE_NAME:
       return data.match(/^[ A-Za-z0-9]+$/g) && data.length <= 32;
-    // case "delete":
+    // case ProjectActionProtected.DELETE:
     //   return !!data;
-    // case "restore":
+    // case ProjectActionProtected.RESTORE:
     //   return !!data;
-    // case "share":
+    // case ProjectActionProtected.SHARE:
     //   return !!data;
     default:
       return !!data;
   }
 };
 
-const validateDataError = (type: string, data: string): string => {
-  switch (type) {
-    case "changeName":
+const validateDataError = (
+  type: projectActionProtected,
+  data: string
+): string => {
+  switch (ProjectActionProtected[type]) {
+    case ProjectActionProtected.CHANGE_NAME:
       return "bad-project-name";
-    // case "delete":
+    // case ProjectActionProtected.DELETE:
     //   return "";
-    // case "restore":
+    // case ProjectActionProtected.RESTORE:
     //   return "";
-    // case "share":
+    // case ProjectActionProtected.SHARE:
     //   return "";
     default:
       return "bad-input";
   }
 };
 
-const onSuccess = (type: string, uuid: string, data: string): string => {
-  switch (type) {
-    case "changeName":
+const onSuccess = (
+  type: projectActionProtected,
+  uuid: string,
+  data: string
+): string => {
+  switch (ProjectActionProtected[type]) {
+    case ProjectActionProtected.CHANGE_NAME:
       return `Project ${uuid}'s name successfully changed to ${data}.`;
-    case "delete":
+    case ProjectActionProtected.DELETE:
       return `Project ${uuid} successfully deleted.`;
-    case "restore":
+    case ProjectActionProtected.RESTORE:
       return `Project ${uuid} successfully restored.`;
-    case "share":
+    case ProjectActionProtected.SHARE:
       return `Project ${uuid} successfully shared with ${data}.`;
     default:
       return "bad-input";
@@ -54,16 +70,16 @@ const tryAction = async (
   uuid: string,
   projectPublic: Server.ProjectPublic,
   data: string,
-  type: string,
+  type: projectActionProtected,
   uid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
 
-  switch (type) {
-    case "changeName":
+  switch (ProjectActionProtected[type]) {
+    case ProjectActionProtected.CHANGE_NAME:
       await db.ref(`projectPublic/${uuid}/name`).set(data);
       break;
-    case "delete":
+    case ProjectActionProtected.DELETE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(true);
 
       await Promise.all(
@@ -78,10 +94,10 @@ const tryAction = async (
         )
       );
       break;
-    case "restore":
+    case ProjectActionProtected.RESTORE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(false);
       break;
-    case "share":
+    case ProjectActionProtected.SHARE:
       const userinfo: UsernameInfo | null = await db
         .ref(`users/${data}`)
         .once("value")
@@ -132,7 +148,7 @@ export const execute = async (req, res) => {
   const data: string = req.body.data;
   const uuid: string = req.body.uuid;
   const authuid: string = req.body.authuid;
-  const type: string = req.body.type;
+  const type: projectActionProtected = req.body.type;
 
   const projectPublic: Server.ProjectPublic = await db
     .ref(`projectPublic/${uuid}`)

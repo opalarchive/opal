@@ -1,40 +1,45 @@
 /*
-  ***********************************************************************************
-  *                    The code in here should remain untouched!                    *
-  *               Under NO CIRCUMSTANCES should this code be changed!               *
-  ***********************************************************************************
-*/
+ ***********************************************************************************
+ *                    The code in here should remain untouched!                    *
+ *               Under NO CIRCUMSTANCES should this code be changed!               *
+ ***********************************************************************************
+ */
 
-import React from 'react';
+import React from "react";
 
-import AuthUserContext from './context';
-import { withFirebase, auth } from '../Firebase';
+import AuthUserContext from "./context";
+import { auth } from "../Firebase";
 
-const withAuthentication = Component => {
-  class WithAuthentication extends React.Component {
-    constructor(props) {
-      super(props);
+interface WithAuthenticationState {
+  authUser: firebase.User | null;
+}
 
-      this.state = {
-        authUser: JSON.parse(localStorage.getItem('authUser')),
-      };
-    }
+const withAuthentication = (Component: React.ElementType) => {
+  class WithAuthentication extends React.Component<
+    object,
+    WithAuthenticationState
+  > {
+    state = {
+      authUser: null,
+    };
+
+    private listener!: firebase.Unsubscribe;
 
     componentDidMount() {
       this.listener = auth.onAuthStateChanged(
-        authUser => {
-          localStorage.setItem('authUser', JSON.stringify(authUser));
+        (authUser) => {
           this.setState({ authUser });
         },
         () => {
-          localStorage.removeItem('authUser');
           this.setState({ authUser: null });
-        },
+        }
       );
     }
 
     componentWillUnmount() {
-      this.listener();
+      if (!!this.listener) {
+        this.listener();
+      }
     }
 
     render() {
@@ -46,7 +51,7 @@ const withAuthentication = Component => {
     }
   }
 
-  return withFirebase(WithAuthentication);
+  return WithAuthentication;
 };
 
 export default withAuthentication;

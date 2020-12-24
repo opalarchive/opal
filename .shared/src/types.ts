@@ -80,6 +80,11 @@ export namespace Client {
   }
 }
 
+export enum ReplyType {
+  COMMENT = "COMMENT",
+  SOLUTION = "SOLUTION",
+}
+
 interface Post {
   author: string;
   text: string;
@@ -87,25 +92,27 @@ interface Post {
 }
 
 export interface Comment extends Post {
-  type: "comment";
+  type: ReplyType.COMMENT;
 }
 
 export interface Solution extends Post {
-  type: "solution";
+  type: ReplyType.SOLUTION;
 }
 
-export type Reply = Comment | Solution;
-export type Vote = 1 | -1;
+export type reply = Comment | Solution;
+export type vote = 0 | 1 | -1;
+
+export type data = string | number;
 
 export interface Votes {
-  [uid: string]: Vote;
+  [uid: string]: vote;
 }
 
 export interface Problem {
   author: string;
   category: string;
   difficulty: number;
-  replies: Reply[];
+  replies: reply[];
   tags: string[];
   text: string;
   title: string;
@@ -115,3 +122,33 @@ export interface Problem {
 export interface ProjectPrivate {
   problems: Problem[];
 }
+
+export enum ProjectActionProtected {
+  SHARE,
+  DELETE,
+  CHANGE_NAME,
+  RESTORE,
+}
+
+export type projectActionProtected = keyof typeof ProjectActionProtected;
+
+export const isProjectActionProtected = (
+  input: projectAction
+): input is projectActionProtected => {
+  return Object.keys(ProjectActionProtected).includes(input);
+};
+
+export enum ProjectActionTrivial {
+  STAR,
+}
+
+export type projectActionTrivial = keyof typeof ProjectActionTrivial;
+
+export const isProjectActionTrivial = (
+  input: projectAction
+): input is projectActionTrivial => {
+  return Object.keys(ProjectActionTrivial).includes(input);
+};
+
+export type projectAction = projectActionTrivial | projectActionProtected;
+export type problemAction = "vote" | "comment";

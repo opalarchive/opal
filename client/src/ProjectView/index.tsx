@@ -2,31 +2,42 @@ import React from "react";
 
 import * as ROUTES from "../Constants/routes";
 
-import { Route, Switch, withRouter } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 
 import Project from "./Project";
 import Selection from "./Selection";
 import { withAuthorization } from "../Session";
-import { compose } from "recompose";
-import {
-  getNotifications,
-  markAllNotifications,
-  withFirebase,
-} from "../Firebase";
+import { getNotifications, markAllNotifications } from "../Firebase";
 import TopBar from "./TopBar";
 import { poll } from "../Constants";
 import Fail from "../Fail";
+import { WithAuthorization } from "../Session/withAuthorization";
+import { Notification } from "../../../.shared/src/types";
+import { Result } from "../Constants/types";
 
-class ProjectView extends React.Component {
-  constructor(props) {
+interface ProjectViewProps extends WithAuthorization {}
+interface ProjectViewState {
+  notifsLoading: boolean;
+  notifications: Result<Notification[]>;
+  title: string;
+  fail: boolean;
+}
+
+class ProjectView extends React.Component<ProjectViewProps, ProjectViewState> {
+  state = {
+    notifsLoading: true,
+    notifications: {
+      success: true,
+      value: [],
+    } as Result<Notification[]>,
+    title: "",
+    fail: false,
+  };
+
+  private interval: number = -1;
+
+  constructor(props: ProjectViewProps) {
     super(props);
-
-    this.state = {
-      notifsLoading: true,
-      notifications: [],
-      title: null,
-      fail: false,
-    };
 
     this.setNotifications = this.setNotifications.bind(this);
     this.markNotifications = this.markNotifications.bind(this);
@@ -34,25 +45,29 @@ class ProjectView extends React.Component {
     this.fail = this.fail.bind(this);
   }
 
-  async setNotifications() {
+  async setNotifications(): Promise<void> {
     try {
       let notifications = await getNotifications(this.props.authUser.uid);
-      this.setState({
-        notifications: notifications.value,
-        notifsLoading: false,
-      });
+      if (notifications.success) {
+        this.setState({
+          notifications,
+          notifsLoading: false,
+        });
+      } else {
+        this.setState({ notifications });
+      }
     } catch (e) {
       return e;
     }
   }
 
-  async markNotifications(number) {
+  async markNotifications(number: number) {
     this.setState({ notifsLoading: true });
     await markAllNotifications(this.props.authUser.uid, number);
     this.setNotifications();
   }
 
-  setTitle(title) {
+  setTitle(title: string) {
     this.setState({ title });
   }
 
@@ -62,13 +77,13 @@ class ProjectView extends React.Component {
 
   async componentDidMount() {
     try {
-      await poll({
-        func: this.setNotifications,
-        validate: () => !this.state.notifsLoading,
-        interval: 1500,
-        maxAttempts: 200,
-      });
-      this.interval = setInterval((_) => {
+      await poll(
+        this.setNotifications,
+        () => !this.state.notifsLoading,
+        1500,
+        200
+      );
+      this.interval = window.setInterval(() => {
         this.setNotifications();
       }, 30000);
     } catch (e) {
@@ -77,8 +92,8 @@ class ProjectView extends React.Component {
   }
 
   componentWillUnmount() {
-    if (!!this.interval) {
-      clearInterval(this.interval);
+    if (this.interval !== -1) {
+      window.clearInterval(this.interval);
     }
   }
 
@@ -136,10 +151,4 @@ class ProjectView extends React.Component {
   }
 }
 
-const condition = (authUser) => !!authUser;
-
-export default compose(
-  withAuthorization(condition),
-  withFirebase,
-  withRouter
-)(ProjectView);
+export default withAuthorization()(ProjectView);

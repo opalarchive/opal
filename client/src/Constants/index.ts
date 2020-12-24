@@ -1,3 +1,5 @@
+import { ProjectView, ProjectViewType } from "./types";
+
 export const camelToTitle = (input: string): string => {
   let result = input.replace(/([A-Z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
@@ -108,6 +110,93 @@ export function lowerBound<T>(arr: T[], x: T): number {
   return lo;
 }
 
-export const tupleToRGBString = (arr: string[]) => {
-  return `rgb(${arr.join(", ")})`;
+// tuples seem to be broken rn
+export const tupleToRGBString = (arr: number[]) => {
+  return `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})`;
+};
+
+/*
+ * + denotes union
+ * starred is a subset of my projects + shared
+ *
+ * priority = my projects + starred, sort by name
+ * my projects = my projects, sort by name
+ * shared = shared, sort by share date
+ * recent = my projects + shared, sort by last modified date (perhaps only by me)
+ * trash = my projects trash, sort by trash date (same as last modified date)
+ */
+
+export const projectViewTypes = {
+  priority: {
+    filter: {
+      includeMine: true,
+      includeShared: false,
+      includeAllStarred: true,
+      includeTrash: false,
+    },
+    data: ["name", "owner", "lastModified"],
+    fixed: false,
+    defaultSort: {
+      dataPoint: "name",
+      direction: "asc",
+    },
+  },
+  myProjects: {
+    filter: {
+      includeMine: true,
+      includeShared: false,
+      includeAllStarred: false,
+      includeTrash: false,
+    },
+    data: ["name", "owner", "lastModified"],
+    fixed: false,
+    defaultSort: {
+      dataPoint: "name",
+      direction: "asc",
+    },
+  },
+  sharedWithMe: {
+    filter: {
+      includeMine: false,
+      includeShared: true,
+      includeAllStarred: false,
+      includeTrash: false,
+    },
+    data: ["name", "owner", "shareDate"], // owner = shared by in this case (unless we allow collaborator sharing?)
+    fixed: false, // owner is still better I think
+    defaultSort: {
+      dataPoint: "shareDate",
+      direction: "desc",
+    },
+  },
+  recent: {
+    filter: {
+      includeMine: true,
+      includeShared: true,
+      includeAllStarred: false,
+      includeTrash: false,
+    },
+    data: ["name", "owner", "lastModifiedByMe"],
+    fixed: true,
+    defaultSort: {
+      dataPoint: "lastModifiedByMe",
+      direction: "desc",
+    },
+  },
+  trash: {
+    filter: {
+      includeMine: false,
+      includeShared: false,
+      includeAllStarred: false,
+      includeTrash: true, // trash is only trash by me (i.e. only owner can trash)
+    },
+    data: ["name", "owner", "lastModified"], // last modified = trash date for obvious reasons
+    fixed: false, // (disable editing when trashed)
+    defaultSort: {
+      dataPoint: "lastModified",
+      direction: "desc",
+    },
+  },
+} as {
+  [type in ProjectViewType]: ProjectView;
 };

@@ -6,7 +6,10 @@ import {
   ProjectPrivate,
   Notification,
   Client,
+  projectActionProtected,
+  data,
 } from "../../../.shared//src/types";
+import { Result } from "../Constants/types";
 
 export { FirebaseContext, withFirebase };
 
@@ -36,7 +39,7 @@ const fetchLocation =
 async function post<Output>(
   url: string,
   data: object
-): Promise<Result<Output | string>> {
+): Promise<Result<Output>> {
   const attempt = await fetch(`${fetchLocation}/${url}`, {
     method: "POST",
     headers: {
@@ -45,12 +48,19 @@ async function post<Output>(
     body: JSON.stringify(data),
   });
 
-  let value: string | Output = await attempt.text();
+  const value: string = await attempt.text();
+  let output: Output;
+  let result: Result<Output> = { success: false, value };
 
   try {
-    value = JSON.parse(value);
+    output = JSON.parse(value);
+    const success = attempt.status >= 200 && attempt.status < 300;
+
+    if (success) {
+      result = { success: true, value: output };
+    }
   } finally {
-    return { success: attempt.status >= 200 && attempt.status < 300, value };
+    return result;
   }
 }
 
@@ -67,52 +77,61 @@ export const createUser = async (
   password: string,
   email: string
 ): Promise<Result<null>> => {
-  const works = await post<null>("createAccount", {
+  const attempt = await post<null>("createAccount", {
     username,
     password,
     email,
   });
-  if (!works.success) return { success: false, value: null };
+  if (!attempt.success)
+    return { success: false, value: understandSignupError(attempt.value) };
 
   // immediately sign them in
   return auth
     .signInWithEmailAndPassword(email, password)
-    .then((_) => {
-      return { success: true, value: null };
+    .then(() => {
+      return { success: true, value: null } as Result<null>;
     })
-    .catch((error) => {
+    .catch((error: { code: string; message: string }) => {
       console.log(error.code);
-      return { success: false, value: null };
+      return { success: false, value: understandLoginError(error.code) };
     });
 };
 
 export const getVisibleProjects = async (authuid: string) => {
-  return await post<Client.ProjectPublic>("visibleProjects", { authuid });
+  return await post<Client.Publico>("visibleProjects", { authuid });
 };
 
-export const tryProjectAction = async (
+export const tryProjectActionProtected = async (
   uuid: string,
   authuid: string,
-  type: string,
+  type: projectActionProtected,
   data?: string
 ): Promise<Result<string>> => {
-  return await post("projectAction", { uuid, authuid, type, data });
+  return await post<string>("projectAction", {
+    uuid,
+    authuid,
+    type,
+    data: !!data ? data : "",
+  });
 };
 
 export const starProject = async (uuid: string, authuid: string) => {
-  return await post("starProject", { uuid, authuid });
+  return await post<string>("starProject", { uuid, authuid });
 };
 
 export const getNotifications = async (authuid: string) => {
   return await post<Notification[]>("getNotifications", { authuid });
 };
 
-export const markAllNotifications = async (authuid: string, number: string) => {
+export const markAllNotifications = async (authuid: string, number: number) => {
   return await post<string>("markNotifications", { authuid, number });
 };
 
 export const getProjectPrivate = async (uuid: string, authuid: string) => {
-  return await post<ProjectPrivate>("projectPrivate", { uuid, authuid });
+  return await post<ProjectPrivate | string>("projectPrivate", {
+    uuid,
+    authuid,
+  });
 };
 
 export const getProjectName = async (uuid: string, authuid: string) => {
@@ -125,76 +144,75 @@ export const newProject = async (uid: string) => {
 
 export const tryProblemAction = async (
   uuid: string,
-  problemId: string,
-  data: string,
+  problemInd: number,
+  data: data,
   type: string,
   authuid: string
 ) => {
   return await post<string>("problemAction", {
     uuid,
-    problemId,
+    problemInd,
     data,
     type,
     authuid,
   });
 };
 
-export const understandError = (e: string) => {
-  let error = "";
+export const understandSignupError = (e: string) => {
   switch (e) {
-    case "auth/email-already-exists":
-      error =
-        "This email address is already in use. Please use an alternate address.";
-      break;
+    case "auth/email-already-in-use":
+      return "This email address is already in use. Please use an alternate address.";
     case "auth/invalid-user-token":
-      error =
-        "It seems like your token has expired. Refresh the page and try again.";
-      break;
+      return "It seems like your token has expired. Refresh the page and try again.";
     case "auth/network-request-failed":
-      error = "There was a network error. Refresh the page and try again.";
-      break;
+      return "There was a network error. Refresh the page and try again.";
     case "auth/too-many-requests":
-      error =
-        "There were too many requests from this device. Wait 5 minutes, refresh the page, and try again.";
-      break;
+      return "There were too many requests from this device. Wait 5 minutes, refresh the page, and try again.";
     case "auth/user-token-expired":
-      error =
-        "It seems that your token has expired. Refresh the page and try again.";
-      break;
+      return "It seems that your token has expired. Refresh the page and try again.";
     case "auth/user-not-found":
-      error =
-        "It seems that you do not have an account. Please sign up and try again.";
-      break;
+      return "It seems that you do not have an account. Please sign up and try again.";
     case "auth/user-disabled":
-      error =
-        "Your account has been disabled. Email us at `email` to resolve this.";
-      break;
+      return "Your account has been disabled. Email us at `email` to resolve this.";
     case "auth/web-storage-unsupported":
-      error =
-        "We use IndexedDB to store your credentials. If you have disabled this, please re-enable it so we can keep you logged in.";
-      break;
+      return "We use IndexedDB to store your credentials. If you have disabled this, please re-enable it so we can keep you logged in.";
     case "auth/no-empty-username":
-      error =
-        "You can't sign up with an empty username. Please enter a username and try again.";
-      break;
+      return "You can't sign up with an empty username. Please enter a username and try again.";
     case "auth/incorrect-username-syntax":
-      error =
-        "Usernames can only contain alphanumeric characters and underscores. Make sure that your username only contains such characters";
-      break;
+      return "Usernames can only contain alphanumeric characters and underscores. Make sure that your username only contains such characters";
     case "auth/username-already-exists":
-      error =
-        "The username already exists. Please try to input a different username.";
-      break;
+      return "The username already exists. Please try to input a different username.";
     case "auth/invalid-email":
-      error = "The email is invalid. Please try again with a valid email.";
-      break;
-    case "auth/wrong-password":
-      error =
-        "The password is incorrect. Please try to type the password correctly.";
-      break;
+      return "The email is invalid. Please try again with a valid email.";
+    case "auth/username-too-long":
+      return "The username is too long. Please enter a username of at most 40 characters.";
+    case "auth/email-too-long":
+      return "The email is too long. Please enter a email of at most 60 characters.";
+    case "auth/password-too-short":
+      return "The password is too short. Please make sure that the password is at least 8 characters long";
+    case "auth/incorrect-password-format":
+      return "The password must contain at least one captial letter, one lowercase letter, one number, and one special character";
+    case "auth/invalid-grade":
+      return "The grade must be a positive integer";
     default:
-      error =
-        "This looks like an error on our side. Please refresh the page and try again, or contact us with the issue!";
+      return "This looks like an error on our side. Please refresh the page and try again, or contact us with the issue!";
   }
-  return error;
+};
+
+export const understandLoginError = (e: string) => {
+  const email = "onlineproblemarchivallocation@gmail.com";
+  switch (e) {
+    case "auth/invalid-email":
+      return "The email is invalid. Please try again with a valid email.";
+    case "auth/user-not-found":
+      return "It seems that you do not have an account. Please sign up and try again.";
+    case "auth/user-disabled":
+      return `Your account has been disabled. Email us at ${email} to resolve this.`;
+    case "auth/wrong-password":
+      return "The password is incorrect. Please try to type the password correctly.";
+    case "auth/too-many-requests":
+      return "There were too many requests from this device. Wait 5 minutes, refresh the page, and try again.";
+    default:
+      return "This looks like an error on our side. Please refresh the page and try again, or contact us with the issue!";
+  }
 };

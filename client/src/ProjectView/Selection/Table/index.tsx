@@ -15,34 +15,69 @@ import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
-import {
-  deleteProject,
-  deleteForeverProject,
-  shareProject,
-  changeName,
-  restoreProject,
-  starProject,
-} from "../../../Firebase";
+import { starProject, tryProjectActionProtected } from "../../../Firebase";
 import { camelToTitle } from "../../../Constants";
+import {
+  Client,
+  projectAction,
+  ProjectActionProtected,
+  isProjectActionProtected,
+  isProjectActionTrivial,
+} from "../../../../../.shared/src/types";
+import {
+  ProjectDataPoint,
+  ProjectViewSort,
+  ProjectViewType,
+  Result,
+} from "../../../Constants/types";
 
-class ProjectTable extends React.Component {
-  constructor(props) {
+interface Selected {
+  [uuid: string]: boolean;
+}
+
+interface ProjectTableProps {
+  projects: Client.Publico;
+  data: ProjectDataPoint[];
+  fixed: boolean;
+  defaultSort: ProjectViewSort;
+  authUser: firebase.User;
+  name: ProjectViewType;
+  refreshProjects: () => Promise<void>;
+}
+
+interface ProjectTableState {
+  selected: Selected;
+  sortedProjectKeys: string[];
+  sort: ProjectViewSort;
+  modal: {
+    show: boolean;
+    type: projectAction;
+    input: string;
+    activeProject: string;
+  };
+}
+
+class ProjectTable extends React.Component<
+  ProjectTableProps,
+  ProjectTableState
+> {
+  state = {
+    selected: {} as Selected,
+    sortedProjectKeys: [] as string[],
+    sort: {
+      dataPoint: "name",
+      direction: "asc",
+    } as ProjectViewSort,
+    modal: {
+      show: false,
+      type: "SHARE" as projectAction,
+      input: "",
+      activeProject: "",
+    },
+  };
+
+  constructor(props: ProjectTableProps) {
     super(props);
-
-    this.state = {
-      selected: {},
-      sortedProjectKeys: [],
-      sort: {
-        dataPoint: "name",
-        direction: "asc",
-      },
-      modal: {
-        show: false,
-        type: "share",
-        input: "",
-        activeProject: "",
-      },
-    };
 
     this.onRowClick = this.onRowClick.bind(this);
     this.onAllClick = this.onAllClick.bind(this);
@@ -64,7 +99,7 @@ class ProjectTable extends React.Component {
     });
   }
 
-  onRowClick(event, uuid) {
+  onRowClick(event: React.MouseEvent<HTMLTableRowElement>, uuid: string) {
     event.preventDefault();
 
     let selected = this.state.selected;
@@ -73,31 +108,35 @@ class ProjectTable extends React.Component {
     this.setState({ selected });
   }
 
-  onAllClick(event) {
+  onAllClick(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
-      let selected = {};
+      let selected = {} as Selected;
       Object.keys(this.props.projects).forEach((uuid) => {
         selected[uuid] = true;
       });
       this.setState({ selected });
     } else {
-      this.setState({ selected: {} });
+      this.setState({ selected: {} as Selected });
     }
   }
 
-  sortProjectKeys(sort, sortedProjectKeys) {
-    console.log(sort.dataPoint);
-    let stabilized = sortedProjectKeys.map((key) => [
-      getDataPoint(
+  sortProjectKeys(sort: ProjectViewSort, sortedProjectKeys: string[]) {
+    type anchoredData = {
+      data: string | number;
+      key: string;
+    };
+
+    let stabilized: anchoredData[] = sortedProjectKeys.map((key) => ({
+      data: getDataPoint(
         this.props.projects[key],
         sort.dataPoint,
-        this.props.authUser.displayName
+        this.props.authUser.displayName!
       ),
       key,
-    ]);
+    }));
 
     // cant just subtract because strings :(
-    const comp = (a, b) => {
+    const comp = (a: string | number, b: string | number) => {
       if (typeof a === "string") a = a.toLowerCase();
       if (typeof b === "string") b = b.toLowerCase();
 
@@ -108,15 +147,18 @@ class ProjectTable extends React.Component {
 
     stabilized.sort((a, b) => {
       let difference =
-        comp(a[0], b[0]) === 0 ? comp(a[1], b[1]) : comp(a[0], b[0]);
+        comp(a.data, b.data) === 0 ? comp(a.key, b.key) : comp(a.data, b.data);
       return difference * (sort.direction === "asc" ? 1 : -1);
     });
 
-    return stabilized.map((arr) => arr[1]);
+    return stabilized.map((arr) => arr.key);
   }
 
-  onSortClick(event, dataPoint) {
-    let sort = { dataPoint: dataPoint, direction: "asc" };
+  onSortClick(
+    event: React.MouseEvent<HTMLButtonElement>,
+    dataPoint: ProjectDataPoint
+  ) {
+    let sort: ProjectViewSort = { dataPoint: dataPoint, direction: "asc" };
     if (dataPoint === this.state.sort.dataPoint) {
       sort = {
         dataPoint,
@@ -132,13 +174,11 @@ class ProjectTable extends React.Component {
     });
   }
 
-  showModal(event, type, activeProject) {
-    event.stopPropagation();
-
+  showModal(type: projectAction, activeProject: string) {
     this.setState({ modal: { show: true, type, input: "", activeProject } });
   }
 
-  updateModalInput(event) {
+  updateModalInput(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
 
     this.setState({
@@ -146,62 +186,43 @@ class ProjectTable extends React.Component {
     });
   }
 
-  closeModal(event) {
-    event.preventDefault();
+  closeModal(event?: React.MouseEvent<HTMLButtonElement>) {
+    if (!!event) event.preventDefault();
 
     this.setState({
       modal: { ...this.state.modal, show: !this.state.modal.show },
     });
   }
 
-  async modalSuccess(event) {
-    event.preventDefault();
+  async modalSuccess(event?: React.MouseEvent<HTMLButtonElement>) {
+    if (!!event) event.preventDefault();
 
-    switch (this.state.modal.type) {
-      case "delete":
-        const tryToDelete = await deleteProject(
-          this.state.modal.activeProject,
-          this.props.authUser.uid
-        );
-        break;
-      case "delete-forever":
-        const tryToDeleteForever = await deleteForeverProject(
-          this.state.modal.activeProject,
-          this.props.authUser.uid
-        );
-        break;
-      case "share":
-        const tryToShare = await shareProject(
-          this.state.modal.input,
-          this.state.modal.activeProject,
-          this.props.authUser.uid
-        );
-        break;
-      case "change-name":
-        const tryToChange = await changeName(
-          this.state.modal.input,
-          this.state.modal.activeProject,
-          this.props.authUser.uid
-        );
-        break;
-      case "restore":
-        const tryToRestore = await restoreProject(
-          this.state.modal.activeProject,
-          this.props.authUser.uid
-        );
-        break;
-      case "star":
-        const tryToStar = await starProject(
-          this.state.modal.activeProject,
-          this.props.authUser.uid
-        );
-        break;
-      default:
-        console.log("Undefined");
+    let attempt: Result<string> = { success: false, value: "" };
+
+    if (isProjectActionProtected(this.state.modal.type)) {
+      attempt = await tryProjectActionProtected(
+        this.state.modal.activeProject,
+        this.props.authUser.uid,
+        this.state.modal.type,
+        this.state.modal.input
+      );
+    } else if (isProjectActionTrivial(this.state.modal.type)) {
+      // currently this is the only trivial action, but this may change
+      // TODO: generalize this
+      attempt = await starProject(
+        this.state.modal.activeProject,
+        this.props.authUser.uid
+      );
+    } else {
+      console.log("Undefined");
     }
 
-    this.closeModal({ preventDefault: () => {} });
-    this.props.refreshProjects();
+    if (attempt.success) {
+      this.closeModal();
+      this.props.refreshProjects();
+    } else {
+      // maybe display error
+    }
   }
 
   render() {
@@ -216,7 +237,7 @@ class ProjectTable extends React.Component {
         <Modal
           show={this.state.modal.show}
           type={this.state.modal.type}
-          onClose={this.closeModal}
+          closeModal={this.closeModal}
           input={this.state.modal.input}
           inputChange={this.updateModalInput}
           modalSuccess={this.modalSuccess}
@@ -224,8 +245,15 @@ class ProjectTable extends React.Component {
         <ProjectToolbar
           selected={realSelected}
           name={camelToTitle(name)}
-          showModal={(type) =>
-            this.setState({ modal: { show: !this.state.modal.show, type } })
+          showModal={(type: projectAction) =>
+            this.setState({
+              modal: {
+                show: !this.state.modal.show,
+                type,
+                input: "",
+                activeProject: "",
+              },
+            })
           }
         />
         <TableContainer>
@@ -264,7 +292,9 @@ class ProjectTable extends React.Component {
                             ? this.state.sort.direction
                             : "asc"
                         }
-                        onClick={(event) => this.onSortClick(event, dataPoint)}
+                        onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+                          this.onSortClick(event, dataPoint)
+                        }
                       >
                         {camelToTitle(dataPoint)}
                       </TableSortLabel>
@@ -282,7 +312,7 @@ class ProjectTable extends React.Component {
                   proj={projects[uuid]}
                   selected={!!this.state.selected[uuid]}
                   onRowClick={this.onRowClick}
-                  username={this.props.authUser.displayName}
+                  username={this.props.authUser.displayName!}
                   showModal={this.showModal}
                   name={name}
                   key={`project-row-${uuid}`}

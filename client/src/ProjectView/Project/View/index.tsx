@@ -1,8 +1,13 @@
 import React from "react";
-import { Route, Switch, withRouter } from "react-router-dom";
+import {
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter,
+} from "react-router-dom";
 import MenuBase from "../../MenuBase";
-import Filter from "./filter";
-import Problem from "./problem";
+import Filter from "./Filter";
+import Problem from "./Problem";
 
 import * as ROUTES from "../../../Constants/routes";
 import Details from "./Details";
@@ -12,56 +17,65 @@ import {
   lerp,
   lowerBound,
 } from "../../../Constants";
+import {
+  data,
+  Problem as ProblemType,
+  problemAction,
+  ProjectPrivate,
+  ReplyType,
+} from "../../../../../.shared/src/types";
+import { ProblemDetails, replyTypes } from "../../../Constants/types";
 
-const ProblemDetails = (props) => {
-  const ind = parseInt(props.match.params.ind);
+interface ViewProps {
+  project: ProjectPrivate;
+  uuid: string;
+  problemAction: (
+    ind: number,
+    data: data,
+    type: problemAction
+  ) => Promise<void>;
+  fail: () => void;
+  authUser: firebase.User;
+}
 
-  return (
-    <Details
-      {...{
-        replies: props.problems[ind].replies,
-        ...props.problemProps(
-          props.problems[ind],
-          ind,
-          props.uuid,
-          props.problemAction,
-          props.authUser
-        ),
-        repliable: false,
-        fail: props.fail,
-        setDefaultScroll: props.setDefaultScroll,
-        loadBackground: props.loadBackground,
-      }}
-    />
-  );
-};
+interface CategoryColors {
+  [category: string]: number[];
+}
 
-const RoutedDetails = withRouter(ProblemDetails);
+interface DifficultyColors {
+  [difficultyKey: number]: number[]; // basically keyframes but with colors
+}
 
-class View extends React.Component {
-  constructor(props) {
+interface ViewState {
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
+  defaultScroll: number;
+}
+
+class View extends React.Component<ViewProps, ViewState> {
+  state = {
+    categoryColors: {
+      algebra: [241, 37, 30],
+      geometry: [35, 141, 25],
+      combinatorics: [21, 52, 224],
+      numberTheory: [173, 19, 179],
+      miscellaneous: [100, 100, 110],
+    } as CategoryColors,
+    difficultyColors: {
+      0: [0, 200, 100],
+      25: [0, 200, 255],
+      50: [150, 50, 255],
+      51: [255, 150, 0],
+      75: [255, 0, 0],
+      100: [0, 0, 0],
+    } as DifficultyColors,
+    defaultScroll: 0,
+  };
+
+  private scrollSet = 0;
+
+  constructor(props: ViewProps) {
     super(props);
-
-    this.state = {
-      categoryColors: {
-        algebra: [241, 37, 30],
-        geometry: [35, 141, 25],
-        combinatorics: [21, 52, 224],
-        numberTheory: [173, 19, 179],
-        miscellaneous: [100, 100, 110],
-      },
-      difficultyColors: {
-        0: [0, 200, 100],
-        25: [0, 200, 255],
-        50: [150, 50, 255],
-        51: [255, 150, 0],
-        75: [255, 0, 0],
-        100: [0, 0, 0],
-      },
-      defaultScroll: 0,
-    };
-
-    this.scrollSet = 0;
 
     this.getCategoryColor = this.getCategoryColor.bind(this);
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
@@ -69,12 +83,12 @@ class View extends React.Component {
     this.setDefaultScroll = this.setDefaultScroll.bind(this);
   }
 
-  getCategoryColor(category) {
+  getCategoryColor(category: string) {
     return this.state.categoryColors[category];
   }
 
   // linearlly interpolate the difficulty color using keyframesque colors
-  getDifficultyColor(difficulty) {
+  getDifficultyColor(difficulty: number) {
     const colors = this.state.difficultyColors;
     const keys = Object.keys(colors).map((key) => parseInt(key));
 
@@ -92,22 +106,31 @@ class View extends React.Component {
         colors[keys[top]][ind],
         difficulty
       )
-    );
+    ) as number[];
   }
 
-  problemProps(prob, ind, uuid, problemAction, authUser) {
-    const replyTypes = {};
+  problemProps(
+    uuid: string,
+    ind: number,
+    prob: ProblemType,
+    problemAction: (
+      ind: number,
+      data: data,
+      type: problemAction
+    ) => Promise<void>,
+    authUser: firebase.User
+  ): ProblemDetails {
+    const replyTypes = Object.fromEntries(
+      Object.keys(ReplyType).map((replyType) => [replyType, 0])
+    ) as replyTypes;
+
     if (!!prob.replies) {
       prob.replies.forEach((reply) => {
-        if (!replyTypes[reply.type]) {
-          replyTypes[reply.type] = 0;
-        }
         replyTypes[reply.type]++;
       });
     }
 
     return {
-      key: ind,
       ind: ind,
       uuid: uuid,
       text: prob.text,
@@ -122,16 +145,17 @@ class View extends React.Component {
       author: prob.author,
       tags: prob.tags,
       votes: !!prob.votes
-        ? Object.values(prob.votes).reduce((a, b) => a + b)
+        ? (Object.values(prob.votes) as number[]).reduce((a, b) => a + b)
         : 0,
-      myVote: !!prob.votes ? prob.votes[authUser.displayName] : 0,
-      problemAction: (data, type) => problemAction(ind, data, type),
+      myVote: !!prob.votes ? prob.votes[authUser.displayName!] : 0,
+      problemAction: (data: data, type: problemAction) =>
+        problemAction(ind, data, type),
       replyTypes,
       authUser: authUser,
     };
   }
 
-  setDefaultScroll(defaultScroll) {
+  setDefaultScroll(defaultScroll: number) {
     this.setState({ defaultScroll });
   }
 
@@ -144,6 +168,38 @@ class View extends React.Component {
     if (!!this.state.defaultScroll) {
       this.scrollSet++;
     }
+
+    interface DetailsMatch {
+      uuid: string;
+      ind: string;
+      reply?: string;
+    }
+
+    const DetailsPage: React.FC<RouteComponentProps<DetailsMatch>> = ({
+      match,
+    }) => {
+      const ind = parseInt(match.params.ind);
+      const reply = !!match.params.reply
+        ? parseInt(match.params.reply)
+        : undefined;
+
+      return (
+        <Details
+          replies={project.problems[ind].replies}
+          {...this.problemProps(
+            uuid,
+            ind,
+            project.problems[ind],
+            problemAction,
+            authUser
+          )}
+          setDefaultScroll={this.setDefaultScroll}
+          reply={reply}
+        />
+      );
+    };
+
+    const RoutedDetails = withRouter(DetailsPage);
 
     return (
       <MenuBase
@@ -163,16 +219,14 @@ class View extends React.Component {
             render={(_) => {
               return project.problems.map((prob, ind) => (
                 <Problem
-                  {...{
-                    ...this.problemProps(
-                      prob,
-                      ind,
-                      uuid,
-                      problemAction,
-                      authUser
-                    ),
-                    repliable: true,
-                  }}
+                  {...this.problemProps(
+                    uuid,
+                    ind,
+                    prob,
+                    problemAction,
+                    authUser
+                  )}
+                  repliable
                 />
               ));
             }}
@@ -183,18 +237,7 @@ class View extends React.Component {
               ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid),
               ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid),
             ]}
-            render={(_) => (
-              <RoutedDetails
-                problemProps={this.problemProps}
-                problems={project.problems}
-                uuid={uuid}
-                problemAction={problemAction}
-                fail={fail}
-                setDefaultScroll={this.setDefaultScroll}
-                authUser={authUser}
-                loadBackground={loadBackground}
-              />
-            )}
+            render={(_) => <RoutedDetails />}
           />
         </Switch>
       </MenuBase>

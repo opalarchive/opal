@@ -1,42 +1,50 @@
 import { clientdb } from "../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import { Problem } from "../../../.shared/src/types";
+import {
+  Problem,
+  data,
+  problemAction,
+  vote,
+  ReplyType,
+} from "../../../.shared/src/types";
 import { Result } from "../helpers/types";
-
-type data = string | number;
 
 const tryAction = async (
   cdb: firebase.database.Database,
   problem: Problem,
-  problemId: string,
+  problemInd: number,
   data: data,
-  type: string,
+  type: problemAction,
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
 
   switch (type) {
     case "vote":
-      if (typeof data !== "number") {
+      if (data !== 1 && data !== -1) {
         return { status: 400, value: "invalid-input" };
       }
 
-      const newVote: number =
+      const newVote: vote =
         !!problem.votes && problem.votes[authuid] === data ? 0 : data;
-      await cdb.ref(`problems/${problemId}/votes/${authuid}`).set(newVote);
+      await cdb.ref(`problems/${problemInd}/votes/${authuid}`).set(newVote);
 
       break;
     case "comment":
+      if (typeof data !== "string") {
+        return { status: 400, value: "invalid-input" };
+      }
+
       let index = 0;
       if (!!problem.replies) {
         index = problem.replies.length;
       }
 
-      await cdb.ref(`problems/${problemId}/replies/${index}`).set({
+      await cdb.ref(`problems/${problemInd}/replies/${index}`).set({
         author: authuid,
         text: data,
         time: now,
-        type: "comment",
+        type: ReplyType.COMMENT,
       });
 
       break;
@@ -48,9 +56,9 @@ const tryAction = async (
 
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
-  const problemId: string = req.body.problemId;
+  const problemId: number = req.body.problemId;
   let data: data = req.body.data;
-  const type: string = req.body.type;
+  const type: problemAction = req.body.type;
   const authuid: string = req.body.authuid;
 
   if (!data) {

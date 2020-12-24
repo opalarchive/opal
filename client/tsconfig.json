@@ -17,14 +17,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
   },
   "include": [
     "src"
   ],
   "references": [{ "path": "../.shared" }],
-  "paths": {
-    "@types/*": "../.shared/types/*"
-  }
 }

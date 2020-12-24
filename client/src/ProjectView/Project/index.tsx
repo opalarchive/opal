@@ -1,30 +1,62 @@
 import React from "react";
-import { withRouter } from "react-router-dom";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import {
+  ProjectPrivate,
+  Problem,
+  data,
+  vote,
+  problemAction,
+  ReplyType,
+} from "../../../../.shared/src/types";
 import { poll } from "../../Constants";
+import { Result } from "../../Constants/types";
 import { getProjectPrivate, tryProblemAction } from "../../Firebase";
 import { getProjectName } from "../../Firebase";
 
 import Loading from "../../Loading";
-import { Unconfigured } from "./unconfigured";
+import Unconfigured from "./unconfigured";
 import View from "./View";
 
-class Project extends React.Component {
-  constructor(props) {
-    super(props);
+interface ProjectMatch {
+  uuid: string;
+}
 
-    this.state = {
-      project: [],
-      loading: true,
-    };
+interface ProjectProps extends RouteComponentProps<ProjectMatch> {
+  authUser: firebase.User;
+  setNotifications: () => Promise<void>;
+  setTitle: (title: string) => void;
+  fail: () => void;
+}
+
+interface ProjectState {
+  project: Result<ProjectPrivate | string>;
+  loading: boolean;
+}
+
+class Project extends React.Component<ProjectProps, ProjectState> {
+  state = {
+    project: {
+      success: true,
+      value: { problems: [] as Problem[] },
+    } as Result<ProjectPrivate | string>,
+    loading: true,
+  };
+  private interval: number = -1;
+
+  constructor(props: ProjectProps) {
+    super(props);
 
     this.problemAction = this.problemAction.bind(this);
   }
 
-  async setProject(uuid, authuid) {
+  async setProject(uuid: string, authuid: string) {
     try {
       const project = await getProjectPrivate(uuid, authuid);
       const name = await getProjectName(uuid, authuid);
-      this.props.setTitle(name.value);
+
+      if (name.success) {
+        this.props.setTitle(name.value);
+      }
 
       this.setState({ project, loading: false });
     } catch (e) {
@@ -34,17 +66,17 @@ class Project extends React.Component {
 
   async componentDidMount() {
     try {
-      await poll({
-        func: () =>
+      await poll(
+        () =>
           this.setProject(
             this.props.match.params.uuid,
             this.props.authUser.uid
           ),
-        validate: () => !this.state.loading,
-        interval: 1500,
-        maxAttempts: 200,
-      });
-      this.interval = setInterval((_) => {
+        () => !this.state.loading,
+        1500,
+        200
+      );
+      this.interval = window.setInterval(() => {
         this.setProject(this.props.match.params.uuid, this.props.authUser.uid);
       }, 30000);
     } catch (e) {
@@ -53,48 +85,63 @@ class Project extends React.Component {
   }
 
   componentWillUnmount() {
-    if (!!this.interval) {
-      clearInterval(this.interval);
+    if (this.interval !== -1) {
+      window.clearInterval(this.interval);
     }
   }
 
-  clientSideAction(ind, data, type) {
+  clientSideAction(ind: number, data: data, type: problemAction) {
     let project = this.state.project;
-    const displayName = this.props.authUser.displayName;
+    const displayName = !!this.props.authUser.displayName
+      ? this.props.authUser.displayName
+      : "";
+
+    if (!project.success || typeof project.value === "string") {
+      return project;
+    }
 
     switch (type) {
       case "vote":
-        if (!project.problems[ind].votes) {
-          project.problems[ind].votes = {};
+        if (data !== 1 && data !== -1) {
+          break;
         }
-        const newVote =
-          project.problems[ind].votes[displayName] === data ? 0 : data;
-        project.problems[ind].votes[displayName] = newVote;
+        if (!project.value.problems[ind].votes) {
+          project.value.problems[ind].votes = {};
+        }
 
-        return project;
+        const newVote: vote =
+          project.value.problems[ind].votes[displayName] === data ? 0 : data;
+        project.value.problems[ind].votes[displayName] = newVote;
+
+        break;
       case "comment":
+        if (typeof data !== "string") {
+          break;
+        }
+
         let index = 0;
-        if (!!project.problems[ind].replies) {
-          index = project.problems[ind].replies.length;
+        if (!!project.value.problems[ind].replies) {
+          index = project.value.problems[ind].replies.length;
         } else {
-          project.problems[ind].replies = [];
+          project.value.problems[ind].replies = [];
         }
 
         const now = new Date();
-        project.problems[ind].replies[index] = {
+        project.value.problems[ind].replies[index] = {
           author: displayName,
           text: data,
           time: now.getTime(),
-          type: "comment",
+          type: ReplyType.COMMENT,
         };
 
-        return project;
+        break;
       default:
-        return project;
+        break;
     }
+    return project;
   }
 
-  async problemAction(ind, data, type) {
+  async problemAction(ind: number, data: data, type: problemAction) {
     const oldProject = this.state.project;
     this.setState({ project: this.clientSideAction(ind, data, type) });
 
@@ -116,24 +163,30 @@ class Project extends React.Component {
     if (this.state.loading) {
       return <Loading background="white" />;
     }
-    if (this.state.project === "does-not-exist") {
-      return "does not exist";
+    if (!this.state.project.success) {
+      if (this.state.project.value === "does-not-exist") {
+        return "does not exist";
+      }
+      if (this.state.project.value === "forbidden") {
+        return "forbidden";
+      }
+      if (this.state.project.value === "trashed") {
+        return "trashed";
+      }
+    } else {
+      if (this.state.project.value === "unconfigured") {
+        return <Unconfigured />;
+      }
     }
-    if (this.state.project === "forbidden") {
-      return "forbidden";
-    }
-    if (this.state.project === "trashed") {
-      return "trashed";
-    }
-    if (this.state.project === "unconfigured") {
-      return <Unconfigured />;
+    if (typeof this.state.project.value === "string") {
+      return "???";
     }
     return (
       <View
-        project={this.state.project}
+        project={this.state.project.value}
         uuid={this.props.match.params.uuid}
         problemAction={this.problemAction}
-        fail={this.fail}
+        fail={this.props.fail}
         authUser={this.props.authUser}
       />
     );

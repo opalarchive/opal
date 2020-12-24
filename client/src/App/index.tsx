@@ -8,8 +8,6 @@ import Home from "../Home";
 import SignUp from "../SignUp";
 import ProjectView from "../ProjectView";
 
-import AuthProvider from "../Providers/AuthProvider";
-
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { withAuthentication } from "../Session";
 
@@ -33,20 +31,24 @@ const theme = createMuiTheme({
 class App extends React.Component {
   render() {
     return (
-      <AuthProvider>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <Switch>
-              <Route exact path={ROUTES.CUSTOM_HOME} component={Home} />
-              <Route exact path={ROUTES.HOME} component={Home} />
-              <Route exact path={ROUTES.SIGNUP} component={SignUp} />
-              <Route path={ROUTES.PROJECT} component={ProjectView} />
-            </Switch>
-          </Router>
-        </ThemeProvider>
-      </AuthProvider>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Switch>
+            <Route exact path={ROUTES.CUSTOM_HOME} render={() => <Home />} />
+            <Route exact path={ROUTES.HOME} render={() => <Home />} />
+            <Route exact path={ROUTES.SIGNUP} render={() => <SignUp />} />
+            <Route
+              path={ROUTES.PROJECT}
+              render={() => {
+                const Project = withAuthentication(ProjectView);
+                return <Project />;
+              }}
+            />
+          </Switch>
+        </Router>
+      </ThemeProvider>
     );
   }
 }
 
-export default withAuthentication(App);
+export default App;

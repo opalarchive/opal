@@ -1,35 +1,40 @@
 /*
-  ***********************************************************************************
-  *                    The code in here should remain untouched!                    *
-  *               Under NO CIRCUMSTANCES should this code be changed!               *
-  ***********************************************************************************
-*/
+ ***********************************************************************************
+ *                    The code in here should remain untouched!                    *
+ *               Under NO CIRCUMSTANCES should this code be changed!               *
+ ***********************************************************************************
+ */
 
-import React from 'react';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'recompose';
+import React from "react";
 
-import AuthUserContext from './context';
-import { withFirebase } from '../Firebase';
+import AuthUserContext from "./context";
 
-const withAuthorization = (condition) => Component => {
-  class WithAuthorization extends React.Component {
+export interface WithAuthorization {
+  authUser: firebase.User;
+}
 
+const withAuthorization = (
+  condition: (authUser: firebase.User | null) => boolean = (
+    authUser: firebase.User | null
+  ) => !!authUser
+) => (Component: React.ElementType) => {
+  class WithAuthorization extends React.Component<object> {
     render() {
       return (
         <AuthUserContext.Consumer>
-          {authUser =>
-            condition(authUser) ? <Component {...this.props} authUser={authUser} /> : "not logged in :("
+          {(authUser) =>
+            condition(authUser) && !!authUser ? (
+              <Component {...this.props} authUser={authUser} />
+            ) : (
+              "not logged in :("
+            )
           }
         </AuthUserContext.Consumer>
       );
     }
   }
 
-  return compose(
-    withRouter,
-    withFirebase,
-  )(WithAuthorization);
+  return WithAuthorization;
 };
 
 export default withAuthorization;
