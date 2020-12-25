@@ -8,7 +8,10 @@ import Home from "../Home";
 import SignUp from "../SignUp";
 import ProjectView from "../ProjectView";
 
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import {
+  unstable_createMuiStrictModeTheme as createMuiTheme,
+  ThemeProvider,
+} from "@material-ui/core/styles";
 import { withAuthentication } from "../Session";
 
 const theme = createMuiTheme({
@@ -28,6 +31,8 @@ const theme = createMuiTheme({
   },
 });
 
+const Project = withAuthentication(ProjectView);
+
 class App extends React.Component {
   render() {
     return (
@@ -37,13 +42,7 @@ class App extends React.Component {
             <Route exact path={ROUTES.CUSTOM_HOME} render={() => <Home />} />
             <Route exact path={ROUTES.HOME} render={() => <Home />} />
             <Route exact path={ROUTES.SIGNUP} render={() => <SignUp />} />
-            <Route
-              path={ROUTES.PROJECT}
-              render={() => {
-                const Project = withAuthentication(ProjectView);
-                return <Project />;
-              }}
-            />
+            <Route path={ROUTES.PROJECT} render={() => <Project />} />
           </Switch>
         </Router>
       </ThemeProvider>

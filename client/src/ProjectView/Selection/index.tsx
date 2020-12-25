@@ -178,7 +178,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <Route
           exact
           path={ROUTES.PROJECT}
-          component={() => (
+          render={() => (
             <SelectionBase
               refreshProjects={this.setProjects}
               type="priority"
@@ -190,7 +190,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <Route
           exact
           path={ROUTES.PROJECT_PRIORITY}
-          component={() => (
+          render={() => (
             <SelectionBase
               refreshProjects={this.setProjects}
               type="priority"
@@ -202,7 +202,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <Route
           exact
           path={ROUTES.PROJECT_MY_PROJECTS}
-          component={() => (
+          render={() => (
             <SelectionBase
               refreshProjects={this.setProjects}
               type="myProjects"
@@ -214,7 +214,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <Route
           exact
           path={ROUTES.PROJECT_SHARED_WITH_ME}
-          component={() => (
+          render={() => (
             <SelectionBase
               refreshProjects={this.setProjects}
               type="sharedWithMe"
@@ -226,7 +226,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <Route
           exact
           path={ROUTES.PROJECT_RECENT}
-          component={() => (
+          render={() => (
             <SelectionBase
               refreshProjects={this.setProjects}
               type="recent"
@@ -238,7 +238,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <Route
           exact
           path={ROUTES.PROJECT_TRASH}
-          component={() => (
+          render={() => (
             <SelectionBase
               refreshProjects={this.setProjects}
               type="trash"

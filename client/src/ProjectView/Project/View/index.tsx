@@ -219,6 +219,7 @@ class View extends React.Component<ViewProps, ViewState> {
             render={(_) => {
               return project.problems.map((prob, ind) => (
                 <Problem
+                  key={`problem-${ind}`}
                   {...this.problemProps(
                     uuid,
                     ind,

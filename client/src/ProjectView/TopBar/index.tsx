@@ -15,7 +15,7 @@ import {
   WithStyles,
 } from "@material-ui/core";
 import React from "react";
-import { Bell, User, Loader } from "react-feather";
+import { Bell, User } from "react-feather";
 import { Notification } from "../../../../.shared";
 import { Result } from "../../Constants/types";
 import Loading from "../../Loading";
@@ -90,12 +90,11 @@ class Notifications extends React.Component<
     };
 
     let ariaLabel = "";
-    let icon: JSX.Element | string = <div />;
+    let icon: JSX.Element | string | undefined = undefined;
     let popOut = <div />;
 
     if (loading) {
       ariaLabel = "the notifications are still loading";
-      icon = <Loader size={10} />;
       popOut = (
         <>
           <Loading background="" hideText={true} />
@@ -135,7 +134,9 @@ class Notifications extends React.Component<
         });
       }
       ariaLabel = `show ${unreadNotifs} new notifications`;
-      icon = `${unreadNotifs}`;
+      if (unreadNotifs > 0) {
+        icon = `${unreadNotifs}`;
+      }
       popOut = (
         <>
           {notifs.value.map((notif, index) => (

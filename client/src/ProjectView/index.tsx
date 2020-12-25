@@ -62,7 +62,6 @@ class ProjectView extends React.Component<ProjectViewProps, ProjectViewState> {
   }
 
   async markNotifications(number: number) {
-    this.setState({ notifsLoading: true });
     await markAllNotifications(this.props.authUser.uid, number);
     this.setNotifications();
   }

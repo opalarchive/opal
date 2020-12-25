@@ -52,12 +52,25 @@ async function post<Output>(
   let output: Output;
   let result: Result<Output> = { success: false, value };
 
+  const success = attempt.status >= 200 && attempt.status < 300;
+
   try {
     output = JSON.parse(value);
-    const success = attempt.status >= 200 && attempt.status < 300;
 
     if (success) {
       result = { success: true, value: output };
+    }
+  } catch (_) {
+    /*
+     Assume that the serverside response is in the correct format i.e. 
+     if it returns success, and we cannot parse it to JSON it must be 
+     a string. Similarly, we must also assume that the clientside 
+     function call is valid, i.e. that the given Output type is a 
+     subtype of string
+     there doesn't seem to be a good way to implement a check for this
+    */
+    if (success) {
+      result = { success: true, value: (value as unknown) as Output };
     }
   } finally {
     return result;

@@ -56,7 +56,7 @@ const tryAction = async (
 
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
-  const problemId: number = req.body.problemId;
+  const problemInd: number = req.body.problemInd;
   let data: data = req.body.data;
   const type: problemAction = req.body.type;
   const authuid: string = req.body.authuid;
@@ -74,7 +74,7 @@ export const execute = async (req, res) => {
   }
 
   const problem: Problem | null = await trydb.value
-    .ref(`problems/${problemId}`)
+    .ref(`problems/${problemInd}`)
     .once("value")
     .then((snapshot) => snapshot.val());
 
@@ -86,7 +86,7 @@ export const execute = async (req, res) => {
   const result = await tryAction(
     trydb.value,
     problem,
-    problemId,
+    problemInd,
     data,
     type,
     authuid

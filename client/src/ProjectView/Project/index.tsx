@@ -154,7 +154,6 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     );
 
     if (!result.success) {
-      console.log(result);
       this.setState({ project: oldProject });
     }
   }
