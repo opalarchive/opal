@@ -38,8 +38,15 @@ const fetchLocation =
  */
 async function post<Output>(
   url: string,
-  data: object
+  data: object,
+  authUser?: firebase.User
 ): Promise<Result<Output>> {
+  if (!!authUser) {
+    const idToken = await authUser.getIdToken();
+
+    data = { ...data, token: idToken };
+  }
+
   const attempt = await fetch(`${fetchLocation}/${url}`, {
     method: "POST",
     headers: {
@@ -81,7 +88,10 @@ firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
 
 export const getUsernames = async (): Promise<Result<string[]>> => {
-  const usernamesObject = await post<UsernameInfo[]>("getAllUsernames", {});
+  const usernamesObject = await post<UsernameInfo[]>(
+    "public/getAllUsernames",
+    {}
+  );
   return { success: true, value: Object.keys(usernamesObject.value) };
 };
 
@@ -90,7 +100,7 @@ export const createUser = async (
   password: string,
   email: string
 ): Promise<Result<null>> => {
-  const attempt = await post<null>("createAccount", {
+  const attempt = await post<null>("public/createAccount", {
     username,
     password,
     email,
@@ -110,49 +120,61 @@ export const createUser = async (
     });
 };
 
-export const getVisibleProjects = async (authuid: string) => {
-  return await post<Client.Publico>("visibleProjects", { authuid });
+export const getVisibleProjects = async (authUser: firebase.User) => {
+  return await post<Client.Publico>("private/visibleProjects", {}, authUser);
 };
 
 export const tryProjectActionProtected = async (
   uuid: string,
-  authuid: string,
+  authUser: firebase.User,
   type: projectActionProtected,
   data?: string
 ): Promise<Result<string>> => {
-  return await post<string>("projectAction", {
-    uuid,
-    authuid,
-    type,
-    data: !!data ? data : "",
-  });
+  return await post<string>(
+    "private/projectAction",
+    {
+      uuid,
+      type,
+      data: !!data ? data : "",
+    },
+    authUser
+  );
 };
 
-export const starProject = async (uuid: string, authuid: string) => {
-  return await post<string>("starProject", { uuid, authuid });
+export const starProject = async (uuid: string, authUser: firebase.User) => {
+  return await post<string>("private/starProject", { uuid }, authUser);
 };
 
-export const getNotifications = async (authuid: string) => {
-  return await post<Notification[]>("getNotifications", { authuid });
+export const getNotifications = async (authUser: firebase.User) => {
+  return await post<Notification[]>("private/getNotifications", {}, authUser);
 };
 
-export const markAllNotifications = async (authuid: string, number: number) => {
-  return await post<string>("markNotifications", { authuid, number });
+export const markAllNotifications = async (
+  authUser: firebase.User,
+  number: number
+) => {
+  return await post<string>("private/markNotifications", { number }, authUser);
 };
 
-export const getProjectPrivate = async (uuid: string, authuid: string) => {
-  return await post<ProjectPrivate | string>("projectPrivate", {
-    uuid,
-    authuid,
-  });
+export const getProjectPrivate = async (
+  uuid: string,
+  authUser: firebase.User
+) => {
+  return await post<ProjectPrivate | string>(
+    "private/projectPrivate",
+    {
+      uuid,
+    },
+    authUser
+  );
 };
 
-export const getProjectName = async (uuid: string, authuid: string) => {
-  return await post<string>("projectName", { uuid, authuid });
+export const getProjectName = async (uuid: string, authUser: firebase.User) => {
+  return await post<string>("private/projectName", { uuid }, authUser);
 };
 
-export const newProject = async (uid: string) => {
-  return await post<string>("newProject", { uid });
+export const newProject = async (authUser: firebase.User) => {
+  return await post<string>("private/newProject", {}, authUser);
 };
 
 export const tryProblemAction = async (
@@ -160,15 +182,18 @@ export const tryProblemAction = async (
   problemInd: number,
   data: data,
   type: string,
-  authuid: string
+  authUser: firebase.User
 ) => {
-  return await post<string>("problemAction", {
-    uuid,
-    problemInd,
-    data,
-    type,
-    authuid,
-  });
+  return await post<string>(
+    "private/problemAction",
+    {
+      uuid,
+      problemInd,
+      data,
+      type,
+    },
+    authUser
+  );
 };
 
 export const understandSignupError = (e: string) => {

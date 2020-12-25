@@ -1,6 +1,6 @@
-import { ProjectPrivate } from "../../../.shared/src/types";
-import { clientdb } from "../helpers/clientdb";
-import { getIdToUsername } from "../helpers/idToUsername";
+import { ProjectPrivate } from "../../../../.shared/src/types";
+import { clientdb } from "../../helpers/clientdb";
+import { getIdToUsername } from "../../helpers/idToUsername";
 
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;

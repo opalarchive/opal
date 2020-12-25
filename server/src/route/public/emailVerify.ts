@@ -1,5 +1,5 @@
-import { convertFromURL } from "../helpers/cryptoSetup";
-import { auth, db } from "../helpers/firebaseSetup";
+import { convertFromURL } from "../../helpers/cryptoSetup";
+import { auth, db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
   let encryptedUID: string = req.url.replace("/verify/", "");

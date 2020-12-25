@@ -1,5 +1,5 @@
-import { dbaccess } from "../helpers/dbaccess";
-import { db } from "../helpers/firebaseSetup";
+import { dbaccess } from "../../helpers/dbaccess";
+import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;

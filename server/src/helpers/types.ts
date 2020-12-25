@@ -16,6 +16,7 @@ export interface ENVTemplate {
   ENCRYPTION_IV: string;
   EMAIL: string;
   DEVELOPMENT: string;
+  PORT: string;
 }
 
 export interface Result<T> {

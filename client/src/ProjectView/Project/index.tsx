@@ -49,10 +49,10 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     this.problemAction = this.problemAction.bind(this);
   }
 
-  async setProject(uuid: string, authuid: string) {
+  async setProject(uuid: string, authUser: firebase.User) {
     try {
-      const project = await getProjectPrivate(uuid, authuid);
-      const name = await getProjectName(uuid, authuid);
+      const project = await getProjectPrivate(uuid, authUser);
+      const name = await getProjectName(uuid, authUser);
 
       if (name.success) {
         this.props.setTitle(name.value);
@@ -68,16 +68,13 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     try {
       await poll(
         () =>
-          this.setProject(
-            this.props.match.params.uuid,
-            this.props.authUser.uid
-          ),
+          this.setProject(this.props.match.params.uuid, this.props.authUser),
         () => !this.state.loading,
         1500,
         200
       );
       this.interval = window.setInterval(() => {
-        this.setProject(this.props.match.params.uuid, this.props.authUser.uid);
+        this.setProject(this.props.match.params.uuid, this.props.authUser);
       }, 30000);
     } catch (e) {
       this.props.fail();
@@ -150,7 +147,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       ind,
       data,
       type,
-      this.props.authUser.uid
+      this.props.authUser
     );
 
     if (!result.success) {
@@ -162,6 +159,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     if (this.state.loading) {
       return <Loading background="white" />;
     }
+    console.log(this.state.project);
     if (!this.state.project.success) {
       if (this.state.project.value === "does-not-exist") {
         return "does not exist";

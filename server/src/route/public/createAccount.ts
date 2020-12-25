@@ -1,9 +1,9 @@
 // must be run on a single thread to prevent race conditions
 
-import { UsernameInfo } from "../../../.shared/src/types";
-import { convertToURL } from "../helpers/cryptoSetup";
-import { sendEmail } from "../helpers/emailSetup";
-import { auth, db } from "../helpers/firebaseSetup";
+import { UsernameInfo } from "../../../../.shared/src/types";
+import { convertToURL } from "../../helpers/cryptoSetup";
+import { sendEmail } from "../../helpers/emailSetup";
+import { auth, db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
   const email: string = req.body.email;

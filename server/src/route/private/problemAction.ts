@@ -1,4 +1,4 @@
-import { clientdb } from "../helpers/clientdb";
+import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
 import {
   Problem,
@@ -6,8 +6,8 @@ import {
   problemAction,
   vote,
   ReplyType,
-} from "../../../.shared/src/types";
-import { Result } from "../helpers/types";
+} from "../../../../.shared/src/types";
+import { Result } from "../../helpers/types";
 
 const tryAction = async (
   cdb: firebase.database.Database,

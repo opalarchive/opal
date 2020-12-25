@@ -1,5 +1,5 @@
-import { UsernameInfo } from "../../../.shared/src/types";
-import { db } from "../helpers/firebaseSetup";
+import { UsernameInfo } from "../../../../.shared/src/types";
+import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
   const usernames: { [username: string]: UsernameInfo } =

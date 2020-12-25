@@ -1,6 +1,6 @@
-import { Client, Server, UserInfo } from "../../../.shared/src/types";
-import { db } from "../helpers/firebaseSetup";
-import { getIdToUsername } from "../helpers/idToUsername";
+import { Client, Server, UserInfo } from "../../../../.shared/src/types";
+import { db } from "../../helpers/firebaseSetup";
+import { getIdToUsername } from "../../helpers/idToUsername";
 
 export const execute = async (req, res) => {
   const authuid: string = req.body.authuid;

@@ -1,10 +1,10 @@
 // must be run on a single thread to prevent race conditions
 
 import { v4 as uuidv4 } from "uuid";
-import { db } from "../helpers/firebaseSetup";
+import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
-  const uid: string = req.body.uid;
+  const authuid: string = req.body.authuid;
   let uuid = "";
 
   const projectIds: string[] =
@@ -26,10 +26,10 @@ export const execute = async (req, res) => {
   const now = Date.now();
   await db.ref(`projectPublic/${uuid}`).set({
     name: "Untitled Project",
-    owner: uid,
+    owner: authuid,
     trashed: false,
     editors: {
-      [uid]: {
+      [authuid]: {
         lastEdit: now,
         shareDate: now,
         starred: false,

@@ -47,7 +47,7 @@ class ProjectView extends React.Component<ProjectViewProps, ProjectViewState> {
 
   async setNotifications(): Promise<void> {
     try {
-      let notifications = await getNotifications(this.props.authUser.uid);
+      let notifications = await getNotifications(this.props.authUser);
       if (notifications.success) {
         this.setState({
           notifications,
@@ -62,7 +62,7 @@ class ProjectView extends React.Component<ProjectViewProps, ProjectViewState> {
   }
 
   async markNotifications(number: number) {
-    await markAllNotifications(this.props.authUser.uid, number);
+    await markAllNotifications(this.props.authUser, number);
     this.setNotifications();
   }
 

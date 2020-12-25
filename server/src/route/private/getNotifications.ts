@@ -1,4 +1,4 @@
-import { getNotifications } from "../helpers/notification";
+import { getNotifications } from "../../helpers/notification";
 
 export const execute = async (req, res) => {
   const authuid: string = req.body.authuid;

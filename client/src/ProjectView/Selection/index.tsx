@@ -132,7 +132,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
 
   async setProjects() {
     try {
-      const visibleProjects = await getVisibleProjects(this.props.authUser.uid);
+      const visibleProjects = await getVisibleProjects(this.props.authUser);
       if (visibleProjects.success) {
         this.setState({
           visibleProjects: visibleProjects.value,

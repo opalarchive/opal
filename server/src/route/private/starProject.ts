@@ -1,5 +1,5 @@
-import { Server } from "../../../.shared/src/types";
-import { db } from "../helpers/firebaseSetup";
+import { Server } from "../../../../.shared/src/types";
+import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;

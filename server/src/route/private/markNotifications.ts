@@ -1,6 +1,6 @@
-import { UserInfo } from "../../../.shared/src/types";
-import { db } from "../helpers/firebaseSetup";
-import { getNotifications } from "../helpers/notification";
+import { UserInfo } from "../../../../.shared/src/types";
+import { db } from "../../helpers/firebaseSetup";
+import { getNotifications } from "../../helpers/notification";
 
 export const execute = async (req, res) => {
   const authuid: string = req.body.authuid;

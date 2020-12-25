@@ -4,12 +4,12 @@ import {
   projectActionProtected,
   Server,
   UsernameInfo,
-} from "../../../.shared/src/types";
-import { editProject } from "../helpers/editProject";
-import { sendEmail } from "../helpers/emailSetup";
-import { db } from "../helpers/firebaseSetup";
-import { pushNotification } from "../helpers/notification";
-import { Result } from "../helpers/types";
+} from "../../../../.shared/src/types";
+import { editProject } from "../../helpers/editProject";
+import { sendEmail } from "../../helpers/emailSetup";
+import { db } from "../../helpers/firebaseSetup";
+import { pushNotification } from "../../helpers/notification";
+import { Result } from "../../helpers/types";
 
 const validateData = (
   type: projectActionProtected,

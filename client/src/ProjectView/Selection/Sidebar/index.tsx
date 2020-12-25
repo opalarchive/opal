@@ -80,7 +80,7 @@ class SidebarBase extends React.Component<SidebarBaseProps> {
     };
 
     const onClickNewProject = async () => {
-      const newProjectUUID = await newProject(authUser.uid);
+      const newProjectUUID = await newProject(authUser);
 
       if (newProjectUUID.success) {
         history.push(
