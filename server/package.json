@@ -1,0 +1,29 @@
+{
+  "name": "opal-server",
+  "version": "1.0.0",
+  "description": "Opal Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently -n 'js,ts' -c 'green,red' -i \"nodemon -w ./built-src built-src/index.js\" \"tsc -w\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/cors": "^2.8.9",
+    "@types/express": "^4.17.9",
+    "@types/node": "^14.14.14",
+    "@types/nodemailer": "^6.4.0",
+    "@types/uuid": "^8.3.0",
+    "body-parser": "^1.19.0",
+    "concurrently": "^5.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-recaptcha": "^5.0.2",
+    "firebase-admin": "^9.2.0",
+    "googleapis": "^61.0.0",
+    "nodemailer": "^6.4.14",
+    "nodemon": "^2.0.4",
+    "uuid": "^8.3.1"
+  }
+}
