@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es5",
+    "lib": ["es6", "dom", "es2016"],
     "allowJs": true,
     "composite": true,
     "skipLibCheck": true,
@@ -9,7 +9,6 @@
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
     "declaration": true,
-    "declarationMap": true,
     "strictFunctionTypes": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,

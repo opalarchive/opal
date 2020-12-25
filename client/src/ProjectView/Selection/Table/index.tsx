@@ -201,7 +201,7 @@ class ProjectTable extends React.Component<
     if (isProjectActionProtected(this.state.modal.type)) {
       attempt = await tryProjectActionProtected(
         this.state.modal.activeProject,
-        this.props.authUser.uid,
+        this.props.authUser,
         this.state.modal.type,
         this.state.modal.input
       );
@@ -210,7 +210,7 @@ class ProjectTable extends React.Component<
       // TODO: generalize this
       attempt = await starProject(
         this.state.modal.activeProject,
-        this.props.authUser.uid
+        this.props.authUser
       );
     } else {
       console.log("Undefined");

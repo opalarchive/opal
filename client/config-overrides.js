@@ -10,10 +10,7 @@ const {
 } = require("customize-cra");
 const path = require("path");
 
-console.log("f");
-
 const addShared = (config) => {
-  console.log(config);
   const loader = getBabelLoader(config, false);
   const sharedPath = path
     .normalize(path.join(process.cwd(), "../.shared/src/types"))
