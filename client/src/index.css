@@ -1,14 +1,14 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -18,23 +18,10 @@ a.MuiButton-containedSecondary:hover {
   color: rgb(0, 0, 0);
 }
 
-
-/* Fix default scrollbar styling */
-
-.vertical-border {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
 .ScrollbarsCustom-TrackY {
-  z-index: 10011;
-  top: 0 !important;
-  height: 100% !important;
+  width: 6px !important;
 }
 
 .ScrollbarsCustom-TrackX {
-  z-index: 10011;
-  left: 0 !important;
-  width: 100% !important;
+  height: 6px !important;
 }
