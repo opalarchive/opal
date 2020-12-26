@@ -1,7 +1,7 @@
 import { createStyles, darken, Theme } from "@material-ui/core";
 import { Category, Difficulty } from "../../../../Constants/types";
 
-const styles = (category: Category, difficulty: Difficulty) => (theme: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
@@ -106,16 +106,12 @@ const styles = (category: Category, difficulty: Difficulty) => (theme: Theme) =>
       borderRadius: "50%",
       margin: "0 0.7rem 0 0.2rem",
     },
-    rightCategoryDot: {
-      backgroundColor: category.color,
-    },
+    rightCategoryDot: {},
     rightDifficulty: {
       padding: "0.5rem",
       display: "flex",
     },
-    rightDifficultyDot: {
-      backgroundColor: difficulty.color,
-    },
+    rightDifficultyDot: {},
     rightFiller: {
       flexGrow: 1,
     },

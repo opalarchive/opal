@@ -33,7 +33,7 @@ type ReplyProps = WithStyles<typeof styles> &
     reply: string;
     content?: reply;
     isHighlighted: boolean;
-    problemAction: (
+    tryProblemAction: (
       data: string | number,
       type: problemAction
     ) => Promise<void>;
@@ -204,7 +204,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
 
     if (this.state.input.length < 8) return;
 
-    this.props.problemAction(this.state.input, "comment");
+    this.props.tryProblemAction(this.state.input, "comment");
     this.setState({ input: "" });
   }
 

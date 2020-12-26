@@ -6,7 +6,7 @@ import {
   withRouter,
 } from "react-router-dom";
 import MenuBase from "../../MenuBase";
-import Filter from "./Filter";
+import Filter from "./Overview/Filter";
 import Problem from "./Problem";
 
 import * as ROUTES from "../../../Constants/routes";
@@ -24,16 +24,18 @@ import {
   ProjectPrivate,
   ReplyType,
 } from "../../../../../.shared/src/types";
-import { ProblemDetails, replyTypes } from "../../../Constants/types";
+import {
+  ProblemDetails,
+  replyTypes,
+  tryProblemAction,
+} from "../../../Constants/types";
+import { MenuBaseProps } from "../../MenuBase";
+import Overview from "./Overview";
 
 interface ViewProps {
   project: ProjectPrivate;
   uuid: string;
-  problemAction: (
-    ind: number,
-    data: data,
-    type: problemAction
-  ) => Promise<void>;
+  tryProblemAction: tryProblemAction;
   fail: () => void;
   authUser: firebase.User;
 }
@@ -113,11 +115,7 @@ class View extends React.Component<ViewProps, ViewState> {
     uuid: string,
     ind: number,
     prob: ProblemType,
-    problemAction: (
-      ind: number,
-      data: data,
-      type: problemAction
-    ) => Promise<void>,
+    tryProblemAction: tryProblemAction,
     authUser: firebase.User
   ): ProblemDetails {
     const replyTypes = Object.fromEntries(
@@ -148,8 +146,8 @@ class View extends React.Component<ViewProps, ViewState> {
         ? (Object.values(prob.votes) as number[]).reduce((a, b) => a + b)
         : 0,
       myVote: !!prob.votes ? prob.votes[authUser.displayName!] : 0,
-      problemAction: (data: data, type: problemAction) =>
-        problemAction(ind, data, type),
+      tryProblemAction: (data: data, type: problemAction) =>
+        tryProblemAction(ind, data, type),
       replyTypes,
       authUser: authUser,
     };
@@ -162,7 +160,7 @@ class View extends React.Component<ViewProps, ViewState> {
   }
 
   render() {
-    const { project, uuid, problemAction, fail, authUser } = this.props;
+    const { project, uuid, tryProblemAction, fail, authUser } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -171,79 +169,51 @@ class View extends React.Component<ViewProps, ViewState> {
       this.scrollSet++;
     }
 
-    interface DetailsMatch {
-      uuid: string;
-      ind: string;
-      reply?: string;
-    }
-
-    const DetailsPage: React.FC<RouteComponentProps<DetailsMatch>> = ({
-      match,
-    }) => {
-      const ind = parseInt(match.params.ind);
-      const reply = !!match.params.reply
-        ? parseInt(match.params.reply)
-        : undefined;
-
-      return (
-        <Details
-          replies={project.problems[ind].replies}
-          {...this.problemProps(
-            uuid,
-            ind,
-            project.problems[ind],
-            problemAction,
-            authUser
-          )}
-          setDefaultScroll={this.setDefaultScroll}
-          reply={reply}
-        />
-      );
+    const menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children"> = {
+      width: 20,
+      right: true,
+      background: loadBackground,
+      totalScroll: true,
+      defaultScroll: this.scrollSet > 1 ? undefined : this.state.defaultScroll,
+      authUser: authUser,
     };
 
-    const RoutedDetails = withRouter(DetailsPage);
-
     return (
-      <MenuBase
-        width={20}
-        right
-        background={loadBackground}
-        Sidebar={Filter}
-        defaultScroll={
-          this.scrollSet > 1 ? undefined : this.state.defaultScroll
-        }
-        authUser={authUser}
-      >
-        <Switch>
-          <Route
-            exact
-            path={ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}
-            render={(_) => {
-              return project.problems.map((prob, ind) => (
-                <Problem
-                  key={`problem-${ind}`}
-                  {...this.problemProps(
-                    uuid,
-                    ind,
-                    prob,
-                    problemAction,
-                    authUser
-                  )}
-                  repliable
-                />
-              ));
-            }}
-          />
-          <Route
-            exact
-            path={[
-              ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid),
-              ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid),
-            ]}
-            render={(_) => <RoutedDetails />}
-          />
-        </Switch>
-      </MenuBase>
+      <Switch>
+        <Route
+          exact
+          path={ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}
+          render={(_) => (
+            <Overview
+              menuBaseProps={menuBaseProps}
+              project={project}
+              uuid={uuid}
+              problemProps={this.problemProps}
+              tryProblemAction={tryProblemAction}
+              authUser={authUser}
+              setDefaultScroll={this.setDefaultScroll}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={[
+            ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid),
+            ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid),
+          ]}
+          render={(_) => (
+            <Details
+              menuBaseProps={menuBaseProps}
+              project={project}
+              uuid={uuid}
+              problemProps={this.problemProps}
+              tryProblemAction={tryProblemAction}
+              authUser={authUser}
+              setDefaultScroll={this.setDefaultScroll}
+            />
+          )}
+        />
+      </Switch>
     );
   }
 }

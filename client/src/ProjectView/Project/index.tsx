@@ -46,7 +46,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
   constructor(props: ProjectProps) {
     super(props);
 
-    this.problemAction = this.problemAction.bind(this);
+    this.tryProblemAction = this.tryProblemAction.bind(this);
   }
 
   async setProject(uuid: string, authUser: firebase.User) {
@@ -138,7 +138,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     return project;
   }
 
-  async problemAction(ind: number, data: data, type: problemAction) {
+  async tryProblemAction(ind: number, data: data, type: problemAction) {
     const oldProject = this.state.project;
     this.setState({ project: this.clientSideAction(ind, data, type) });
 
@@ -181,7 +181,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       <View
         project={this.state.project.value}
         uuid={this.props.match.params.uuid}
-        problemAction={this.problemAction}
+        tryProblemAction={this.tryProblemAction}
         fail={this.props.fail}
         authUser={this.props.authUser}
       />

@@ -1,3 +1,4 @@
+import { Theme } from "@material-ui/core";
 import { ProjectView, ProjectViewType } from "./types";
 
 export const camelToTitle = (input: string): string => {
@@ -113,6 +114,10 @@ export function lowerBound<T>(arr: T[], x: T): number {
 // tuples seem to be broken rn
 export const tupleToRGBString = (arr: number[]) => {
   return `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})`;
+};
+
+export const spacingRem = (theme: Theme, size: number) => {
+  return theme.typography.pxToRem(theme.spacing(size));
 };
 
 /*

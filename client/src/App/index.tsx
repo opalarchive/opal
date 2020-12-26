@@ -8,28 +8,9 @@ import Home from "../Home";
 import SignUp from "../SignUp";
 import ProjectView from "../ProjectView";
 
-import {
-  unstable_createMuiStrictModeTheme as createMuiTheme,
-  ThemeProvider,
-} from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/core/styles";
 import { withAuthentication } from "../Session";
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      light: "#4dabf5",
-      main: "#2196f3",
-      dark: "#1769aa",
-      contrastText: "#fff",
-    },
-    secondary: {
-      light: "#33eb91",
-      main: "#00e676",
-      dark: "#00a152",
-      contrastText: "#000",
-    },
-  },
-});
+import theme from "./index.css";
 
 const Project = withAuthentication(ProjectView);
 

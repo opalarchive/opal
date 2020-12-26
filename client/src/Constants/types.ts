@@ -66,6 +66,12 @@ export interface Difficulty {
   color: string;
 }
 
+export type tryProblemAction = (
+  ind: number,
+  data: data,
+  type: problemAction
+) => Promise<void>;
+
 export interface ProblemDetails {
   uuid: string;
   ind: number;
@@ -82,7 +88,7 @@ export interface ProblemDetails {
   tags: string[];
   votes: number;
   myVote: number;
-  problemAction: (data: data, type: problemAction) => Promise<void>;
+  tryProblemAction: (data: data, type: problemAction) => Promise<void>;
   replyTypes: replyTypes;
   authUser: firebase.User;
 }

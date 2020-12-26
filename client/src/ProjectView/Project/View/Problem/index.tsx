@@ -12,20 +12,15 @@ import Latex from "../../../../Constants/latex";
 import { Link } from "react-router-dom";
 
 import * as ROUTES from "../../../../Constants/routes";
-import generateStyles from "./index.css";
+import styles from "./index.css";
 import { ProblemDetails } from "../../../../Constants/types";
 
 interface ProblemProps extends ProblemDetails {
   repliable: boolean;
 }
 
-const blankStyles = generateStyles(
-  { name: "", color: "black" },
-  { name: 0, color: "black" }
-);
-
-class ProblemBase extends React.Component<
-  ProblemProps & WithStyles<typeof blankStyles>
+class Problem extends React.Component<
+  ProblemProps & WithStyles<typeof styles>
 > {
   render() {
     const {
@@ -39,7 +34,7 @@ class ProblemBase extends React.Component<
       tags,
       votes,
       myVote,
-      problemAction,
+      tryProblemAction,
       replyTypes,
       repliable,
       authUser,
@@ -63,7 +58,7 @@ class ProblemBase extends React.Component<
                     ? classes.leftVoteArrowActivated
                     : classes.leftVoteArrow
                 }
-                onClick={(_) => problemAction(1, "vote")}
+                onClick={(_) => tryProblemAction(1, "vote")}
               />
             </div>
             <div>
@@ -78,7 +73,7 @@ class ProblemBase extends React.Component<
                     ? classes.leftVoteArrowActivated
                     : classes.leftVoteArrow
                 }
-                onClick={(_) => problemAction(-1, "vote")}
+                onClick={(_) => tryProblemAction(-1, "vote")}
               />
             </div>
           </div>
@@ -110,12 +105,14 @@ class ProblemBase extends React.Component<
           <div className={classes.rightCategory}>
             <div
               className={`${classes.icon} ${classes.rightDot} ${classes.rightCategoryDot}`}
+              style={{ backgroundColor: category.color }}
             ></div>
             {category.name}
           </div>
           <div className={classes.rightDifficulty}>
             <div
               className={`${classes.icon} ${classes.rightDot} ${classes.rightDifficultyDot}`}
+              style={{ backgroundColor: difficulty.color }}
             ></div>
             d-{difficulty.name}
           </div>
@@ -135,11 +132,4 @@ class ProblemBase extends React.Component<
     );
   }
 }
-const Problem: React.FC<ProblemProps> = (props) => {
-  const StyledProblem = withStyles(
-    generateStyles(props.category, props.difficulty)
-  )(ProblemBase);
-  return <StyledProblem {...props} />;
-};
-
-export default Problem;
+export default withStyles(styles)(Problem);
