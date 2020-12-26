@@ -159,7 +159,6 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     if (this.state.loading) {
       return <Loading background="white" />;
     }
-    console.log(this.state.project);
     if (!this.state.project.success) {
       if (this.state.project.value === "does-not-exist") {
         return "does not exist";

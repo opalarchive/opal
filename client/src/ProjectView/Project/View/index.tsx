@@ -156,7 +156,9 @@ class View extends React.Component<ViewProps, ViewState> {
   }
 
   setDefaultScroll(defaultScroll: number) {
-    this.setState({ defaultScroll });
+    if (this.scrollSet === 0) {
+      this.setState({ defaultScroll });
+    }
   }
 
   render() {

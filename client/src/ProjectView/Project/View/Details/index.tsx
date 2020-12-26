@@ -20,18 +20,20 @@ interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
 class Details extends React.Component<DetailProps> {
   private top = React.createRef<HTMLDivElement>();
   private prob = React.createRef<HTMLDivElement>();
-  private commentRefs: RefObject<HTMLDivElement>[] = [];
+  private commentRefs = [...Array(this.props.replies.length).keys()].map((_) =>
+    React.createRef<HTMLDivElement>()
+  );
 
   componentDidMount() {
-    if (!this.props.reply) return;
+    if (this.props.reply === undefined) return;
     if (this.commentRefs.length <= this.props.reply) return;
 
     const rem = parseInt(
-      getComputedStyle(this.top.current as Element).fontSize.replace("px", "")
+      getComputedStyle(this.prob.current as Element).fontSize.replace("px", "")
     );
 
     const Reply0 =
-      rem * 2 +
+      rem +
       (this.top.current as Element).clientHeight +
       (this.prob.current as Element).clientHeight;
 
@@ -42,9 +44,7 @@ class Details extends React.Component<DetailProps> {
         Reply0 +
           [...Array(this.props.reply).keys()].reduce(
             (acc, cur) =>
-              acc +
-              (this.commentRefs[cur].current as Element).clientHeight +
-              rem,
+              acc + this.commentRefs[cur].current!.clientHeight + rem,
             0
           )
       );
