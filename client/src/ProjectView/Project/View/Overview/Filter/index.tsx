@@ -38,166 +38,53 @@ import Tag from "../../Ornamentation/Tag";
 interface FilterProps {
   setFilter: (filter: (problem: Problem) => boolean) => void;
   setSortWeight: (sortWeight: (problem: Problem) => number) => void;
+  keyword: string;
+  author: string;
+  difficulty: {
+    start: number;
+    end: number;
+  };
+  difficultyRange: {
+    start: number;
+    end: number;
+  };
+  category: {
+    [category: string]: boolean;
+  };
   categoryColors: CategoryColors;
-  difficultyRange: { start: number; end: number };
   editors: string[];
   allTags: Set<string>;
   clickedTags: {
     [tag: string]: boolean;
   };
+  resetFilter: () => void;
+  filterUsed: (
+    type: "keyword" | "author" | "category" | "tag" | "difficulty"
+  ) => boolean;
+  onChange: (
+    name: string,
+    value: any,
+    type: "keyword" | "author" | "category" | "tag" | "difficulty"
+  ) => void;
   onClickTag: (tagText: string, callBack?: () => void) => void;
-}
-
-interface FilterState {
-  keyword: string;
-  author: string;
-  difficultyRange: { start: number; end: number };
-  category: {
-    [category: string]: boolean;
-  };
 }
 
 type Props = SidebarProps & FilterProps & WithStyles<typeof styles> & WithTheme;
 
-class Filter extends React.Component<Props, FilterState> {
-  state = {
-    keyword: "",
-    author: "",
-    difficultyRange: { start: 0, end: 0 },
-    category: {} as {
-      [category: string]: boolean;
-    },
-  };
-
-  constructor(props: Props) {
-    super(props);
-
-    this.resetFilter = this.resetFilter.bind(this);
-    this.onChange = this.onChange.bind(this);
-  }
-
-  filterUsed(
-    type: "keyword" | "author" | "category" | "tag" | "difficulty"
-  ): boolean {
-    switch (type) {
-      case "keyword":
-        return this.state.keyword !== "";
-      case "author":
-        return this.state.author !== "";
-      case "category":
-        return !Object.values(this.state.category).reduce(
-          (a, b) => a && !b,
-          true
-        ); // just cant all be false/undefined
-      case "tag":
-        return !Object.values(this.props.clickedTags).reduce(
-          (a, b) => a && !b,
-          true
-        );
-      case "difficulty":
-        return (
-          this.state.difficultyRange.start !==
-            this.props.difficultyRange.start ||
-          this.state.difficultyRange.end !== this.props.difficultyRange.end
-        );
-    }
-  }
-
-  resetFilter() {
-    const { keyword, author, difficultyRange } = this.state;
-
-    this.props.setFilter((problem: Problem) => {
-      if (this.filterUsed("keyword")) {
-        if (
-          !problem.text
-            .toLocaleLowerCase()
-            .includes(keyword.toLocaleLowerCase()) &&
-          !problem.title
-            .toLocaleLowerCase()
-            .includes(keyword.toLocaleLowerCase())
-        ) {
-          return false;
-        }
-      }
-      if (this.filterUsed("author")) {
-        if (!problem.author.startsWith(author)) return false;
-      }
-      if (this.filterUsed("category")) {
-        if (!this.state.category[problem.category]) return false;
-      }
-      if (this.filterUsed("tag")) {
-        console.log(problem.tags);
-        let works = false;
-        for (let i = 0; i < problem.tags.length; i++) {
-          if (this.props.clickedTags[problem.tags[i]]) {
-            works = true;
-            break;
-          }
-        }
-        if (!works) return false;
-      }
-      if (this.filterUsed("difficulty")) {
-        if (
-          difficultyRange.start >= problem.difficulty ||
-          problem.difficulty >= difficultyRange.end
-        )
-          return false;
-      }
-      return true;
-    });
-  }
-
-  onChange(
-    name: string,
-    value: any,
-    type: "keyword" | "author" | "category" | "tag" | "difficulty"
-  ) {
-    switch (type) {
-      case "keyword":
-        this.setState({ keyword: value as string }, () => this.resetFilter());
-        break;
-      case "author":
-        this.setState({ author: value as string }, () => this.resetFilter());
-        break;
-      case "category":
-        this.setState(
-          {
-            category: {
-              ...this.state.category,
-              [name]: !this.state.category[name],
-            },
-          },
-          () => this.resetFilter()
-        );
-        break;
-      case "tag":
-        break;
-      case "difficulty":
-        const difficultyArray = value as number[];
-        this.setState(
-          {
-            difficultyRange: {
-              start: difficultyArray[0],
-              end: difficultyArray[1],
-            },
-          },
-          () => this.resetFilter()
-        );
-        break;
-    }
-  }
-
-  componentDidMount() {
-    this.setState({ difficultyRange: this.props.difficultyRange });
-  }
-
+class Filter extends React.Component<Props> {
   render() {
     const {
-      categoryColors,
+      keyword,
+      author,
+      category: categorySelected,
+      difficulty,
       difficultyRange,
-      editors,
+      categoryColors,
       allTags,
       clickedTags,
+      resetFilter,
+      filterUsed,
+      onChange,
       onClickTag,
       classes,
       width,
@@ -231,18 +118,18 @@ class Filter extends React.Component<Props, FilterState> {
                   id="keyword-filter-header"
                 >
                   Keyword
-                  {this.filterUsed("keyword") && filterUsedDot}
+                  {filterUsed("keyword") && filterUsedDot}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
                   <TextField
                     name="keyword"
                     id="keyword-filter"
                     label="Keyword"
-                    value={this.state.keyword}
+                    value={keyword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
 
-                      this.onChange(e.target.name, e.target.value, "keyword");
+                      onChange(e.target.name, e.target.value, "keyword");
                     }}
                   />
                 </AccordionDetails>
@@ -254,18 +141,18 @@ class Filter extends React.Component<Props, FilterState> {
                   id="author-filter-header"
                 >
                   Author
-                  {this.filterUsed("author") && filterUsedDot}
+                  {filterUsed("author") && filterUsedDot}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
                   <TextField
                     name="author"
                     id="author-filter"
                     label="Author"
-                    value={this.state.author}
+                    value={author}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
 
-                      this.onChange(e.target.name, e.target.value, "author");
+                      onChange(e.target.name, e.target.value, "author");
                     }}
                   />
                 </AccordionDetails>
@@ -276,7 +163,7 @@ class Filter extends React.Component<Props, FilterState> {
                   aria-controls="category-filter-content"
                   id="category-filter-header"
                 >
-                  Category {this.filterUsed("category") && filterUsedDot}
+                  Category {filterUsed("category") && filterUsedDot}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
                   {Object.entries(categoryColors).map(([category, color]) => {
@@ -290,12 +177,12 @@ class Filter extends React.Component<Props, FilterState> {
                             name={category}
                           />
                         }
-                        value={!!this.state.category[category]}
+                        value={!!categorySelected[category]}
                         onChange={(
                           e: React.ChangeEvent<{}>,
                           checked: boolean
                         ) => {
-                          this.onChange(category, checked, "category");
+                          onChange(category, checked, "category");
                         }}
                         label={
                           <>
@@ -318,17 +205,17 @@ class Filter extends React.Component<Props, FilterState> {
                   id="tag-filter-header"
                 >
                   Tag
-                  {this.filterUsed("tag") && filterUsedDot}
+                  {filterUsed("tag") && filterUsedDot}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
-                  <div>
+                  <div className={classes.tagContainer}>
                     {[...allTags].map((tag) => (
                       <Tag
                         key={tag}
                         text={tag}
                         clicked={!!clickedTags[tag]}
                         onClickTag={(tagText: string) =>
-                          onClickTag(tagText, this.resetFilter)
+                          onClickTag(tagText, resetFilter)
                         }
                       />
                     ))}
@@ -342,7 +229,7 @@ class Filter extends React.Component<Props, FilterState> {
                   id="difficulty-filter-header"
                 >
                   Difficulty
-                  {this.filterUsed("difficulty") && filterUsedDot}
+                  {filterUsed("difficulty") && filterUsedDot}
                 </AccordionSummary>
                 <AccordionDetails
                   className={classes.accordionDetails}
@@ -352,22 +239,19 @@ class Filter extends React.Component<Props, FilterState> {
                   }}
                 >
                   <Slider
-                    value={[
-                      this.state.difficultyRange.start,
-                      this.state.difficultyRange.end,
-                    ]}
+                    value={[difficulty.start, difficulty.end]}
                     onChange={(
                       e: React.ChangeEvent<{}>,
                       value: number | number[]
                     ) => {
-                      this.onChange("difficulty", value, "difficulty");
+                      onChange("difficulty", value, "difficulty");
                     }}
-                    min={this.props.difficultyRange.start}
-                    max={this.props.difficultyRange.end}
+                    min={difficultyRange.start}
+                    max={difficultyRange.end}
                     valueLabelDisplay="auto"
                     aria-labelledby="difficulty-filter-header"
                     getAriaValueText={() =>
-                      `lower bound d-${this.state.difficultyRange.start}, upper bound d-${this.state.difficultyRange.end}`
+                      `lower bound d-${difficulty.start}, upper bound d-${difficulty.end}`
                     }
                   />
                 </AccordionDetails>

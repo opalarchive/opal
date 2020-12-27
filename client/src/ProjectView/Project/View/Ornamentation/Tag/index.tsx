@@ -36,7 +36,7 @@ const Tag: React.FC<TagProps & WithStyles<typeof styles> & WithTheme> = ({
           : undefined
       }
     >
-      {text}
+      {text.replace(/ /g, "\u00a0")}{" "}
     </span>
   );
 };

@@ -34,6 +34,9 @@ const styles = (theme: Theme) =>
       display: "flex",
       flexDirection: "column",
     },
+    tagContainer: {
+      lineHeight: "200%",
+    },
   });
 
 export default styles;
