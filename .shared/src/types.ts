@@ -109,6 +109,7 @@ export interface Votes {
 }
 
 export interface Problem {
+  ind: number;
   author: string;
   category: string;
   difficulty: number;

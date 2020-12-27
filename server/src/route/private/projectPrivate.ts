@@ -1,4 +1,9 @@
-import { ProjectPrivate } from "../../../../.shared/src/types";
+import {
+  Problem,
+  ProjectPrivate,
+  reply,
+  Votes,
+} from "../../../../.shared/src/types";
 import { clientdb } from "../../helpers/clientdb";
 import { getIdToUsername } from "../../helpers/idToUsername";
 
@@ -13,15 +18,39 @@ export const execute = async (req, res) => {
     return;
   }
 
-  let projectPrivate: ProjectPrivate = await trydb.value
+  interface PseudoProjectPrivate extends Omit<ProjectPrivate, "problems"> {
+    // these can possibly be undefined because of how firebase stores empty arrays/objects
+    problems: (Omit<Problem, "ind" | "replies" | "tags" | "votes"> & {
+      replies?: reply[];
+      tags?: string[];
+      votes?: Votes;
+    })[];
+  }
+
+  const pseudoProjectPrivate: PseudoProjectPrivate = await trydb.value
     .ref("/")
     .once("value")
     .then((snapshot) => snapshot.val());
+  const { problems, ...rest } = pseudoProjectPrivate;
+
+  let projectPrivate: ProjectPrivate = { ...rest, problems: [] };
 
   const idToUsername = await getIdToUsername();
 
-  // change private uids to usernames
-  if (!!projectPrivate.problems) {
+  if (!!pseudoProjectPrivate.problems) {
+    pseudoProjectPrivate.problems.forEach(
+      ({ replies, tags, votes, ...rest }, ind) => {
+        projectPrivate.problems[ind] = {
+          ind,
+          replies: replies || [],
+          tags: tags || [],
+          votes: votes || {},
+          ...rest,
+        };
+      }
+    );
+
+    // change private uids to usernames
     projectPrivate.problems.forEach((prob) => {
       prob.author = idToUsername(prob.author);
       // the uid is a key, so we have to turn the object into an array and back

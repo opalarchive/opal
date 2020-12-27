@@ -1,9 +1,8 @@
-import React, { RefObject, useEffect } from "react";
+import React from "react";
 import { ChevronLeft } from "react-feather";
 import { withStyles, WithStyles } from "@material-ui/core";
 import Problem from "../Problem";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { compose } from "recompose";
 
 import * as ROUTES from "../../../../Constants/routes";
 import Reply from "./Reply";
@@ -15,7 +14,7 @@ import {
 import styles from "./index.css";
 import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
 import MenuBase, { MenuBaseProps } from "../../../MenuBase";
-import Filter from "../Overview/Filter";
+import Sidebar from "./Sidebar";
 
 interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
@@ -120,7 +119,6 @@ interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
   uuid: string;
   problemProps: (
     uuid: string,
-    ind: number,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
@@ -145,13 +143,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   return (
     <StyledDetails
       replies={project.problems[ind].replies}
-      {...problemProps(
-        uuid,
-        ind,
-        project.problems[ind],
-        tryProblemAction,
-        authUser
-      )}
+      {...problemProps(uuid, project.problems[ind], tryProblemAction, authUser)}
       setDefaultScroll={setDefaultScroll}
       reply={reply}
     />
@@ -164,7 +156,7 @@ const DetailsPage: React.FC<
   }
 > = ({ menuBaseProps, ...rest }) => {
   return (
-    <MenuBase Sidebar={Filter} {...menuBaseProps}>
+    <MenuBase Sidebar={Sidebar} {...menuBaseProps}>
       <RoutedDetails {...rest} />
     </MenuBase>
   );

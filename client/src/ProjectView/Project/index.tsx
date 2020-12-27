@@ -7,11 +7,12 @@ import {
   vote,
   problemAction,
   ReplyType,
+  Client,
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
 import { getProjectPrivate, tryProblemAction } from "../../Firebase";
-import { getProjectName } from "../../Firebase";
+import { getProjectName, post } from "../../Firebase";
 
 import Loading from "../../Loading";
 import Unconfigured from "./unconfigured";
@@ -30,15 +31,20 @@ interface ProjectProps extends RouteComponentProps<ProjectMatch> {
 
 interface ProjectState {
   project: Result<ProjectPrivate | string>;
+  editors: Result<string[]>;
   loading: boolean;
 }
 
 class Project extends React.Component<ProjectProps, ProjectState> {
   state = {
     project: {
-      success: true,
-      value: { problems: [] as Problem[] },
+      success: false,
+      value: "",
     } as Result<ProjectPrivate | string>,
+    editors: {
+      success: false,
+      value: "",
+    } as Result<string[]>,
     loading: true,
   };
   private interval: number = -1;
@@ -52,13 +58,20 @@ class Project extends React.Component<ProjectProps, ProjectState> {
   async setProject(uuid: string, authUser: firebase.User) {
     try {
       const project = await getProjectPrivate(uuid, authUser);
+      const editors = await post<string[]>(
+        "private/getEditors",
+        {
+          uuid,
+        },
+        authUser
+      );
       const name = await getProjectName(uuid, authUser);
 
       if (name.success) {
         this.props.setTitle(name.value);
       }
 
-      this.setState({ project, loading: false });
+      this.setState({ project, editors, loading: false });
     } catch (e) {
       return e;
     }
@@ -159,14 +172,23 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     if (this.state.loading) {
       return <Loading background="white" />;
     }
-    if (!this.state.project.success) {
-      if (this.state.project.value === "does-not-exist") {
+    if (!this.state.project.success || !this.state.editors.success) {
+      if (
+        this.state.project.value === "does-not-exist" ||
+        this.state.editors.value === "does-not-exist"
+      ) {
         return "does not exist";
       }
-      if (this.state.project.value === "forbidden") {
+      if (
+        this.state.project.value === "forbidden" ||
+        this.state.editors.value === "forbidden"
+      ) {
         return "forbidden";
       }
-      if (this.state.project.value === "trashed") {
+      if (
+        this.state.project.value === "trashed" ||
+        this.state.editors.value === "trashed"
+      ) {
         return "trashed";
       }
     } else {
@@ -177,9 +199,11 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     if (typeof this.state.project.value === "string") {
       return "???";
     }
+    if (!this.state.editors.success) return "???"; // obviously impossible, but it shuts lint up
     return (
       <View
         project={this.state.project.value}
+        editors={this.state.editors.value}
         uuid={this.props.match.params.uuid}
         tryProblemAction={this.tryProblemAction}
         fail={this.props.fail}

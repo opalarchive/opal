@@ -34,13 +34,14 @@ import Overview from "./Overview";
 
 interface ViewProps {
   project: ProjectPrivate;
+  editors: string[];
   uuid: string;
   tryProblemAction: tryProblemAction;
   fail: () => void;
   authUser: firebase.User;
 }
 
-interface CategoryColors {
+export interface CategoryColors {
   [category: string]: number[];
 }
 
@@ -51,6 +52,10 @@ interface DifficultyColors {
 interface ViewState {
   categoryColors: CategoryColors;
   difficultyColors: DifficultyColors;
+  difficultyRange: {
+    start: number;
+    end: number;
+  };
   defaultScroll: number;
 }
 
@@ -71,6 +76,7 @@ class View extends React.Component<ViewProps, ViewState> {
       75: [255, 0, 0],
       100: [0, 0, 0],
     } as DifficultyColors,
+    difficultyRange: { start: 0, end: 100 },
     defaultScroll: 0,
   };
 
@@ -113,7 +119,6 @@ class View extends React.Component<ViewProps, ViewState> {
 
   problemProps(
     uuid: string,
-    ind: number,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
@@ -129,8 +134,9 @@ class View extends React.Component<ViewProps, ViewState> {
     }
 
     return {
-      ind: ind,
+      ind: prob.ind,
       uuid: uuid,
+      title: prob.title,
       text: prob.text,
       category: {
         name: camelToTitle(prob.category),
@@ -142,12 +148,16 @@ class View extends React.Component<ViewProps, ViewState> {
       },
       author: prob.author,
       tags: prob.tags,
-      votes: !!prob.votes
-        ? (Object.values(prob.votes) as number[]).reduce((a, b) => a + b)
-        : 0,
-      myVote: !!prob.votes ? prob.votes[authUser.displayName!] : 0,
+      votes:
+        Object.values(prob.votes).length === 0
+          ? 0
+          : (Object.values(prob.votes) as number[]).reduce((a, b) => a + b),
+      myVote:
+        Object.values(prob.votes).length === 0
+          ? 0
+          : prob.votes[authUser.displayName!],
       tryProblemAction: (data: data, type: problemAction) =>
-        tryProblemAction(ind, data, type),
+        tryProblemAction(prob.ind, data, type),
       replyTypes,
       authUser: authUser,
     };
@@ -160,7 +170,14 @@ class View extends React.Component<ViewProps, ViewState> {
   }
 
   render() {
-    const { project, uuid, tryProblemAction, fail, authUser } = this.props;
+    const {
+      project,
+      editors,
+      uuid,
+      tryProblemAction,
+      fail,
+      authUser,
+    } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -188,6 +205,9 @@ class View extends React.Component<ViewProps, ViewState> {
               menuBaseProps={menuBaseProps}
               project={project}
               uuid={uuid}
+              categoryColors={this.state.categoryColors}
+              difficultyRange={this.state.difficultyRange}
+              editors={editors}
               problemProps={this.problemProps}
               tryProblemAction={tryProblemAction}
               authUser={authUser}

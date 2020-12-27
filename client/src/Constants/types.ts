@@ -75,6 +75,7 @@ export type tryProblemAction = (
 export interface ProblemDetails {
   uuid: string;
   ind: number;
+  title: string;
   text: string;
   category: {
     name: string;

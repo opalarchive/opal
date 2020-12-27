@@ -14,9 +14,15 @@ import { Link } from "react-router-dom";
 import * as ROUTES from "../../../../Constants/routes";
 import styles from "./index.css";
 import { ProblemDetails } from "../../../../Constants/types";
+import Dot from "../Ornamentation/Dot";
+import Tag from "../Ornamentation/Tag";
 
 interface ProblemProps extends ProblemDetails {
   repliable: boolean;
+  clickedTags?: {
+    [tag: string]: boolean;
+  };
+  onClickTag?: (tagText: string) => void;
 }
 
 class Problem extends React.Component<
@@ -27,6 +33,7 @@ class Problem extends React.Component<
       classes,
       ind,
       uuid,
+      title,
       text,
       category,
       difficulty,
@@ -37,12 +44,10 @@ class Problem extends React.Component<
       tryProblemAction,
       replyTypes,
       repliable,
+      clickedTags,
+      onClickTag,
       authUser,
     } = this.props;
-
-    const Tag: React.FC<{ text: string }> = ({ text }) => {
-      return <span className={classes.tag}>{text}</span>;
-    };
 
     return (
       <Paper elevation={3} className={classes.root}>
@@ -79,7 +84,7 @@ class Problem extends React.Component<
           </div>
         </div>
         <div className={classes.body}>
-          <div className={classes.bodyTitle}>Epic Problem</div>
+          <div className={classes.bodyTitle}>{title}</div>
           <div className={classes.bodyAuthor}>Proposed by {author}</div>
           <div className={classes.bodyText}>
             <Latex>{text}</Latex>
@@ -87,7 +92,16 @@ class Problem extends React.Component<
           <div className={classes.bodyFiller} />
           <div className={classes.bodyTags}>
             Tags:{" "}
-            {!!tags ? tags.map((tag) => <Tag key={tag} text={tag} />) : null}
+            {!!tags
+              ? tags.map((tag) => (
+                  <Tag
+                    key={tag}
+                    text={tag}
+                    clicked={!!clickedTags && !!clickedTags[tag]}
+                    onClickTag={onClickTag}
+                  />
+                ))
+              : null}
           </div>
           {repliable ? (
             <div className={classes.bodyReply}>
@@ -103,17 +117,17 @@ class Problem extends React.Component<
         </div>
         <div className={classes.right}>
           <div className={classes.rightCategory}>
-            <div
-              className={`${classes.icon} ${classes.rightDot} ${classes.rightCategoryDot}`}
-              style={{ backgroundColor: category.color }}
-            ></div>
+            <Dot
+              color={category.color}
+              style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
+            />
             {category.name}
           </div>
           <div className={classes.rightDifficulty}>
-            <div
-              className={`${classes.icon} ${classes.rightDot} ${classes.rightDifficultyDot}`}
-              style={{ backgroundColor: difficulty.color }}
-            ></div>
+            <Dot
+              color={difficulty.color}
+              style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
+            />
             d-{difficulty.name}
           </div>
           <div className={classes.rightFiller} />

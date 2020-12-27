@@ -1,5 +1,4 @@
 import { createStyles, darken, Theme } from "@material-ui/core";
-import { Category, Difficulty } from "../../../../Constants/types";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -99,19 +98,10 @@ const styles = (theme: Theme) =>
       padding: "0.5rem 0.5rem 0 0.5rem",
       display: "flex",
     },
-    rightDot: {
-      height: "0.75rem",
-      width: "0.75rem",
-      top: "0.48rem",
-      borderRadius: "50%",
-      margin: "0 0.7rem 0 0.2rem",
-    },
-    rightCategoryDot: {},
     rightDifficulty: {
       padding: "0.5rem",
       display: "flex",
     },
-    rightDifficultyDot: {},
     rightFiller: {
       flexGrow: 1,
     },
@@ -122,13 +112,6 @@ const styles = (theme: Theme) =>
     rightSolutions: {
       padding: "0 0.5rem 0.5rem 0.5rem",
       display: "flex",
-    },
-    tag: {
-      marginRight: "0.25rem",
-      backgroundColor: "#eaecec",
-      padding: "0.1rem 0.4rem 0.1rem 0.2rem",
-      borderBottomRightRadius: "1rem",
-      borderTopRightRadius: "1rem",
     },
   });
 

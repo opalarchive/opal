@@ -13,7 +13,8 @@ export interface MenuBaseProps {
   right?: boolean;
   background: string;
   totalScroll?: boolean;
-  Sidebar: React.ComponentType<SidebarProps>;
+  sidebarProps?: object;
+  Sidebar: React.ComponentType<any>;
   defaultScroll?: number;
   authUser: firebase.User;
   children: JSX.Element | JSX.Element[];
@@ -29,6 +30,7 @@ class MenuBase extends React.Component<
       width,
       right,
       background,
+      sidebarProps,
       Sidebar,
       defaultScroll,
       authUser,
@@ -42,7 +44,7 @@ class MenuBase extends React.Component<
 
     return (
       <div className={classes.root} style={{ backgroundColor: background }}>
-        <Sidebar width={width} authUser={authUser} />
+        <Sidebar width={width} authUser={authUser} {...sidebarProps} />
         <div
           className={classes.inner}
           style={{

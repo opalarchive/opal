@@ -26,18 +26,19 @@ import { compose } from "recompose";
 import { problemAction, reply, ReplyType } from "../../../../../../../.shared";
 import styles from "./index.css";
 
-type ReplyProps = WithStyles<typeof styles> &
-  WithTheme & {
-    uuid: string;
-    ind: string;
-    reply: string;
-    content?: reply;
-    isHighlighted: boolean;
-    tryProblemAction: (
-      data: string | number,
-      type: problemAction
-    ) => Promise<void>;
-  };
+interface ReplyPropsBase {
+  uuid: string;
+  ind: string;
+  reply: string;
+  content?: reply;
+  isHighlighted: boolean;
+  tryProblemAction: (
+    data: string | number,
+    type: problemAction
+  ) => Promise<void>;
+}
+
+type ReplyProps = WithStyles<typeof styles> & WithTheme & ReplyPropsBase;
 
 class ReplyBase<State> extends React.Component<ReplyProps, State> {
   constructor(props: ReplyProps) {
@@ -269,4 +270,7 @@ const Reply: React.FC<ReplyProps> = (props) => {
   }
 };
 
-export default compose<ReplyProps, any>(withStyles(styles), withTheme)(Reply);
+export default compose<ReplyProps, ReplyPropsBase>(
+  withStyles(styles),
+  withTheme
+)(Reply);
