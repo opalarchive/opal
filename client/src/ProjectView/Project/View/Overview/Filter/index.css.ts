@@ -37,6 +37,12 @@ const styles = (theme: Theme) =>
     tagContainer: {
       lineHeight: "200%",
     },
+    sort: {
+      padding: `${spacingRem(theme, 1)} ${spacingRem(theme, 2)} ${spacingRem(
+        theme,
+        1
+      )} ${spacingRem(theme, 2)}`,
+    },
   });
 
 export default styles;

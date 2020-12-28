@@ -9,6 +9,7 @@ import {
   FormControlLabel,
   Paper,
   Slider,
+  TableSortLabel,
   TextField,
   withStyles,
   WithStyles,
@@ -34,6 +35,7 @@ import {
 } from "../../../../../Constants";
 import Scrollbar from "react-scrollbars-custom";
 import Tag from "../../Ornamentation/Tag";
+import { SortDirection } from "../../../../../Constants/types";
 
 interface FilterProps {
   setFilter: (filter: (problem: Problem) => boolean) => void;
@@ -57,6 +59,10 @@ interface FilterProps {
   clickedTags: {
     [tag: string]: boolean;
   };
+  sort: {
+    dataPoint: "ind" | "difficulty" | "votes";
+    direction: SortDirection;
+  };
   resetFilter: () => void;
   filterUsed: (
     type: "keyword" | "author" | "category" | "tag" | "difficulty"
@@ -67,6 +73,10 @@ interface FilterProps {
     type: "keyword" | "author" | "category" | "tag" | "difficulty"
   ) => void;
   onClickTag: (tagText: string, callBack?: () => void) => void;
+  onSortClick: (
+    e: React.MouseEvent<HTMLButtonElement>,
+    dataPoint: "ind" | "difficulty" | "votes"
+  ) => void;
 }
 
 type Props = SidebarProps & FilterProps & WithStyles<typeof styles> & WithTheme;
@@ -82,10 +92,12 @@ class Filter extends React.Component<Props> {
       categoryColors,
       allTags,
       clickedTags,
+      sort,
       resetFilter,
       filterUsed,
       onChange,
       onClickTag,
+      onSortClick,
       classes,
       width,
       theme,
@@ -256,6 +268,49 @@ class Filter extends React.Component<Props> {
                   />
                 </AccordionDetails>
               </Accordion>
+            </Paper>
+            <Paper elevation={3} className={classes.paper}>
+              <div className={classes.title}>
+                Sort
+                <FilterIcon
+                  style={{
+                    position: "relative",
+                    top: "0.3rem",
+                    marginLeft: "0.4rem",
+                  }}
+                />
+                <Divider className={classes.divider} />
+              </div>
+              <div className={classes.sort}>
+                Index
+                <TableSortLabel
+                  active={sort.dataPoint === "ind"}
+                  direction={sort.direction}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    onSortClick(e, "ind")
+                  }
+                />
+              </div>
+              <div className={classes.sort}>
+                Difficulty
+                <TableSortLabel
+                  active={sort.dataPoint === "difficulty"}
+                  direction={sort.direction}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    onSortClick(e, "difficulty")
+                  }
+                />
+              </div>
+              <div className={classes.sort}>
+                Votes
+                <TableSortLabel
+                  active={sort.dataPoint === "votes"}
+                  direction={sort.direction}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    onSortClick(e, "votes")
+                  }
+                />
+              </div>
             </Paper>
           </div>
         </Scrollbar>

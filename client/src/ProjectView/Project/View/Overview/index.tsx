@@ -5,7 +5,11 @@ import {
   ProjectPrivate,
   Problem as ProblemType,
 } from "../../../../../../.shared";
-import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
+import {
+  ProblemDetails,
+  SortDirection,
+  tryProblemAction,
+} from "../../../../Constants/types";
 import MenuBase, { MenuBaseProps } from "../../../MenuBase";
 import Problem from "../Problem";
 import Filter from "./Filter";
@@ -40,6 +44,10 @@ interface OverviewState {
   clickedTags: {
     [tag: string]: boolean;
   };
+  sort: {
+    dataPoint: "ind" | "difficulty" | "votes";
+    direction: SortDirection;
+  };
 }
 
 class Overview extends React.Component<OverviewProps, OverviewState> {
@@ -53,6 +61,13 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
       [category: string]: boolean;
     },
     clickedTags: {} as { [tag: string]: boolean },
+    sort: {
+      dataPoint: "ind",
+      direction: "desc",
+    } as {
+      dataPoint: "ind" | "difficulty" | "votes";
+      direction: SortDirection;
+    },
   };
 
   constructor(props: OverviewProps) {
@@ -64,6 +79,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
     this.onClickTag = this.onClickTag.bind(this);
     this.resetFilter = this.resetFilter.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.onSortClick = this.onSortClick.bind(this);
   }
 
   setFilter(filter: (problem: ProblemType) => boolean) {
@@ -144,6 +160,32 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
     });
   }
 
+  resetSort() {
+    const { dataPoint, direction } = this.state.sort;
+    const sign = direction === "asc" ? 1 : -1;
+
+    this.setSortWeight((problem: ProblemType) => {
+      let magnitude = 0;
+      switch (dataPoint) {
+        case "ind":
+          magnitude = problem.ind;
+          break;
+        case "difficulty":
+          magnitude = problem.difficulty;
+          break;
+        case "votes":
+          magnitude =
+            Object.values(problem.votes).length === 0
+              ? 0
+              : (Object.values(problem.votes) as number[]).reduce(
+                  (a, b) => a + b
+                );
+          break;
+      }
+      return sign * magnitude;
+    });
+  }
+
   onChange(
     name: string,
     value: any,
@@ -196,8 +238,23 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
     );
   }
 
+  onSortClick(
+    event: React.MouseEvent<HTMLButtonElement>,
+    dataPoint: "ind" | "difficulty" | "votes"
+  ) {
+    let sort = { dataPoint: dataPoint, direction: "asc" as SortDirection };
+    if (dataPoint === this.state.sort.dataPoint) {
+      sort = {
+        dataPoint,
+        direction: this.state.sort.direction === "asc" ? "desc" : "asc",
+      };
+    }
+    this.setState({ sort }, () => this.resetSort());
+  }
+
   componentDidMount() {
     this.setState({ difficultyRange: this.props.difficultyRange });
+    this.resetSort(); // nothing should be filtered out at the beginning, but the problems will not be sorted
   }
 
   render() {
@@ -220,7 +277,15 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
 
     const problems = project.problems
       .filter((prob) => this.state.filter(prob))
-      .sort((p1, p2) => this.state.sortWeight(p1) - this.state.sortWeight(p2));
+      .sort((p1, p2) => {
+        const w1 = this.state.sortWeight(p1),
+          w2 = this.state.sortWeight(p2);
+        if (w1 === w2)
+          return (
+            (this.state.sort.direction === "asc" ? 1 : -1) * (p1.ind - p2.ind)
+          );
+        return w1 - w2;
+      });
 
     return (
       <MenuBase
@@ -238,10 +303,12 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
           editors,
           allTags,
           clickedTags: this.state.clickedTags,
+          sort: this.state.sort,
           resetFilter: this.resetFilter,
           filterUsed: this.filterUsed,
           onChange: this.onChange,
           onClickTag: this.onClickTag,
+          onSortClick: this.onSortClick,
         }}
       >
         {problems.map((prob) => (
