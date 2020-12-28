@@ -172,7 +172,6 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
       <MenuBase
         width={15}
         background="rgb(0, 0, 0, 0.025)"
-        totalScroll
         Sidebar={Sidebar}
         authUser={this.props.authUser}
       >

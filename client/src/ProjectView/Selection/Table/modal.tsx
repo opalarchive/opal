@@ -8,7 +8,7 @@ import {
   DialogActions,
   Button,
 } from "@material-ui/core";
-import { Trash2, UserPlus, Edit2, CornerLeftUp } from "react-feather";
+import { FiTrash2, FiUserPlus, FiEdit2, FiCornerLeftUp } from "react-icons/fi";
 import {
   isProjectActionProtected,
   isProjectActionTrivial,
@@ -72,7 +72,7 @@ const Modal: React.FC<ModalProps> = ({
               </Button>
               <Button
                 onClick={modalSuccess}
-                startIcon={<UserPlus />}
+                startIcon={<FiUserPlus />}
                 color="primary"
                 variant="contained"
                 autoFocus
@@ -110,7 +110,7 @@ const Modal: React.FC<ModalProps> = ({
               </Button>
               <Button
                 onClick={modalSuccess}
-                startIcon={<Trash2 />}
+                startIcon={<FiTrash2 />}
                 color="primary"
                 variant="outlined"
               >
@@ -148,7 +148,7 @@ const Modal: React.FC<ModalProps> = ({
               </Button>
               <Button
                 onClick={modalSuccess}
-                startIcon={<Edit2 />}
+                startIcon={<FiEdit2 />}
                 color="primary"
                 variant="contained"
                 autoFocus
@@ -180,7 +180,7 @@ const Modal: React.FC<ModalProps> = ({
               </Button>
               <Button
                 onClick={modalSuccess}
-                startIcon={<CornerLeftUp />}
+                startIcon={<FiCornerLeftUp />}
                 variant="contained"
                 color="primary"
                 autoFocus

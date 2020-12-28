@@ -13,12 +13,12 @@ import {
   withTheme,
 } from "@material-ui/core";
 import {
-  AlignLeft,
-  CornerRightUp,
-  Edit2,
-  Link2,
-  MessageSquare,
-} from "react-feather";
+  FiAlignLeft,
+  FiCornerRightUp,
+  FiEdit2,
+  FiLink2,
+  FiMessageSquare,
+} from "react-icons/fi";
 import Latex from "../../../../../Constants/latex";
 import { formatTime } from "../../../../../Constants";
 import * as ROUTES from "../../../../../Constants/routes";
@@ -26,18 +26,19 @@ import { compose } from "recompose";
 import { problemAction, reply, ReplyType } from "../../../../../../../.shared";
 import styles from "./index.css";
 
-type ReplyProps = WithStyles<typeof styles> &
-  WithTheme & {
-    uuid: string;
-    ind: string;
-    reply: string;
-    content?: reply;
-    isHighlighted: boolean;
-    problemAction: (
-      data: string | number,
-      type: problemAction
-    ) => Promise<void>;
-  };
+interface ReplyPropsBase {
+  uuid: string;
+  ind: number;
+  reply: number;
+  content?: reply;
+  isHighlighted: boolean;
+  tryProblemAction: (
+    data: string | number,
+    type: problemAction
+  ) => Promise<void>;
+}
+
+type ReplyProps = WithStyles<typeof styles> & WithTheme & ReplyPropsBase;
 
 class ReplyBase<State> extends React.Component<ReplyProps, State> {
   constructor(props: ReplyProps) {
@@ -59,7 +60,7 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
   }
 
   getIcon() {
-    return MessageSquare;
+    return FiMessageSquare;
   }
 
   render() {
@@ -82,8 +83,8 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
     const link =
       linkPrefix +
       ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid)
-        .replace(":ind", ind)
-        .replace(":reply", reply);
+        .replace(":ind", "" + ind)
+        .replace(":reply", "" + reply);
 
     return (
       <div className={classes.root}>
@@ -101,7 +102,7 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
                       navigator.clipboard.writeText(link);
                     }}
                   >
-                    <Link2 size="1.2rem" />
+                    <FiLink2 size="1.2rem" />
                   </IconButton>
                 </Tooltip>
               </div>
@@ -168,7 +169,7 @@ class Solution extends ReplyBase<SolutionState> {
   }
 
   getIcon() {
-    return AlignLeft;
+    return FiAlignLeft;
   }
 }
 
@@ -204,7 +205,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
 
     if (this.state.input.length < 8) return;
 
-    this.props.problemAction(this.state.input, "comment");
+    this.props.tryProblemAction(this.state.input, "comment");
     this.setState({ input: "" });
   }
 
@@ -237,7 +238,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
             color="primary"
             type="submit"
             endIcon={
-              <CornerRightUp
+              <FiCornerRightUp
                 className={`${classes.icon} ${classes.submitIcon}`}
               />
             }
@@ -250,7 +251,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
     );
   }
   getIcon() {
-    return Edit2;
+    return FiEdit2;
   }
 }
 
@@ -269,4 +270,7 @@ const Reply: React.FC<ReplyProps> = (props) => {
   }
 };
 
-export default compose<ReplyProps, any>(withStyles(styles), withTheme)(Reply);
+export default compose<ReplyProps, ReplyPropsBase>(
+  withStyles(styles),
+  withTheme
+)(Reply);

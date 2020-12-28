@@ -15,7 +15,7 @@ import {
   WithStyles,
 } from "@material-ui/core";
 import React from "react";
-import { Bell, User } from "react-feather";
+import { FiBell, FiUser } from "react-icons/fi";
 import { Notification } from "../../../../.shared";
 import { Result } from "../../Constants/types";
 import Loading from "../../Loading";
@@ -187,7 +187,7 @@ class Notifications extends React.Component<
           ref={this.notificationButton}
         >
           <Badge badgeContent={icon} color="secondary">
-            <Bell />
+            <FiBell />
           </Badge>
         </IconButton>
         <Popper
@@ -242,7 +242,7 @@ class TopBar extends React.Component<TopBarProps> {
             color="inherit"
             className={classes.menuButton}
           >
-            <User />
+            <FiUser />
           </IconButton>
         </Toolbar>
       </AppBar>

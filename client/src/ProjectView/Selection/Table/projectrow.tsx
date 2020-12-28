@@ -13,7 +13,13 @@ import {
 } from "@material-ui/core";
 import { WithStyles, withStyles } from "@material-ui/core/styles";
 
-import { UserPlus, Trash2, Edit, Star, CornerLeftUp } from "react-feather";
+import {
+  FiUserPlus,
+  FiTrash2,
+  FiEdit,
+  FiStar,
+  FiCornerLeftUp,
+} from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { rowStyles, dataPointDisplay, IfDisplay } from "./constants";
 import { Client, projectAction } from "../../../../../.shared";
@@ -142,31 +148,35 @@ class ProjectRow extends React.Component<ProjectRowProps, ProjectRowState> {
     const actions = [
       {
         display: "Share",
-        icon: <UserPlus />,
+        icon: <FiUserPlus size="1.4rem" />,
         event: "SHARE",
         condition: SHARE,
       },
       {
         display: "Delete",
-        icon: <Trash2 />,
+        icon: <FiTrash2 size="1.4rem" />,
         event: "DELETE",
         condition: DELETE_PROJECT,
       },
       {
         display: "Change Name",
-        icon: <Edit />,
+        icon: <FiEdit size="1.4rem" />,
         event: "CHANGE_NAME",
         condition: CHANGE_NAME,
       },
       {
         display: "Restore",
-        icon: <CornerLeftUp />,
+        icon: <FiCornerLeftUp size="1.4rem" />,
         event: "RESTORE",
         condition: RESTORE,
       },
       {
         display: "Star",
-        icon: proj.starred ? <Star color="#FFD700" fill="#FFD700" /> : <Star />,
+        icon: proj.starred ? (
+          <FiStar color="#FFD700" fill="#FFD700" size="1.4rem" />
+        ) : (
+          <FiStar size="1.4rem" />
+        ),
         event: "STAR",
         condition: STAR,
       },

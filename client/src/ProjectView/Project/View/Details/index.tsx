@@ -1,15 +1,20 @@
-import React, { RefObject } from "react";
-import { ChevronLeft } from "react-feather";
+import React from "react";
+import { FiChevronLeft } from "react-icons/fi";
 import { withStyles, WithStyles } from "@material-ui/core";
 import Problem from "../Problem";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { compose } from "recompose";
 
 import * as ROUTES from "../../../../Constants/routes";
 import Reply from "./Reply";
-import { reply as replyType } from "../../../../../../.shared";
+import {
+  ProjectPrivate,
+  reply as replyType,
+  Problem as ProblemType,
+} from "../../../../../../.shared";
 import styles from "./index.css";
-import { ProblemDetails } from "../../../../Constants/types";
+import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
+import MenuBase, { MenuBaseProps } from "../../../MenuBase";
+import Sidebar from "./Sidebar";
 
 interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
@@ -61,7 +66,7 @@ class Details extends React.Component<DetailProps> {
             className={classes.topLink}
             to={ROUTES.PROJECT_VIEW.replace(":uuid", otherProps.uuid)}
           >
-            <ChevronLeft className={classes.topIcon} />
+            <FiChevronLeft className={classes.topIcon} />
             Back
           </Link>
           <div className={classes.topFiller} />
@@ -83,7 +88,7 @@ class Details extends React.Component<DetailProps> {
                     reply={id}
                     content={reply}
                     isHighlighted={replyNumber === id}
-                    problemAction={otherProps.problemAction}
+                    tryProblemAction={otherProps.tryProblemAction}
                   />
                 </div>
               ))}
@@ -93,7 +98,7 @@ class Details extends React.Component<DetailProps> {
             ind={otherProps.ind}
             reply={-1}
             isHighlighted={false}
-            problemAction={otherProps.problemAction}
+            tryProblemAction={otherProps.tryProblemAction}
           />
         </div>
       </>
@@ -101,4 +106,60 @@ class Details extends React.Component<DetailProps> {
   }
 }
 
-export default withStyles(styles)(Details);
+const StyledDetails = withStyles(styles)(Details);
+
+interface DetailsMatch {
+  uuid: string;
+  ind: string;
+  reply?: string;
+}
+
+interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
+  project: ProjectPrivate;
+  uuid: string;
+  problemProps: (
+    uuid: string,
+    prob: ProblemType,
+    tryProblemAction: tryProblemAction,
+    authUser: firebase.User
+  ) => ProblemDetails;
+  tryProblemAction: tryProblemAction;
+  authUser: firebase.User;
+  setDefaultScroll: (scroll: number) => void;
+}
+
+const RoutedDetails: React.FC<RoutedDetailsProps> = ({
+  project,
+  uuid,
+  problemProps,
+  tryProblemAction,
+  authUser,
+  setDefaultScroll,
+  match,
+}) => {
+  const ind = parseInt(match.params.ind);
+  const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
+
+  return (
+    <StyledDetails
+      replies={project.problems[ind].replies}
+      {...problemProps(uuid, project.problems[ind], tryProblemAction, authUser)}
+      setDefaultScroll={setDefaultScroll}
+      reply={reply}
+    />
+  );
+};
+
+const DetailsPage: React.FC<
+  RoutedDetailsProps & {
+    menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children">;
+  }
+> = ({ menuBaseProps, ...rest }) => {
+  return (
+    <MenuBase Sidebar={Sidebar} {...menuBaseProps}>
+      <RoutedDetails {...rest} />
+    </MenuBase>
+  );
+};
+
+export default withRouter(DetailsPage);

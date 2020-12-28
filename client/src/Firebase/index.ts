@@ -36,7 +36,7 @@ const fetchLocation =
  * It is guaranteed that result.value is of type Output when result.success is true,
  * and result.value is of type string when result.success is false.
  */
-async function post<Output>(
+export async function post<Output>(
   url: string,
   data: object,
   authUser?: firebase.User

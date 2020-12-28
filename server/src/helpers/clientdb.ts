@@ -1,6 +1,6 @@
 import { db } from "./firebaseSetup";
 import * as firebase from "firebase-admin";
-import { dbaccess } from "./dbaccess";
+import { projectAccess } from "./projectAccess";
 import { Result } from "./types";
 import { Config } from "../../../.shared/src/types";
 
@@ -8,7 +8,7 @@ export const clientdb = async (
   uuid: string,
   authuid: string
 ): Promise<Result<string | firebase.database.Database>> => {
-  const tryAccess = await dbaccess(uuid, authuid);
+  const tryAccess = await projectAccess(uuid, authuid);
   if (tryAccess.status !== 200) {
     return tryAccess;
   }

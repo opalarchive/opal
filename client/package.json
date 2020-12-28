@@ -15,7 +15,7 @@
     "react": "^16.13.1",
     "react-app-rewired": "^2.1.8",
     "react-dom": "^16.13.1",
-    "react-feather": "^2.0.8",
+    "react-icons": "^4.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.4",
     "react-scrollbars-custom": "^4.0.25",

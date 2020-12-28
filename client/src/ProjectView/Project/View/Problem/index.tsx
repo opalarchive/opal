@@ -2,36 +2,38 @@ import React from "react";
 
 import { darken, Paper, WithStyles, withStyles } from "@material-ui/core";
 import {
-  AlignLeft,
-  ArrowDown,
-  ArrowUp,
-  CornerDownRight,
-  MessageSquare,
-} from "react-feather";
+  FiAlignLeft,
+  FiArrowDown,
+  FiArrowUp,
+  FiCornerDownRight,
+  FiMessageSquare,
+} from "react-icons/fi";
 import Latex from "../../../../Constants/latex";
 import { Link } from "react-router-dom";
 
 import * as ROUTES from "../../../../Constants/routes";
-import generateStyles from "./index.css";
+import styles from "./index.css";
 import { ProblemDetails } from "../../../../Constants/types";
+import Dot from "../Ornamentation/Dot";
+import Tag from "../Ornamentation/Tag";
 
 interface ProblemProps extends ProblemDetails {
   repliable: boolean;
+  clickedTags?: {
+    [tag: string]: boolean;
+  };
+  onClickTag?: (tagText: string) => void;
 }
 
-const blankStyles = generateStyles(
-  { name: "", color: "black" },
-  { name: 0, color: "black" }
-);
-
-class ProblemBase extends React.Component<
-  ProblemProps & WithStyles<typeof blankStyles>
+class Problem extends React.Component<
+  ProblemProps & WithStyles<typeof styles>
 > {
   render() {
     const {
       classes,
       ind,
       uuid,
+      title,
       text,
       category,
       difficulty,
@@ -39,15 +41,13 @@ class ProblemBase extends React.Component<
       tags,
       votes,
       myVote,
-      problemAction,
+      tryProblemAction,
       replyTypes,
       repliable,
+      clickedTags,
+      onClickTag,
       authUser,
     } = this.props;
-
-    const Tag: React.FC<{ text: string }> = ({ text }) => {
-      return <span className={classes.tag}>{text}</span>;
-    };
 
     return (
       <Paper elevation={3} className={classes.root}>
@@ -55,7 +55,7 @@ class ProblemBase extends React.Component<
           <div className={classes.leftIndex}>#{ind + 1}</div>
           <div className={classes.leftVote}>
             <div>
-              <ArrowUp
+              <FiArrowUp
                 size="1.2rem"
                 strokeWidth={3}
                 className={
@@ -63,14 +63,14 @@ class ProblemBase extends React.Component<
                     ? classes.leftVoteArrowActivated
                     : classes.leftVoteArrow
                 }
-                onClick={(_) => problemAction(1, "vote")}
+                onClick={(_) => tryProblemAction(1, "vote")}
               />
             </div>
             <div>
               <span className={classes.leftVoteNumber}>{votes}</span>
             </div>
             <div>
-              <ArrowDown
+              <FiArrowDown
                 size="1.2rem"
                 strokeWidth={3}
                 className={
@@ -78,13 +78,13 @@ class ProblemBase extends React.Component<
                     ? classes.leftVoteArrowActivated
                     : classes.leftVoteArrow
                 }
-                onClick={(_) => problemAction(-1, "vote")}
+                onClick={(_) => tryProblemAction(-1, "vote")}
               />
             </div>
           </div>
         </div>
         <div className={classes.body}>
-          <div className={classes.bodyTitle}>Epic Problem</div>
+          <div className={classes.bodyTitle}>{title}</div>
           <div className={classes.bodyAuthor}>Proposed by {author}</div>
           <div className={classes.bodyText}>
             <Latex>{text}</Latex>
@@ -92,7 +92,16 @@ class ProblemBase extends React.Component<
           <div className={classes.bodyFiller} />
           <div className={classes.bodyTags}>
             Tags:{" "}
-            {!!tags ? tags.map((tag) => <Tag key={tag} text={tag} />) : null}
+            {!!tags
+              ? tags.map((tag) => (
+                  <Tag
+                    key={tag}
+                    text={tag}
+                    clicked={!!clickedTags && !!clickedTags[tag]}
+                    onClickTag={onClickTag}
+                  />
+                ))
+              : null}
           </div>
           {repliable ? (
             <div className={classes.bodyReply}>
@@ -100,7 +109,7 @@ class ProblemBase extends React.Component<
                 className={classes.bodyReplyLink}
                 to={`${ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}/p${ind}`}
               >
-                <CornerDownRight className={classes.icon} />
+                <FiCornerDownRight className={classes.icon} />
                 Reply
               </Link>
             </div>
@@ -108,25 +117,27 @@ class ProblemBase extends React.Component<
         </div>
         <div className={classes.right}>
           <div className={classes.rightCategory}>
-            <div
-              className={`${classes.icon} ${classes.rightDot} ${classes.rightCategoryDot}`}
-            ></div>
+            <Dot
+              color={category.color}
+              style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
+            />
             {category.name}
           </div>
           <div className={classes.rightDifficulty}>
-            <div
-              className={`${classes.icon} ${classes.rightDot} ${classes.rightDifficultyDot}`}
-            ></div>
+            <Dot
+              color={difficulty.color}
+              style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
+            />
             d-{difficulty.name}
           </div>
           <div className={classes.rightFiller} />
           <div className={classes.rightComments}>
-            <MessageSquare className={classes.icon} />
+            <FiMessageSquare className={classes.icon} />
             {replyTypes.COMMENT}&nbsp;comment
             {replyTypes.COMMENT === 1 ? "" : "s"}
           </div>
           <div className={classes.rightSolutions}>
-            <AlignLeft className={classes.icon} />
+            <FiAlignLeft className={classes.icon} />
             {replyTypes.SOLUTION}&nbsp;solution
             {replyTypes.SOLUTION === 1 ? "" : "s"}
           </div>
@@ -135,11 +146,4 @@ class ProblemBase extends React.Component<
     );
   }
 }
-const Problem: React.FC<ProblemProps> = (props) => {
-  const StyledProblem = withStyles(
-    generateStyles(props.category, props.difficulty)
-  )(ProblemBase);
-  return <StyledProblem {...props} />;
-};
-
-export default Problem;
+export default withStyles(styles)(Problem);

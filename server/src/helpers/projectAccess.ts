@@ -2,7 +2,7 @@ import { Server } from "../../../.shared/src/types";
 import { db } from "./firebaseSetup";
 import { Result } from "./types";
 
-export const dbaccess = async (
+export const projectAccess = async (
   uuid: string,
   authuid: string
 ): Promise<Result<string>> => {
