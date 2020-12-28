@@ -7,7 +7,7 @@ import {
   withStyles,
   WithStyles,
 } from "@material-ui/core";
-import { Filter, Trash2 } from "react-feather";
+import { FiFilter, FiTrash2 } from "react-icons/fi";
 import { toolbarStyles } from "./constants";
 import { projectAction } from "../../../../../.shared";
 
@@ -53,14 +53,14 @@ const ProjectToolbar: React.FC<ProjectToolbarProps> = ({
         <>
           <Tooltip title="Delete">
             <IconButton aria-label="delete">
-              <Trash2 />
+              <FiTrash2 />
             </IconButton>
           </Tooltip>
         </>
       ) : (
         <Tooltip title="Filter list">
           <IconButton aria-label="filter list">
-            <Filter />
+            <FiFilter />
           </IconButton>
         </Tooltip>
       )}

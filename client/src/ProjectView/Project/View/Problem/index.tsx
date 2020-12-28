@@ -2,12 +2,12 @@ import React from "react";
 
 import { darken, Paper, WithStyles, withStyles } from "@material-ui/core";
 import {
-  AlignLeft,
-  ArrowDown,
-  ArrowUp,
-  CornerDownRight,
-  MessageSquare,
-} from "react-feather";
+  FiAlignLeft,
+  FiArrowDown,
+  FiArrowUp,
+  FiCornerDownRight,
+  FiMessageSquare,
+} from "react-icons/fi";
 import Latex from "../../../../Constants/latex";
 import { Link } from "react-router-dom";
 
@@ -55,7 +55,7 @@ class Problem extends React.Component<
           <div className={classes.leftIndex}>#{ind + 1}</div>
           <div className={classes.leftVote}>
             <div>
-              <ArrowUp
+              <FiArrowUp
                 size="1.2rem"
                 strokeWidth={3}
                 className={
@@ -70,7 +70,7 @@ class Problem extends React.Component<
               <span className={classes.leftVoteNumber}>{votes}</span>
             </div>
             <div>
-              <ArrowDown
+              <FiArrowDown
                 size="1.2rem"
                 strokeWidth={3}
                 className={
@@ -109,7 +109,7 @@ class Problem extends React.Component<
                 className={classes.bodyReplyLink}
                 to={`${ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}/p${ind}`}
               >
-                <CornerDownRight className={classes.icon} />
+                <FiCornerDownRight className={classes.icon} />
                 Reply
               </Link>
             </div>
@@ -132,12 +132,12 @@ class Problem extends React.Component<
           </div>
           <div className={classes.rightFiller} />
           <div className={classes.rightComments}>
-            <MessageSquare className={classes.icon} />
+            <FiMessageSquare className={classes.icon} />
             {replyTypes.COMMENT}&nbsp;comment
             {replyTypes.COMMENT === 1 ? "" : "s"}
           </div>
           <div className={classes.rightSolutions}>
-            <AlignLeft className={classes.icon} />
+            <FiAlignLeft className={classes.icon} />
             {replyTypes.SOLUTION}&nbsp;solution
             {replyTypes.SOLUTION === 1 ? "" : "s"}
           </div>

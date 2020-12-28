@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft } from "react-feather";
+import { FiChevronLeft } from "react-icons/fi";
 import { withStyles, WithStyles } from "@material-ui/core";
 import Problem from "../Problem";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
@@ -66,7 +66,7 @@ class Details extends React.Component<DetailProps> {
             className={classes.topLink}
             to={ROUTES.PROJECT_VIEW.replace(":uuid", otherProps.uuid)}
           >
-            <ChevronLeft className={classes.topIcon} />
+            <FiChevronLeft className={classes.topIcon} />
             Back
           </Link>
           <div className={classes.topFiller} />

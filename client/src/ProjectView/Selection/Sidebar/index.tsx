@@ -2,7 +2,14 @@ import React from "react";
 
 import * as ROUTES from "../../../Constants/routes";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { Star, HardDrive, Users, Clock, Trash2, Plus } from "react-feather";
+import {
+  FiStar,
+  FiHardDrive,
+  FiUsers,
+  FiClock,
+  FiTrash2,
+  FiPlus,
+} from "react-icons/fi";
 import {
   Button,
   List,
@@ -100,7 +107,7 @@ class SidebarBase extends React.Component<SidebarBaseProps> {
               style={{ borderRadius: 1000 }}
               onClick={() => onClickNewProject()}
             >
-              <Plus
+              <FiPlus
                 strokeWidth="1.5"
                 style={{
                   position: "relative",
@@ -113,26 +120,26 @@ class SidebarBase extends React.Component<SidebarBaseProps> {
           </ListItem>
 
           {navlink(
-            Star,
+            FiStar,
             "Priority",
             "0.3",
             ROUTES.PROJECT_PRIORITY,
             ROUTES.PROJECT
           )}
           {navlink(
-            HardDrive,
+            FiHardDrive,
             "My Projects",
             "0.225",
             ROUTES.PROJECT_MY_PROJECTS
           )}
           {navlink(
-            Users,
+            FiUsers,
             "Shared with Me",
             "0.3",
             ROUTES.PROJECT_SHARED_WITH_ME
           )}
-          {navlink(Clock, "Recent", "0.31", ROUTES.PROJECT_RECENT)}
-          {navlink(Trash2, "Trash", "0.33", ROUTES.PROJECT_TRASH)}
+          {navlink(FiClock, "Recent", "0.31", ROUTES.PROJECT_RECENT)}
+          {navlink(FiTrash2, "Trash", "0.33", ROUTES.PROJECT_TRASH)}
         </List>
       </Paper>
     );

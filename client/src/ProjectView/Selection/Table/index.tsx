@@ -17,6 +17,7 @@ import ProjectRow from "./projectrow";
 import Modal from "./modal";
 import { starProject, tryProjectActionProtected } from "../../../Firebase";
 import { camelToTitle } from "../../../Constants";
+import { FiArrowDown } from "react-icons/fi";
 import {
   Client,
   projectAction,
@@ -294,6 +295,7 @@ class ProjectTable extends React.Component<
                         onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
                           this.onSortClick(event, dataPoint)
                         }
+                        IconComponent={FiArrowDown}
                       >
                         {camelToTitle(dataPoint)}
                       </TableSortLabel>

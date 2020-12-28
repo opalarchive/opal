@@ -13,12 +13,12 @@ import {
   withTheme,
 } from "@material-ui/core";
 import {
-  AlignLeft,
-  CornerRightUp,
-  Edit2,
-  Link2,
-  MessageSquare,
-} from "react-feather";
+  FiAlignLeft,
+  FiCornerRightUp,
+  FiEdit2,
+  FiLink2,
+  FiMessageSquare,
+} from "react-icons/fi";
 import Latex from "../../../../../Constants/latex";
 import { formatTime } from "../../../../../Constants";
 import * as ROUTES from "../../../../../Constants/routes";
@@ -60,7 +60,7 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
   }
 
   getIcon() {
-    return MessageSquare;
+    return FiMessageSquare;
   }
 
   render() {
@@ -102,7 +102,7 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
                       navigator.clipboard.writeText(link);
                     }}
                   >
-                    <Link2 size="1.2rem" />
+                    <FiLink2 size="1.2rem" />
                   </IconButton>
                 </Tooltip>
               </div>
@@ -169,7 +169,7 @@ class Solution extends ReplyBase<SolutionState> {
   }
 
   getIcon() {
-    return AlignLeft;
+    return FiAlignLeft;
   }
 }
 
@@ -238,7 +238,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
             color="primary"
             type="submit"
             endIcon={
-              <CornerRightUp
+              <FiCornerRightUp
                 className={`${classes.icon} ${classes.submitIcon}`}
               />
             }
@@ -251,7 +251,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
     );
   }
   getIcon() {
-    return Edit2;
+    return FiEdit2;
   }
 }
 

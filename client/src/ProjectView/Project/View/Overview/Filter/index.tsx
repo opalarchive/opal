@@ -21,11 +21,13 @@ import { compose } from "recompose";
 import { SidebarProps } from "../../../../MenuBase";
 import { Problem } from "../../../../../../../.shared";
 import {
-  CheckCircle,
-  ChevronDown,
-  Circle,
-  Filter as FilterIcon,
-} from "react-feather";
+  FiCheckCircle,
+  FiChevronDown,
+  FiArrowDown,
+  FiCircle,
+  FiFilter,
+} from "react-icons/fi";
+import { HiOutlineSortDescending } from "react-icons/hi";
 import Dot from "../../Ornamentation/Dot";
 import { CategoryColors } from "../..";
 import {
@@ -114,7 +116,7 @@ class Filter extends React.Component<Props> {
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
                 Filter
-                <FilterIcon
+                <FiFilter
                   style={{
                     position: "relative",
                     top: "0.3rem",
@@ -125,7 +127,7 @@ class Filter extends React.Component<Props> {
               </div>
               <Accordion elevation={0} className={classes.accordion}>
                 <AccordionSummary
-                  expandIcon={<ChevronDown />}
+                  expandIcon={<FiChevronDown />}
                   aria-controls="keyword-filter-content"
                   id="keyword-filter-header"
                 >
@@ -148,7 +150,7 @@ class Filter extends React.Component<Props> {
               </Accordion>
               <Accordion elevation={0} className={classes.accordion}>
                 <AccordionSummary
-                  expandIcon={<ChevronDown />}
+                  expandIcon={<FiChevronDown />}
                   aria-controls="author-filter-content"
                   id="author-filter-header"
                 >
@@ -171,7 +173,7 @@ class Filter extends React.Component<Props> {
               </Accordion>
               <Accordion elevation={0} className={classes.accordion}>
                 <AccordionSummary
-                  expandIcon={<ChevronDown />}
+                  expandIcon={<FiChevronDown />}
                   aria-controls="category-filter-content"
                   id="category-filter-header"
                 >
@@ -184,8 +186,8 @@ class Filter extends React.Component<Props> {
                         key={`category-filter-${category}`}
                         control={
                           <Checkbox
-                            icon={<Circle />}
-                            checkedIcon={<CheckCircle />}
+                            icon={<FiCircle />}
+                            checkedIcon={<FiCheckCircle />}
                             name={category}
                           />
                         }
@@ -212,7 +214,7 @@ class Filter extends React.Component<Props> {
               </Accordion>
               <Accordion elevation={0} className={classes.accordion}>
                 <AccordionSummary
-                  expandIcon={<ChevronDown />}
+                  expandIcon={<FiChevronDown />}
                   aria-controls="tag-filter-content"
                   id="tag-filter-header"
                 >
@@ -236,7 +238,7 @@ class Filter extends React.Component<Props> {
               </Accordion>
               <Accordion elevation={0} className={classes.accordion}>
                 <AccordionSummary
-                  expandIcon={<ChevronDown />}
+                  expandIcon={<FiChevronDown />}
                   aria-controls="difficulty-filter-content"
                   id="difficulty-filter-header"
                 >
@@ -272,10 +274,10 @@ class Filter extends React.Component<Props> {
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
                 Sort
-                <FilterIcon
+                <HiOutlineSortDescending
                   style={{
                     position: "relative",
-                    top: "0.3rem",
+                    top: "0.15rem",
                     marginLeft: "0.4rem",
                   }}
                 />
@@ -289,6 +291,7 @@ class Filter extends React.Component<Props> {
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                     onSortClick(e, "ind")
                   }
+                  IconComponent={FiArrowDown}
                 />
               </div>
               <div className={classes.sort}>
@@ -299,6 +302,7 @@ class Filter extends React.Component<Props> {
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                     onSortClick(e, "difficulty")
                   }
+                  IconComponent={FiArrowDown}
                 />
               </div>
               <div className={classes.sort}>
@@ -309,6 +313,7 @@ class Filter extends React.Component<Props> {
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                     onSortClick(e, "votes")
                   }
+                  IconComponent={FiArrowDown}
                 />
               </div>
             </Paper>
