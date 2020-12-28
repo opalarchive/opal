@@ -28,8 +28,8 @@ import styles from "./index.css";
 
 interface ReplyPropsBase {
   uuid: string;
-  ind: string;
-  reply: string;
+  ind: number;
+  reply: number;
   content?: reply;
   isHighlighted: boolean;
   tryProblemAction: (
@@ -83,8 +83,8 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
     const link =
       linkPrefix +
       ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid)
-        .replace(":ind", ind)
-        .replace(":reply", reply);
+        .replace(":ind", "" + ind)
+        .replace(":reply", "" + reply);
 
     return (
       <div className={classes.root}>
