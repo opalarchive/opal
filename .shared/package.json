@@ -2,6 +2,9 @@
   "name": "opal-shared",
   "version": "1.0.0",
   "scripts": {
-    "start": "tsc -b -w"
+    "start": "tsc -w"
+  },
+  "dependencies": {
+    "typescript": "^4.1.3"
   }
 }
