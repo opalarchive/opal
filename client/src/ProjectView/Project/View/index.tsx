@@ -187,8 +187,8 @@ class View extends React.Component<ViewProps, ViewState> {
     }
 
     const menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children"> = {
-      width: 20,
-      right: true,
+      sidebarWidth: 18,
+      maxWidth: 1320,
       background: loadBackground,
       totalScroll: true,
       defaultScroll: this.scrollSet > 1 ? undefined : this.state.defaultScroll,

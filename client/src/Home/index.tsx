@@ -5,7 +5,7 @@ import styles from "./index.module.css";
 
 class Home extends React.Component {
   render() {
-    return <Loading background="white" hideText={false} />;
+    return "Home Page";
   }
 }
 

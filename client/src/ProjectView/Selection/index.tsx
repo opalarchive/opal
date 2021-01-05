@@ -170,7 +170,8 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
     }
     return (
       <MenuBase
-        width={15}
+        sidebarWidth={15}
+        maxWidth={1280}
         background="rgb(0, 0, 0, 0.025)"
         Sidebar={Sidebar}
         authUser={this.props.authUser}

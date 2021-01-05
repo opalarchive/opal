@@ -1,3 +1,4 @@
+import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { CategoryColors } from "..";
 
@@ -13,8 +14,9 @@ import {
 import MenuBase, { MenuBaseProps } from "../../../MenuBase";
 import Problem from "../Problem";
 import Filter from "./Filter";
+import styles from "./index.css";
 
-interface OverviewProps {
+interface OverviewProps extends WithStyles<typeof styles> {
   menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children">;
   project: ProjectPrivate;
   uuid: string;
@@ -267,6 +269,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
       uuid,
       tryProblemAction,
       authUser,
+      classes,
     } = this.props;
 
     const allTags = new Set<string>();
@@ -311,18 +314,20 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
           onSortClick: this.onSortClick,
         }}
       >
-        {problems.map((prob) => (
-          <Problem
-            key={`problem-${prob.ind}`}
-            {...problemProps(uuid, prob, tryProblemAction, authUser)}
-            repliable
-            clickedTags={this.state.clickedTags}
-            onClickTag={this.onClickTag}
-          />
-        ))}
+        <div className={classes.root}>
+          {problems.map((prob) => (
+            <Problem
+              key={`problem-${prob.ind}`}
+              {...problemProps(uuid, prob, tryProblemAction, authUser)}
+              repliable
+              clickedTags={this.state.clickedTags}
+              onClickTag={this.onClickTag}
+            />
+          ))}
+        </div>
       </MenuBase>
     );
   }
 }
 
-export default Overview;
+export default withStyles(styles)(Overview);

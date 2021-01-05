@@ -1,7 +1,12 @@
 import { createStyles, darken, lighten, Theme } from "@material-ui/core";
+import { spacingRem } from "../../../../Constants";
 
 const styles = (theme: Theme) =>
   createStyles({
+    root: {
+      padding: spacingRem(theme, 3),
+      paddingRight: spacingRem(theme, 1.5),
+    },
     top: {
       fontSize: "1.2rem",
       display: "flex",

@@ -10,6 +10,8 @@ import {
   TableBody,
   Checkbox,
   TableSortLabel,
+  WithStyles,
+  withStyles,
 } from "@material-ui/core";
 import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
@@ -30,12 +32,13 @@ import {
   ProjectViewType,
   Result,
 } from "../../../Constants/types";
+import styles from "./index.css";
 
 interface Selected {
   [uuid: string]: boolean;
 }
 
-interface ProjectTableProps {
+interface ProjectTableProps extends WithStyles<typeof styles> {
   projects: Client.Publico;
   data: ProjectDataPoint[];
   fixed: boolean;
@@ -226,105 +229,107 @@ class ProjectTable extends React.Component<
   }
 
   render() {
-    const { projects, data, name } = this.props;
+    const { projects, data, name, classes } = this.props;
 
     const realSelected = Object.keys(this.state.selected).filter(
       (proj) => this.state.selected[proj]
     );
 
     return (
-      <Paper elevation={2}>
-        <Modal
-          show={this.state.modal.show}
-          type={this.state.modal.type}
-          closeModal={this.closeModal}
-          input={this.state.modal.input}
-          inputChange={this.updateModalInput}
-          modalSuccess={this.modalSuccess}
-        />
-        <ProjectToolbar
-          selected={realSelected}
-          name={camelToTitle(name)}
-          showModal={(type: projectAction) =>
-            this.setState({
-              modal: {
-                show: !this.state.modal.show,
-                type,
-                input: "",
-                activeProject: "",
-              },
-            })
-          }
-        />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={
-                      realSelected.length > 0 &&
-                      realSelected.length < Object.values(projects).length
-                    }
-                    checked={
-                      Object.values(projects).length > 0 &&
-                      realSelected.length === Object.values(projects).length
-                    }
-                    onChange={this.onAllClick}
-                    inputProps={{ "aria-label": "select all projects" }}
-                  />
-                </TableCell>
-                {data.map((dataPoint, index) => (
-                  <TableCell
-                    component="th"
-                    scope="col"
-                    padding={index === 0 ? "none" : "default"}
-                    align={index === 0 ? "left" : "right"}
-                    key={dataPoint}
-                  >
-                    {this.props.fixed ? (
-                      camelToTitle(dataPoint)
-                    ) : (
-                      <TableSortLabel
-                        active={this.state.sort.dataPoint === dataPoint}
-                        direction={
-                          this.state.sort.dataPoint === dataPoint
-                            ? this.state.sort.direction
-                            : "asc"
-                        }
-                        onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
-                          this.onSortClick(event, dataPoint)
-                        }
-                        IconComponent={FiArrowDown}
-                      >
-                        {camelToTitle(dataPoint)}
-                      </TableSortLabel>
-                    )}
+      <div className={classes.root}>
+        <Paper elevation={2}>
+          <Modal
+            show={this.state.modal.show}
+            type={this.state.modal.type}
+            closeModal={this.closeModal}
+            input={this.state.modal.input}
+            inputChange={this.updateModalInput}
+            modalSuccess={this.modalSuccess}
+          />
+          <ProjectToolbar
+            selected={realSelected}
+            name={camelToTitle(name)}
+            showModal={(type: projectAction) =>
+              this.setState({
+                modal: {
+                  show: !this.state.modal.show,
+                  type,
+                  input: "",
+                  activeProject: "",
+                },
+              })
+            }
+          />
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      indeterminate={
+                        realSelected.length > 0 &&
+                        realSelected.length < Object.values(projects).length
+                      }
+                      checked={
+                        Object.values(projects).length > 0 &&
+                        realSelected.length === Object.values(projects).length
+                      }
+                      onChange={this.onAllClick}
+                      inputProps={{ "aria-label": "select all projects" }}
+                    />
                   </TableCell>
+                  {data.map((dataPoint, index) => (
+                    <TableCell
+                      component="th"
+                      scope="col"
+                      padding={index === 0 ? "none" : "default"}
+                      align={index === 0 ? "left" : "right"}
+                      key={dataPoint}
+                    >
+                      {this.props.fixed ? (
+                        camelToTitle(dataPoint)
+                      ) : (
+                        <TableSortLabel
+                          active={this.state.sort.dataPoint === dataPoint}
+                          direction={
+                            this.state.sort.dataPoint === dataPoint
+                              ? this.state.sort.direction
+                              : "asc"
+                          }
+                          onClick={(
+                            event: React.MouseEvent<HTMLButtonElement>
+                          ) => this.onSortClick(event, dataPoint)}
+                          IconComponent={FiArrowDown}
+                        >
+                          {camelToTitle(dataPoint)}
+                        </TableSortLabel>
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {this.state.sortedProjectKeys.map((uuid, index) => (
+                  <ProjectRow
+                    uuid={uuid}
+                    index={index}
+                    data={data}
+                    proj={projects[uuid]}
+                    selected={!!this.state.selected[uuid]}
+                    onRowClick={this.onRowClick}
+                    username={this.props.authUser.displayName!}
+                    showModal={this.showModal}
+                    name={name}
+                    key={`project-row-${uuid}`}
+                  />
                 ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.sortedProjectKeys.map((uuid, index) => (
-                <ProjectRow
-                  uuid={uuid}
-                  index={index}
-                  data={data}
-                  proj={projects[uuid]}
-                  selected={!!this.state.selected[uuid]}
-                  onRowClick={this.onRowClick}
-                  username={this.props.authUser.displayName!}
-                  showModal={this.showModal}
-                  name={name}
-                  key={`project-row-${uuid}`}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </div>
     );
   }
 }
 
-export default ProjectTable;
+export default withStyles(styles)(ProjectTable);

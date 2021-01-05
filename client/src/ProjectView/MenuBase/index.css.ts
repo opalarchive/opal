@@ -1,8 +1,18 @@
 import { createStyles } from "@material-ui/core";
 
 const styles = createStyles({
-  root: {
+  container: {
     width: "100%",
+    height: "100%",
+    position: "relative",
+  },
+  centered: {
+    margin: "0 auto",
+    position: "relative",
+  },
+  sidebar: {
+    display: "inline-block",
+    position: "absolute",
     height: "100%",
   },
   inner: {
@@ -10,10 +20,6 @@ const styles = createStyles({
     height: "100%",
     display: "flex",
     flexDirection: "column",
-    "& .ScrollbarsCustom-TrackY": {
-      top: "0 !important",
-      height: "100% !important",
-    },
   },
 });
 

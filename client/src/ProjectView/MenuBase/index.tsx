@@ -5,29 +5,61 @@ import styles from "./index.css";
 
 export interface SidebarProps {
   width: number;
+  height: number;
   authUser: firebase.User;
 }
 
 export interface MenuBaseProps {
-  width: number;
+  sidebarWidth: number;
+  maxWidth?: number;
   right?: boolean;
   background: string;
   totalScroll?: boolean;
   sidebarProps?: object;
-  Sidebar: React.ComponentType<any>;
+  Sidebar: React.ComponentType<any & SidebarProps>;
   defaultScroll?: number;
   authUser: firebase.User;
   children: JSX.Element | JSX.Element[];
 }
 
+interface MenuBaseState {
+  height: number;
+}
+
 class MenuBase extends React.Component<
-  MenuBaseProps & WithStyles<typeof styles>
+  MenuBaseProps & WithStyles<typeof styles>,
+  MenuBaseState
 > {
   private scrollSet = 0;
+  private body = React.createRef<HTMLDivElement>();
+
+  state = {
+    height: 0,
+  };
+
+  constructor(props: MenuBaseProps & WithStyles<typeof styles>) {
+    super(props);
+
+    this.changeBodyHeight = this.changeBodyHeight.bind(this);
+  }
+
+  changeBodyHeight() {
+    this.setState({ height: this.body.current?.clientHeight! });
+  }
+
+  componentDidMount() {
+    this.changeBodyHeight();
+    window.addEventListener("resize", this.changeBodyHeight);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.changeBodyHeight);
+  }
 
   render() {
     const {
-      width,
+      sidebarWidth,
+      maxWidth,
       right,
       background,
       sidebarProps,
@@ -42,29 +74,49 @@ class MenuBase extends React.Component<
       this.scrollSet = this.scrollSet + 1;
     }
 
+    console.log(this.state.height);
+
     return (
-      <div className={classes.root} style={{ backgroundColor: background }}>
-        <Sidebar width={width} authUser={authUser} {...sidebarProps} />
-        <div
-          className={classes.inner}
-          style={{
-            marginLeft: !!right ? 0 : `${width}rem`,
-            marginRight: !!right ? `${width}rem` : 0,
-          }}
+      <div
+        className={classes.container}
+        style={{ backgroundColor: background }}
+        ref={this.body}
+      >
+        <Scrollbar
+          noScrollX
+          disableTrackYWidthCompensation
+          scrollTop={this.scrollSet > 1 ? undefined : defaultScroll}
         >
-          <Scrollbar
-            noScrollX
-            scrollTop={this.scrollSet > 1 ? undefined : defaultScroll}
+          <div
+            className={`${classes.container} ${classes.centered}`}
+            style={{ maxWidth }}
           >
             <div
+              className={classes.sidebar}
               style={{
-                padding: "1rem",
+                width: `${sidebarWidth}rem`,
+                left: right ? "auto" : 0,
+                right: right ? 0 : "auto",
+              }}
+            >
+              <Sidebar
+                width={sidebarWidth}
+                height={this.state.height}
+                authUser={authUser}
+                {...sidebarProps}
+              />
+            </div>
+            <div
+              className={classes.inner}
+              style={{
+                marginLeft: !!right ? 0 : `${sidebarWidth}rem`,
+                marginRight: !!right ? `${sidebarWidth}rem` : 0,
               }}
             >
               {children}
             </div>
-          </Scrollbar>
-        </div>
+          </div>
+        </Scrollbar>
       </div>
     );
   }

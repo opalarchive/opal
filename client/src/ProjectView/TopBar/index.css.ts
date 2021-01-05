@@ -1,4 +1,5 @@
 import { createStyles, Theme } from "@material-ui/core";
+import { spacingRem } from "../../Constants";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -6,7 +7,7 @@ const styles = (theme: Theme) =>
       flexGrow: 1,
     },
     menuButton: {
-      marginLeft: theme.spacing(1),
+      marginLeft: spacingRem(theme, 1),
     },
     title: {
       flexGrow: 1,
@@ -16,8 +17,8 @@ const styles = (theme: Theme) =>
       backgroundColor: theme.palette.info.light,
     },
     list: {
-      width: theme.spacing(40),
-      maxHeight: theme.spacing(40),
+      width: spacingRem(theme, 40),
+      maxHeight: spacingRem(theme, 40),
       overflow: "auto",
     },
     listItem: {
@@ -27,13 +28,13 @@ const styles = (theme: Theme) =>
     loading: {
       display: "flex",
       justifyContent: "center",
-      margin: theme.spacing(1, 0),
+      margin: `${spacingRem(theme, 1)} 0`,
     },
     divider: {
-      margin: theme.spacing(1, 0),
+      margin: `${spacingRem(theme, 1)} 0`,
     },
     centeredSpace: {
-      padding: theme.spacing(1),
+      padding: spacingRem(theme, 1),
       textAlign: "center",
     },
     notificationDot: {

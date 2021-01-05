@@ -102,6 +102,7 @@ class Filter extends React.Component<Props> {
       onSortClick,
       classes,
       width,
+      height,
       theme,
     } = this.props;
 
@@ -110,7 +111,7 @@ class Filter extends React.Component<Props> {
     );
 
     return (
-      <div className={classes.root} style={{ width: `${width}rem` }}>
+      <div className={classes.root} style={{ width: `${width}rem`, height }}>
         <Scrollbar>
           <div className={classes.wrapper}>
             <Paper elevation={3} className={classes.paper}>

@@ -21,23 +21,23 @@ import {
   WithStyles,
 } from "@material-ui/core";
 import { newProject } from "../../../Firebase";
-import generateStyles from "./index.css";
+import styles from "./index.css";
 import { compose } from "recompose";
 
-interface SidebarProps {
+interface SidebarBaseProps {
+  width: number;
+  height: number;
   authUser: firebase.User;
 }
 
-const blankStyles = generateStyles(0);
-
-interface SidebarBaseProps
-  extends SidebarProps,
-    WithStyles<typeof blankStyles>,
+interface SidebarProps
+  extends SidebarBaseProps,
+    WithStyles<typeof styles>,
     RouteComponentProps<{}> {}
 
-class SidebarBase extends React.Component<SidebarBaseProps> {
+class Sidebar extends React.Component<SidebarProps> {
   render() {
-    const { authUser, classes, location, history } = this.props;
+    const { width, height, authUser, classes, location, history } = this.props;
 
     const navlink = (
       Icon: React.ElementType,
@@ -97,7 +97,7 @@ class SidebarBase extends React.Component<SidebarBaseProps> {
     };
 
     return (
-      <Paper square elevation={2} className={classes.root}>
+      <div className={classes.root} style={{ width: `${width}rem`, height }}>
         <List component="nav" aria-label="project selection">
           <ListItem className={`${classes.item} ${classes.buttonWrapper}`}>
             <Button
@@ -141,21 +141,12 @@ class SidebarBase extends React.Component<SidebarBaseProps> {
           {navlink(FiClock, "Recent", "0.31", ROUTES.PROJECT_RECENT)}
           {navlink(FiTrash2, "Trash", "0.33", ROUTES.PROJECT_TRASH)}
         </List>
-      </Paper>
+      </div>
     );
   }
 }
 
-const Sidebar: React.FC<SidebarProps & { width: number }> = ({
-  width,
-  ...rest
-}) => {
-  const FixedWidthSidebar = compose<SidebarBaseProps, any>(
-    withRouter,
-    withStyles(generateStyles(width))
-  )(SidebarBase);
-
-  return <FixedWidthSidebar {...rest} />;
-};
-
-export default Sidebar;
+export default compose<SidebarProps, SidebarBaseProps>(
+  withStyles(styles),
+  withRouter
+)(Sidebar);

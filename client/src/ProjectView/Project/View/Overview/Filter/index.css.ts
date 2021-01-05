@@ -5,17 +5,16 @@ const styles = (theme: Theme) =>
   createStyles({
     root: {
       display: "inline-block",
-      position: "absolute",
-      right: 0,
-      borderLeft: "1px solid rgba(0, 0, 0, 0.12)",
+      position: "fixed",
       height: "100%",
     },
     wrapper: {
-      padding: spacingRem(theme, 2),
+      padding: spacingRem(theme, 3),
+      paddingRight: spacingRem(theme, 1.5),
     },
     paper: {
-      marginBottom: spacingRem(theme, 2),
-      paddingBottom: spacingRem(theme, 1),
+      marginBottom: spacingRem(theme, 3),
+      paddingBottom: spacingRem(theme, 1.5),
     },
     title: {
       fontSize: spacingRem(theme, 2.5),

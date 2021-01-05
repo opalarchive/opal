@@ -1,6 +1,6 @@
 import React from "react";
 import { lighten, darken, createStyles, Theme } from "@material-ui/core";
-import { formatTime } from "../../../Constants";
+import { formatTime, spacingRem } from "../../../Constants";
 import { Client } from "../../../../../.shared";
 import { ProjectDataPoint } from "../../../Constants/types";
 
@@ -74,8 +74,8 @@ export const dataPointDisplay = (
 export const toolbarStyles = (theme: Theme) =>
   createStyles({
     root: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
+      paddingLeft: spacingRem(theme, 2),
+      paddingRight: spacingRem(theme, 1),
     },
     highlight:
       theme.palette.type === "light"

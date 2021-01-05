@@ -60,7 +60,7 @@ class Details extends React.Component<DetailProps> {
     const { classes, replies, reply: replyNumber, ...otherProps } = this.props;
 
     return (
-      <>
+      <div className={classes.root}>
         <div className={classes.top} ref={this.top}>
           <Link
             className={classes.topLink}
@@ -101,7 +101,7 @@ class Details extends React.Component<DetailProps> {
             tryProblemAction={otherProps.tryProblemAction}
           />
         </div>
-      </>
+      </div>
     );
   }
 }
@@ -156,7 +156,7 @@ const DetailsPage: React.FC<
   }
 > = ({ menuBaseProps, ...rest }) => {
   return (
-    <MenuBase Sidebar={Sidebar} {...menuBaseProps}>
+    <MenuBase Sidebar={Sidebar} {...menuBaseProps} right>
       <RoutedDetails {...rest} />
     </MenuBase>
   );

@@ -1,6 +1,5 @@
 import { Theme, withStyles, WithStyles, withTheme } from "@material-ui/core";
 import React from "react";
-import { compose } from "recompose";
 
 import styles from "./index.css";
 
