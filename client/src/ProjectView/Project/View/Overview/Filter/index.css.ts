@@ -5,11 +5,13 @@ const styles = (theme: Theme) =>
   createStyles({
     root: {
       display: "inline-block",
-      position: "fixed",
       height: "100%",
+      paddingTop: spacingRem(theme, 2.8),
+      paddingBottom: spacingRem(theme, 3),
     },
     wrapper: {
-      padding: spacingRem(theme, 3),
+      paddingTop: spacingRem(theme, 0.2),
+      paddingLeft: spacingRem(theme, 3),
       paddingRight: spacingRem(theme, 1.5),
     },
     paper: {

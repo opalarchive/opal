@@ -123,23 +123,23 @@ class Sidebar extends React.Component<SidebarProps> {
             FiStar,
             "Priority",
             "0.3",
-            ROUTES.PROJECT_PRIORITY,
+            ROUTES.SELECTION_PRIORITY,
             ROUTES.PROJECT
           )}
           {navlink(
             FiHardDrive,
             "My Projects",
             "0.225",
-            ROUTES.PROJECT_MY_PROJECTS
+            ROUTES.SELECTION_MY_PROJECTS
           )}
           {navlink(
             FiUsers,
             "Shared with Me",
             "0.3",
-            ROUTES.PROJECT_SHARED_WITH_ME
+            ROUTES.SELECTION_SHARED_WITH_ME
           )}
-          {navlink(FiClock, "Recent", "0.31", ROUTES.PROJECT_RECENT)}
-          {navlink(FiTrash2, "Trash", "0.33", ROUTES.PROJECT_TRASH)}
+          {navlink(FiClock, "Recent", "0.31", ROUTES.SELECTION_RECENT)}
+          {navlink(FiTrash2, "Trash", "0.33", ROUTES.SELECTION_TRASH)}
         </List>
       </div>
     );

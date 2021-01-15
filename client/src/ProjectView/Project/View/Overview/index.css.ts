@@ -7,6 +7,10 @@ const styles = (theme: Theme) =>
       padding: spacingRem(theme, 3),
       paddingLeft: spacingRem(theme, 1.5),
     },
+    navbarContainer: {
+      position: "relative",
+      margin: "0 auto",
+    },
   });
 
 export default styles;

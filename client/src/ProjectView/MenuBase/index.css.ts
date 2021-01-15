@@ -15,6 +15,10 @@ const styles = createStyles({
     position: "absolute",
     height: "100%",
   },
+  sidebarWrapper: {
+    display: "inline-block",
+    height: "100%",
+  },
   inner: {
     position: "relative",
     height: "100%",
