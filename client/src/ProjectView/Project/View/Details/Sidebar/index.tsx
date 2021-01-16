@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import styles from "./index.css";
 import { compose } from "recompose";
-import { SidebarProps } from "../../../../MenuBase";
+import { SidebarProps } from "../../../../Template/ScrollBase";
 
 const Sidebar: React.FC<
   SidebarProps & WithStyles<typeof styles> & WithTheme

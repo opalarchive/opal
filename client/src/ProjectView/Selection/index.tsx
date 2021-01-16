@@ -8,7 +8,7 @@ import Sidebar from "./Sidebar";
 import Loading from "../../Loading";
 import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
-import MenuBase from "../MenuBase";
+import ScrollBase from "../Template/ScrollBase";
 import { poll, projectViewTypes } from "../../Constants";
 import { Client } from "../../../../.shared";
 import {
@@ -18,6 +18,7 @@ import {
   Result,
   ProjectViewFilter,
 } from "../../Constants/types";
+import SidebaredBase from "../Template/SidebaredBase";
 
 interface SelectionBaseProps {
   refreshProjects: () => Promise<void>;
@@ -113,12 +114,14 @@ interface SelectionProps {
 
 interface SelectionState {
   visibleProjects: Client.Publico;
+  bodyHeight: number;
   loading: boolean;
 }
 
 class Selection extends React.Component<SelectionProps, SelectionState> {
   state = {
     visibleProjects: {} as Client.Publico,
+    bodyHeight: 0,
     loading: true,
   };
 
@@ -128,6 +131,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
     super(props);
 
     this.setProjects = this.setProjects.bind(this);
+    this.onBodyHeightChange = this.onBodyHeightChange.bind(this);
   }
 
   async setProjects() {
@@ -142,6 +146,10 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
     } catch (e) {
       return e;
     }
+  }
+
+  onBodyHeightChange(height: number) {
+    this.setState({ bodyHeight: height });
   }
 
   async componentDidMount() {
@@ -169,86 +177,92 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
       return <Loading background="white" />;
     }
     return (
-      <MenuBase
-        sidebarWidth={15}
-        maxWidth={1280}
+      <ScrollBase
+        maxWidth={1320}
         background="rgb(0, 0, 0, 0.025)"
-        Sidebar={Sidebar}
-        authUser={this.props.authUser}
+        onBodyHeightChange={this.onBodyHeightChange}
       >
-        <Route
-          exact
-          path={ROUTES.PROJECT}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="priority"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.SELECTION_PRIORITY}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="priority"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.SELECTION_MY_PROJECTS}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="myProjects"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.SELECTION_SHARED_WITH_ME}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="sharedWithMe"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.SELECTION_RECENT}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="recent"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.SELECTION_TRASH}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="trash"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-      </MenuBase>
+        <SidebaredBase
+          sidebarWidth={15}
+          Sidebar={Sidebar}
+          stickySidebar
+          height={this.state.bodyHeight}
+          authUser={this.props.authUser}
+        >
+          <Route
+            exact
+            path={ROUTES.PROJECT}
+            render={() => (
+              <SelectionBase
+                refreshProjects={this.setProjects}
+                type="priority"
+                visibleProjects={this.state.visibleProjects}
+                authUser={this.props.authUser}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={ROUTES.SELECTION_PRIORITY}
+            render={() => (
+              <SelectionBase
+                refreshProjects={this.setProjects}
+                type="priority"
+                visibleProjects={this.state.visibleProjects}
+                authUser={this.props.authUser}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={ROUTES.SELECTION_MY_PROJECTS}
+            render={() => (
+              <SelectionBase
+                refreshProjects={this.setProjects}
+                type="myProjects"
+                visibleProjects={this.state.visibleProjects}
+                authUser={this.props.authUser}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={ROUTES.SELECTION_SHARED_WITH_ME}
+            render={() => (
+              <SelectionBase
+                refreshProjects={this.setProjects}
+                type="sharedWithMe"
+                visibleProjects={this.state.visibleProjects}
+                authUser={this.props.authUser}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={ROUTES.SELECTION_RECENT}
+            render={() => (
+              <SelectionBase
+                refreshProjects={this.setProjects}
+                type="recent"
+                visibleProjects={this.state.visibleProjects}
+                authUser={this.props.authUser}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={ROUTES.SELECTION_TRASH}
+            render={() => (
+              <SelectionBase
+                refreshProjects={this.setProjects}
+                type="trash"
+                visibleProjects={this.state.visibleProjects}
+                authUser={this.props.authUser}
+              />
+            )}
+          />
+        </SidebaredBase>
+      </ScrollBase>
     );
   }
 }

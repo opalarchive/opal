@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  Route,
-  RouteComponentProps,
-  Switch,
-  withRouter,
-} from "react-router-dom";
-import MenuBase from "../../MenuBase";
-import Filter from "./Overview/Filter";
-import Problem from "./Problem";
+import { Route, Switch } from "react-router-dom";
+import ScrollBase from "../../Template/ScrollBase";
 
 import * as ROUTES from "../../../Constants/routes";
 import Details from "./Details";
@@ -29,8 +22,9 @@ import {
   replyTypes,
   tryProblemAction,
 } from "../../../Constants/types";
-import { MenuBaseProps } from "../../MenuBase";
+import { ScrollBaseProps } from "../../Template/ScrollBase";
 import Overview from "./Overview";
+import Navbar from "./Navbar";
 
 interface ViewProps {
   project: ProjectPrivate;
@@ -57,6 +51,9 @@ interface ViewState {
     end: number;
   };
   defaultScroll: number;
+  scrollTop: number;
+  bodyHeight: number;
+  navbarHeight: number;
 }
 
 class View extends React.Component<ViewProps, ViewState> {
@@ -78,9 +75,13 @@ class View extends React.Component<ViewProps, ViewState> {
     } as DifficultyColors,
     difficultyRange: { start: 0, end: 100 },
     defaultScroll: 0,
+    scrollTop: 0,
+    bodyHeight: 0,
+    navbarHeight: 0,
   };
 
   private scrollSet = 0;
+  private navbarRef = React.createRef<HTMLDivElement>();
 
   constructor(props: ViewProps) {
     super(props);
@@ -89,6 +90,9 @@ class View extends React.Component<ViewProps, ViewState> {
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
     this.problemProps = this.problemProps.bind(this);
     this.setDefaultScroll = this.setDefaultScroll.bind(this);
+    this.onBodyHeightChange = this.onBodyHeightChange.bind(this);
+    this.onScrollTopChange = this.onScrollTopChange.bind(this);
+    this.changeNavbarHeight = this.changeNavbarHeight.bind(this);
   }
 
   getCategoryColor(category: string) {
@@ -169,15 +173,63 @@ class View extends React.Component<ViewProps, ViewState> {
     }
   }
 
+  onScrollTopChange(scrollTop: number) {
+    this.setState({ scrollTop });
+  }
+
+  onBodyHeightChange(height: number) {
+    this.setState({ bodyHeight: height });
+  }
+
+  changeNavbarHeight() {
+    this.setState({ navbarHeight: this.navbarRef.current!.clientHeight! });
+  }
+
+  componentDidMount() {
+    this.changeNavbarHeight();
+    window.addEventListener("resize", this.changeNavbarHeight);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.changeNavbarHeight);
+  }
+
+  private prefixes = {
+    [ROUTES.PROJECT_OVERVIEW]: {
+      section: 0,
+      component: 0,
+    },
+    [ROUTES.PROJECT_PROBLEM.substring(
+      0,
+      ROUTES.PROJECT_PROBLEM.indexOf(":ind")
+    )]: {
+      section: 0,
+      component: 1,
+    },
+    [ROUTES.PROJECT_COMPILE]: { section: 1, component: 0 },
+    [ROUTES.PROJECT_SETTINGS]: { section: 2, component: 0 },
+  } as { [url: string]: { section: number; component: number } };
+
+  getCurrent(path: string) {
+    let current: { section: number; component: number } = {
+      section: 0,
+      component: 0,
+    };
+    for (let i = 0; i < Object.keys(this.prefixes).length; i++) {
+      if (
+        path.startsWith(
+          Object.keys(this.prefixes)[i].replace(":uuid", this.props.uuid)
+        )
+      ) {
+        current = this.prefixes[Object.keys(this.prefixes)[i]];
+        break;
+      }
+    }
+    return current;
+  }
+
   render() {
-    const {
-      project,
-      editors,
-      uuid,
-      tryProblemAction,
-      fail,
-      authUser,
-    } = this.props;
+    const { project, editors, uuid, tryProblemAction, authUser } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -186,54 +238,77 @@ class View extends React.Component<ViewProps, ViewState> {
       this.scrollSet++;
     }
 
-    const menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children"> = {
-      sidebarWidth: 18,
-      maxWidth: 1320,
-      background: loadBackground,
-      totalScroll: true,
-      defaultScroll: this.scrollSet > 1 ? undefined : this.state.defaultScroll,
-      authUser: authUser,
-    };
+    // const menuBaseProps: Omit<ScrollBaseProps, "Sidebar" | "children"> = {
+    //   sidebarWidth: 18,
+    //   maxWidth: 1320,
+    //   background: loadBackground,
+    //   totalScroll: true,
+    //   defaultScroll: this.scrollSet > 1 ? undefined : this.state.defaultScroll,
+    //   authUser: authUser,
+    // };
+
+    const sectionNames = ["Overview", "Compile", "Settings"];
+    const sectionLinks = [
+      ROUTES.PROJECT_OVERVIEW,
+      ROUTES.PROJECT_COMPILE,
+      ROUTES.PROJECT_SETTINGS,
+    ];
+    const components = [
+      <Overview
+        height={this.state.bodyHeight - this.state.navbarHeight}
+        project={project}
+        uuid={uuid}
+        categoryColors={this.state.categoryColors}
+        difficultyRange={this.state.difficultyRange}
+        editors={editors}
+        problemProps={this.problemProps}
+        tryProblemAction={tryProblemAction}
+        authUser={authUser}
+        setDefaultScroll={this.setDefaultScroll}
+      />,
+      <Details
+        height={this.state.bodyHeight - this.state.navbarHeight}
+        project={project}
+        uuid={uuid}
+        problemProps={this.problemProps}
+        tryProblemAction={tryProblemAction}
+        authUser={authUser}
+        setDefaultScroll={this.setDefaultScroll}
+      />,
+    ];
 
     return (
-      <Switch>
-        <Route
-          exact
-          path={ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}
-          render={(_) => (
-            <Overview
-              menuBaseProps={menuBaseProps}
-              project={project}
-              uuid={uuid}
-              categoryColors={this.state.categoryColors}
-              difficultyRange={this.state.difficultyRange}
-              editors={editors}
-              problemProps={this.problemProps}
-              tryProblemAction={tryProblemAction}
-              authUser={authUser}
-              setDefaultScroll={this.setDefaultScroll}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={[
-            ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid),
-            ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid),
-          ]}
-          render={(_) => (
-            <Details
-              menuBaseProps={menuBaseProps}
-              project={project}
-              uuid={uuid}
-              problemProps={this.problemProps}
-              tryProblemAction={tryProblemAction}
-              authUser={authUser}
-              setDefaultScroll={this.setDefaultScroll}
-            />
-          )}
-        />
-      </Switch>
+      <ScrollBase
+        maxWidth={1320}
+        background={loadBackground}
+        defaultScroll={
+          this.scrollSet > 1 ? undefined : this.state.defaultScroll
+        }
+        onBodyHeightChange={this.onBodyHeightChange}
+        onScrollTopChange={this.onScrollTopChange}
+      >
+        <Switch>
+          <Route
+            exact
+            render={({ location, match }) => {
+              const current = this.getCurrent(location.pathname);
+              console.log(match);
+              return (
+                <>
+                  <Navbar
+                    uuid={uuid}
+                    currentSection={current.section}
+                    tabNames={sectionNames}
+                    tabLinks={sectionLinks}
+                    forwardedRef={this.navbarRef}
+                  />
+                  {components[current.component]}
+                </>
+              );
+            }}
+          />
+        </Switch>
+      </ScrollBase>
     );
   }
 }

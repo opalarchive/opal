@@ -2,7 +2,7 @@ import React from "react";
 import { FiChevronLeft } from "react-icons/fi";
 import { withStyles, WithStyles } from "@material-ui/core";
 import Problem from "../Problem";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
+import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
 
 import * as ROUTES from "../../../../Constants/routes";
 import Reply from "./Reply";
@@ -13,8 +13,9 @@ import {
 } from "../../../../../../.shared";
 import styles from "./index.css";
 import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
-import MenuBase, { MenuBaseProps } from "../../../MenuBase";
+import ScrollBase, { ScrollBaseProps } from "../../../Template/ScrollBase";
 import Sidebar from "./Sidebar";
+import SidebaredBase from "../../../Template/SidebaredBase";
 
 interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
@@ -115,6 +116,7 @@ interface DetailsMatch {
 }
 
 interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
+  height: number;
   project: ProjectPrivate;
   uuid: string;
   problemProps: (
@@ -129,6 +131,7 @@ interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
 }
 
 const RoutedDetails: React.FC<RoutedDetailsProps> = ({
+  height,
   project,
   uuid,
   problemProps,
@@ -139,27 +142,30 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
+  console.log(match.params);
 
   return (
-    <StyledDetails
-      replies={project.problems[ind].replies}
-      {...problemProps(uuid, project.problems[ind], tryProblemAction, authUser)}
-      setDefaultScroll={setDefaultScroll}
-      reply={reply}
-    />
+    <SidebaredBase
+      sidebarWidth={18}
+      Sidebar={Sidebar}
+      right
+      stickySidebar
+      height={height}
+      authUser={authUser}
+    >
+      <StyledDetails
+        replies={project.problems[ind].replies}
+        {...problemProps(
+          uuid,
+          project.problems[ind],
+          tryProblemAction,
+          authUser
+        )}
+        setDefaultScroll={setDefaultScroll}
+        reply={reply}
+      />
+    </SidebaredBase>
   );
 };
 
-const DetailsPage: React.FC<
-  RoutedDetailsProps & {
-    menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children">;
-  }
-> = ({ menuBaseProps, ...rest }) => {
-  return (
-    <MenuBase Sidebar={Sidebar} {...menuBaseProps} right>
-      <RoutedDetails {...rest} />
-    </MenuBase>
-  );
-};
-
-export default withRouter(DetailsPage);
+export default withRouter(RoutedDetails);

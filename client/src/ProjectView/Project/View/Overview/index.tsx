@@ -11,13 +11,13 @@ import {
   SortDirection,
   tryProblemAction,
 } from "../../../../Constants/types";
-import MenuBase, { MenuBaseProps } from "../../../MenuBase";
+import SidebaredBase from "../../../Template/SidebaredBase";
 import Problem from "../Problem";
 import Filter from "./Filter";
 import styles from "./index.css";
 
 interface OverviewProps extends WithStyles<typeof styles> {
-  menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children">;
+  height: number;
   project: ProjectPrivate;
   uuid: string;
   categoryColors: CategoryColors;
@@ -261,7 +261,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
 
   render() {
     const {
-      menuBaseProps,
+      height,
       project,
       categoryColors,
       editors,
@@ -291,9 +291,9 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
       });
 
     return (
-      <MenuBase
+      <SidebaredBase
+        sidebarWidth={18}
         Sidebar={Filter}
-        {...menuBaseProps}
         sidebarProps={{
           setFilter: this.setFilter,
           setSortWeight: this.setSortWeight,
@@ -313,6 +313,9 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
           onClickTag: this.onClickTag,
           onSortClick: this.onSortClick,
         }}
+        stickySidebar
+        height={height}
+        authUser={authUser}
       >
         <div className={classes.root}>
           {problems.map((prob) => (
@@ -325,7 +328,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
             />
           ))}
         </div>
-      </MenuBase>
+      </SidebaredBase>
     );
   }
 }
