@@ -1,19 +1,12 @@
 import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
-import { CategoryColors } from "..";
+import { CategoryColors, ViewSectionProps } from "..";
 
-import {
-  ProjectPrivate,
-  Problem as ProblemType,
-} from "../../../../../../.shared";
+import { Problem as ProblemType } from "../../../../../../.shared";
 import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
-import ScrollBase, { ScrollBaseProps } from "../../../Template/ScrollBase";
 import styles from "./index.css";
 
-interface CompileProps extends WithStyles<typeof styles> {
-  menuBaseProps: Omit<ScrollBaseProps, "Sidebar" | "children">;
-  project: ProjectPrivate;
-  uuid: string;
+interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
   categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
   editors: string[];
@@ -24,13 +17,12 @@ interface CompileProps extends WithStyles<typeof styles> {
     authUser: firebase.User
   ) => ProblemDetails;
   tryProblemAction: tryProblemAction;
-  authUser: firebase.User;
 }
 
 class Compile extends React.Component<CompileProps> {
   render() {
     const {
-      menuBaseProps,
+      height,
       project,
       categoryColors,
       editors,
@@ -41,7 +33,11 @@ class Compile extends React.Component<CompileProps> {
       classes,
     } = this.props;
 
-    return <div className={classes.root}>wen</div>;
+    return (
+      <div className={classes.root}>
+        {/* TODO add problem compilation code. The above props are recommended */}
+      </div>
+    );
   }
 }
 

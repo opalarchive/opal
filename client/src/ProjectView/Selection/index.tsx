@@ -185,7 +185,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
         <SidebaredBase
           sidebarWidth={15}
           Sidebar={Sidebar}
-          stickySidebar
+          fixedSidebar
           height={this.state.bodyHeight}
           authUser={this.props.authUser}
         >

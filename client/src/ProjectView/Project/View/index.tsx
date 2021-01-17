@@ -22,9 +22,9 @@ import {
   replyTypes,
   tryProblemAction,
 } from "../../../Constants/types";
-import { ScrollBaseProps } from "../../Template/ScrollBase";
 import Overview from "./Overview";
 import Navbar from "./Navbar";
+import Compile from "./Compile";
 
 interface ViewProps {
   project: ProjectPrivate;
@@ -32,6 +32,13 @@ interface ViewProps {
   uuid: string;
   tryProblemAction: tryProblemAction;
   fail: () => void;
+  authUser: firebase.User;
+}
+
+export interface ViewSectionProps {
+  height: number;
+  project: ProjectPrivate;
+  uuid: string;
   authUser: firebase.User;
 }
 
@@ -194,40 +201,6 @@ class View extends React.Component<ViewProps, ViewState> {
     window.removeEventListener("resize", this.changeNavbarHeight);
   }
 
-  private prefixes = {
-    [ROUTES.PROJECT_OVERVIEW]: {
-      section: 0,
-      component: 0,
-    },
-    [ROUTES.PROJECT_PROBLEM.substring(
-      0,
-      ROUTES.PROJECT_PROBLEM.indexOf(":ind")
-    )]: {
-      section: 0,
-      component: 1,
-    },
-    [ROUTES.PROJECT_COMPILE]: { section: 1, component: 0 },
-    [ROUTES.PROJECT_SETTINGS]: { section: 2, component: 0 },
-  } as { [url: string]: { section: number; component: number } };
-
-  getCurrent(path: string) {
-    let current: { section: number; component: number } = {
-      section: 0,
-      component: 0,
-    };
-    for (let i = 0; i < Object.keys(this.prefixes).length; i++) {
-      if (
-        path.startsWith(
-          Object.keys(this.prefixes)[i].replace(":uuid", this.props.uuid)
-        )
-      ) {
-        current = this.prefixes[Object.keys(this.prefixes)[i]];
-        break;
-      }
-    }
-    return current;
-  }
-
   render() {
     const { project, editors, uuid, tryProblemAction, authUser } = this.props;
 
@@ -247,35 +220,24 @@ class View extends React.Component<ViewProps, ViewState> {
     //   authUser: authUser,
     // };
 
-    const sectionNames = ["Overview", "Compile", "Settings"];
-    const sectionLinks = [
-      ROUTES.PROJECT_OVERVIEW,
-      ROUTES.PROJECT_COMPILE,
-      ROUTES.PROJECT_SETTINGS,
-    ];
-    const components = [
-      <Overview
-        height={this.state.bodyHeight - this.state.navbarHeight}
-        project={project}
-        uuid={uuid}
-        categoryColors={this.state.categoryColors}
-        difficultyRange={this.state.difficultyRange}
-        editors={editors}
-        problemProps={this.problemProps}
-        tryProblemAction={tryProblemAction}
-        authUser={authUser}
-        setDefaultScroll={this.setDefaultScroll}
-      />,
-      <Details
-        height={this.state.bodyHeight - this.state.navbarHeight}
-        project={project}
-        uuid={uuid}
-        problemProps={this.problemProps}
-        tryProblemAction={tryProblemAction}
-        authUser={authUser}
-        setDefaultScroll={this.setDefaultScroll}
-      />,
-    ];
+    const scrollPastHeader = this.state.scrollTop >= this.state.navbarHeight;
+    const viewableWindowHeight = scrollPastHeader
+      ? this.state.bodyHeight
+      : this.state.bodyHeight - this.state.navbarHeight + this.state.scrollTop;
+
+    console.log(viewableWindowHeight);
+
+    const viewSectionProps = {
+      height: viewableWindowHeight,
+      project,
+      uuid,
+      authUser,
+    };
+
+    const viewSectionWithSidebarProps = {
+      fixedSidebar: scrollPastHeader,
+      sidebarYOffset: -this.state.navbarHeight,
+    };
 
     return (
       <ScrollBase
@@ -287,25 +249,57 @@ class View extends React.Component<ViewProps, ViewState> {
         onBodyHeightChange={this.onBodyHeightChange}
         onScrollTopChange={this.onScrollTopChange}
       >
+        <Navbar uuid={uuid} forwardedRef={this.navbarRef} />
+
         <Switch>
           <Route
             exact
-            render={({ location, match }) => {
-              const current = this.getCurrent(location.pathname);
-              console.log(match);
-              return (
-                <>
-                  <Navbar
-                    uuid={uuid}
-                    currentSection={current.section}
-                    tabNames={sectionNames}
-                    tabLinks={sectionLinks}
-                    forwardedRef={this.navbarRef}
-                  />
-                  {components[current.component]}
-                </>
-              );
-            }}
+            path={[
+              ROUTES.PROJECT_VIEW.replace(":uuid", uuid),
+              ROUTES.PROJECT_OVERVIEW.replace(":uuid", uuid),
+            ]}
+            render={(_) => (
+              <Overview
+                {...viewSectionProps}
+                {...viewSectionWithSidebarProps}
+                categoryColors={this.state.categoryColors}
+                difficultyRange={this.state.difficultyRange}
+                editors={editors}
+                problemProps={this.problemProps}
+                tryProblemAction={tryProblemAction}
+                setDefaultScroll={this.setDefaultScroll}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={[
+              ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid),
+              ROUTES.PROJECT_PROBLEM_REPLY.replace(":uuid", uuid),
+            ]}
+            render={(_) => (
+              <Details
+                {...viewSectionProps}
+                {...viewSectionWithSidebarProps}
+                problemProps={this.problemProps}
+                tryProblemAction={tryProblemAction}
+                setDefaultScroll={this.setDefaultScroll}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={[ROUTES.PROJECT_COMPILE.replace(":uuid", uuid)]}
+            render={(_) => (
+              <Compile
+                {...viewSectionProps}
+                categoryColors={this.state.categoryColors}
+                difficultyRange={this.state.difficultyRange}
+                editors={editors}
+                problemProps={this.problemProps}
+                tryProblemAction={tryProblemAction}
+              />
+            )}
           />
         </Switch>
       </ScrollBase>

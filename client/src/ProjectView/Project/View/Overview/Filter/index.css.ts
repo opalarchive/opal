@@ -5,9 +5,8 @@ const styles = (theme: Theme) =>
   createStyles({
     root: {
       display: "inline-block",
-      height: "100%",
+      height: `calc(100% - ${spacingRem(theme, 2.8)})`,
       paddingTop: spacingRem(theme, 2.8),
-      paddingBottom: spacingRem(theme, 3),
     },
     wrapper: {
       paddingTop: spacingRem(theme, 0.2),

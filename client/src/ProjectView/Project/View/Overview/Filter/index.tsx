@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 import styles from "./index.css";
 import { compose } from "recompose";
-import { SidebarProps } from "../../../../Template/ScrollBase";
+import { SidebarProps } from "../../../../Template/SidebaredBase";
 import { Problem } from "../../../../../../../.shared";
 import {
   FiCheckCircle,
@@ -102,7 +102,6 @@ class Filter extends React.Component<Props> {
       onSortClick,
       classes,
       width,
-      height,
       theme,
     } = this.props;
 
@@ -111,7 +110,7 @@ class Filter extends React.Component<Props> {
     );
 
     return (
-      <div className={classes.root} style={{ width: `${width}rem`, height }}>
+      <div className={classes.root} style={{ width: `${width}rem` }}>
         <Scrollbar>
           <div className={classes.wrapper}>
             <Paper elevation={3} className={classes.paper}>

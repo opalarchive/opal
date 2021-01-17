@@ -1,11 +1,8 @@
 import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
-import { CategoryColors } from "..";
+import { CategoryColors, ViewSectionProps } from "..";
 
-import {
-  ProjectPrivate,
-  Problem as ProblemType,
-} from "../../../../../../.shared";
+import { Problem as ProblemType } from "../../../../../../.shared";
 import {
   ProblemDetails,
   SortDirection,
@@ -16,10 +13,9 @@ import Problem from "../Problem";
 import Filter from "./Filter";
 import styles from "./index.css";
 
-interface OverviewProps extends WithStyles<typeof styles> {
-  height: number;
-  project: ProjectPrivate;
-  uuid: string;
+interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
+  fixedSidebar: boolean;
+  sidebarYOffset: number;
   categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
   editors: string[];
@@ -30,7 +26,6 @@ interface OverviewProps extends WithStyles<typeof styles> {
     authUser: firebase.User
   ) => ProblemDetails;
   tryProblemAction: tryProblemAction;
-  authUser: firebase.User;
   setDefaultScroll: (scroll: number) => void;
 }
 
@@ -262,6 +257,8 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
   render() {
     const {
       height,
+      fixedSidebar,
+      sidebarYOffset,
       project,
       categoryColors,
       editors,
@@ -313,7 +310,8 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
           onClickTag: this.onClickTag,
           onSortClick: this.onSortClick,
         }}
-        stickySidebar
+        fixedSidebar={fixedSidebar}
+        sidebarYOffset={sidebarYOffset}
         height={height}
         authUser={authUser}
       >

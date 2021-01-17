@@ -2,20 +2,19 @@ import React from "react";
 import { FiChevronLeft } from "react-icons/fi";
 import { withStyles, WithStyles } from "@material-ui/core";
 import Problem from "../Problem";
-import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 
 import * as ROUTES from "../../../../Constants/routes";
 import Reply from "./Reply";
 import {
-  ProjectPrivate,
   reply as replyType,
   Problem as ProblemType,
 } from "../../../../../../.shared";
 import styles from "./index.css";
 import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
-import ScrollBase, { ScrollBaseProps } from "../../../Template/ScrollBase";
 import Sidebar from "./Sidebar";
 import SidebaredBase from "../../../Template/SidebaredBase";
+import { ViewSectionProps } from "..";
 
 interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
@@ -115,10 +114,11 @@ interface DetailsMatch {
   reply?: string;
 }
 
-interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
-  height: number;
-  project: ProjectPrivate;
-  uuid: string;
+interface RoutedDetailsProps
+  extends RouteComponentProps<DetailsMatch>,
+    ViewSectionProps {
+  fixedSidebar: boolean;
+  sidebarYOffset: number;
   problemProps: (
     uuid: string,
     prob: ProblemType,
@@ -126,12 +126,13 @@ interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
     authUser: firebase.User
   ) => ProblemDetails;
   tryProblemAction: tryProblemAction;
-  authUser: firebase.User;
   setDefaultScroll: (scroll: number) => void;
 }
 
 const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   height,
+  fixedSidebar,
+  sidebarYOffset,
   project,
   uuid,
   problemProps,
@@ -149,7 +150,8 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
       sidebarWidth={18}
       Sidebar={Sidebar}
       right
-      stickySidebar
+      fixedSidebar={fixedSidebar}
+      sidebarYOffset={sidebarYOffset}
       height={height}
       authUser={authUser}
     >

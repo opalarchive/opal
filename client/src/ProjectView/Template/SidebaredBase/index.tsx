@@ -4,7 +4,6 @@ import styles from "./index.css";
 
 export interface SidebarProps {
   width: number;
-  height: number;
   authUser: firebase.User;
 }
 
@@ -13,7 +12,8 @@ interface SidebaredBaseProps extends WithStyles<typeof styles> {
   right?: boolean;
   Sidebar?: React.ComponentType<any & SidebarProps>;
   sidebarProps?: object;
-  stickySidebar?: boolean;
+  fixedSidebar?: boolean;
+  sidebarYOffset?: number;
   height: number;
   authUser: firebase.User;
 }
@@ -25,7 +25,8 @@ class SidebaredBase extends React.Component<SidebaredBaseProps> {
       right,
       Sidebar,
       sidebarProps,
-      stickySidebar,
+      fixedSidebar,
+      sidebarYOffset,
       height,
       authUser,
       classes,
@@ -45,18 +46,19 @@ class SidebaredBase extends React.Component<SidebaredBaseProps> {
         >
           <div
             className={classes.sidebarWrapper}
-            style={
-              stickySidebar
+            style={{
+              height,
+              ...(fixedSidebar
                 ? {
                     position: "fixed",
+                    transform: `translateY(${sidebarYOffset}px)`,
                   }
-                : {} // basically position: sticky but with ref because sticky doesn't work for some reason
-            }
+                : {}), // basically position: sticky but with ref because sticky doesn't work for some reason
+            }}
           >
             {!!Sidebar && (
               <Sidebar
                 width={sidebarWidth}
-                height={height}
                 authUser={authUser}
                 {...sidebarProps}
               />

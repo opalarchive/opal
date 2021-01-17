@@ -16,28 +16,22 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Paper,
   withStyles,
   WithStyles,
 } from "@material-ui/core";
 import { newProject } from "../../../Firebase";
 import styles from "./index.css";
 import { compose } from "recompose";
-
-interface SidebarBaseProps {
-  width: number;
-  height: number;
-  authUser: firebase.User;
-}
+import { SidebarProps as SidebarPropsBase } from "../../Template/SidebaredBase";
 
 interface SidebarProps
-  extends SidebarBaseProps,
+  extends SidebarPropsBase,
     WithStyles<typeof styles>,
     RouteComponentProps<{}> {}
 
 class Sidebar extends React.Component<SidebarProps> {
   render() {
-    const { width, height, authUser, classes, location, history } = this.props;
+    const { width, authUser, classes, location, history } = this.props;
 
     const navlink = (
       Icon: React.ElementType,
@@ -97,7 +91,7 @@ class Sidebar extends React.Component<SidebarProps> {
     };
 
     return (
-      <div className={classes.root} style={{ width: `${width}rem`, height }}>
+      <div className={classes.root} style={{ width: `${width}rem` }}>
         <List component="nav" aria-label="project selection">
           <ListItem className={`${classes.item} ${classes.buttonWrapper}`}>
             <Button
@@ -146,7 +140,7 @@ class Sidebar extends React.Component<SidebarProps> {
   }
 }
 
-export default compose<SidebarProps, SidebarBaseProps>(
+export default compose<SidebarProps, SidebarPropsBase>(
   withStyles(styles),
   withRouter
 )(Sidebar);
