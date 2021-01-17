@@ -225,8 +225,6 @@ class View extends React.Component<ViewProps, ViewState> {
       ? this.state.bodyHeight
       : this.state.bodyHeight - this.state.navbarHeight + this.state.scrollTop;
 
-    console.log(viewableWindowHeight);
-
     const viewSectionProps = {
       height: viewableWindowHeight,
       project,

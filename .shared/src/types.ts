@@ -120,8 +120,14 @@ export interface Problem {
   votes: Votes;
 }
 
+export interface List {
+  name: string;
+  problems: number[];
+}
+
 export interface ProjectPrivate {
-  problems: Problem[];
+  lists: List[];
+  problems: Problem[]
 }
 
 export enum ProjectActionProtected {

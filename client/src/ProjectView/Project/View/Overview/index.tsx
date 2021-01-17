@@ -1,4 +1,5 @@
-import { withStyles, WithStyles } from "@material-ui/core";
+import { withStyles, WithStyles, AppBar, Toolbar, Menu, MenuItem, ListItemIcon, ListItemText, IconButton } from "@material-ui/core";
+import { ArrowDropDownCircleSharp } from '@material-ui/icons';
 import React from "react";
 import { CategoryColors, ViewSectionProps } from "..";
 
@@ -45,6 +46,8 @@ interface OverviewState {
     dataPoint: "ind" | "difficulty" | "votes";
     direction: SortDirection;
   };
+  listMenuAnchorEl: EventTarget | null;
+  currentList: number;
 }
 
 class Overview extends React.Component<OverviewProps, OverviewState> {
@@ -65,6 +68,8 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
       dataPoint: "ind" | "difficulty" | "votes";
       direction: SortDirection;
     },
+    listMenuAnchorEl: null,
+    currentList: 0,
   };
 
   constructor(props: OverviewProps) {
@@ -77,6 +82,16 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
     this.resetFilter = this.resetFilter.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSortClick = this.onSortClick.bind(this);
+    this.openListMenu = this.openListMenu.bind(this);
+    this.closeListMenu = this.closeListMenu.bind(this);
+  }
+
+  openListMenu(event: React.MouseEvent<HTMLButtonElement>) {
+    this.setState({ listMenuAnchorEl: event.currentTarget });
+  }
+
+  closeListMenu() {
+    this.setState({ listMenuAnchorEl: null });
   }
 
   setFilter(filter: (problem: ProblemType) => boolean) {
@@ -269,13 +284,17 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
       classes,
     } = this.props;
 
+    const { listMenuAnchorEl } = this.state;
+
     const allTags = new Set<string>();
 
-    project.problems.forEach((prob) => {
+    const listProblems = this.state.currentList < 0 ? project.problems : project.lists[this.state.currentList].problems.map((probIndex) => project.problems[probIndex]);
+
+    listProblems.forEach((prob) => {
       prob.tags.forEach((tag) => allTags.add(tag));
     });
 
-    const problems = project.problems
+    const problems = listProblems
       .filter((prob) => this.state.filter(prob))
       .sort((p1, p2) => {
         const w1 = this.state.sortWeight(p1),
@@ -315,6 +334,49 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
         height={height}
         authUser={authUser}
       >
+        <AppBar position="sticky" className={classes.headerWrapper}>
+          <Toolbar>
+            <div className={classes.logo}>
+              <div className={classes.filler} />
+                <IconButton
+                  color="inherit"
+                  onClick={this.openListMenu}
+                  aria-controls="simple-menu"
+                  aria-haspopup="true"
+                >
+                  <ArrowDropDownCircleSharp /> {this.state.currentList < 0 ? "All Problems" : project.lists[this.state.currentList].name}
+                </IconButton>
+                <Menu
+                  id="customized-menu"
+                  anchorEl={listMenuAnchorEl}
+                  keepMounted
+                  open={Boolean(listMenuAnchorEl)}
+                  onClose={this.closeListMenu}
+                  elevation={0}
+                  getContentAnchorEl={null}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                >
+                  {project.lists.map((list, ind) => (
+                    <MenuItem onClick={() => this.setState({ currentList: ind })}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                  <MenuItem onClick={() => this.setState({ currentList: -1 })}>
+                    All Problems
+                  </MenuItem>
+                </Menu>
+              <div className={classes.filler} />
+            </div>
+            <div className={classes.filler} />
+          </Toolbar>
+        </AppBar>
         <div className={classes.root}>
           {problems.map((prob) => (
             <Problem
