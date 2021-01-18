@@ -196,6 +196,18 @@ export const tryProblemAction = async (
   );
 };
 
+export const changeList = async (uuid: string, listSelection: boolean[], problemInd: number, authUser: firebase.User) => {
+  return await post<string>(
+    "private/changeList",
+    {
+      uuid,
+      listSelection,
+      problemInd,
+    },
+    authUser
+  );
+}
+
 export const understandSignupError = (e: string) => {
   switch (e) {
     case "auth/email-already-in-use":
