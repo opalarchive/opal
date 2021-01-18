@@ -68,7 +68,7 @@ const LinkTab: React.FC<
 );
 
 const StyledTab = withStyles(tabStyles)(LinkTab);
-class Navbar extends React.Component<
+class Navbar extends React.PureComponent<
   NavbarProps & RouteComponentProps & WithStyles<typeof styles>
 > {
   render() {

@@ -39,21 +39,14 @@ import Scrollbar from "react-scrollbars-custom";
 import Tag from "../../Ornamentation/Tag";
 import { SortDirection } from "../../../../../Constants/types";
 
-interface FilterProps {
+interface FilterPropsBase {
   setFilter: (filter: (problem: Problem) => boolean) => void;
-  setSortWeight: (sortWeight: (problem: Problem) => number) => void;
-  keyword: string;
-  author: string;
-  difficulty: {
-    start: number;
-    end: number;
-  };
+  setSortWeight: (
+    sortWeight: (problem: Problem) => { p: number; s: number }
+  ) => void;
   difficultyRange: {
     start: number;
     end: number;
-  };
-  category: {
-    [category: string]: boolean;
   };
   categoryColors: CategoryColors;
   editors: string[];
@@ -61,45 +54,226 @@ interface FilterProps {
   clickedTags: {
     [tag: string]: boolean;
   };
+  onClickTag: (tagText: string, callBack?: () => void) => void;
+}
+
+type FilterProps = SidebarProps &
+  FilterPropsBase &
+  WithStyles<typeof styles> &
+  WithTheme;
+
+interface FilterState {
+  keyword: string;
+  author: string;
+  difficulty: { start: number; end: number };
+  category: {
+    [category: string]: boolean;
+  };
+
   sort: {
     dataPoint: "ind" | "difficulty" | "votes";
     direction: SortDirection;
   };
-  resetFilter: () => void;
-  filterUsed: (
+}
+
+class Filter extends React.PureComponent<FilterProps, FilterState> {
+  state = {
+    keyword: "",
+    author: "",
+    difficulty: { start: 0, end: 0 },
+    category: {} as {
+      [category: string]: boolean;
+    },
+    sort: {
+      dataPoint: "ind",
+      direction: "desc",
+    } as {
+      dataPoint: "ind" | "difficulty" | "votes";
+      direction: SortDirection;
+    },
+  };
+
+  constructor(props: FilterProps) {
+    super(props);
+
+    this.filterUsed = this.filterUsed.bind(this);
+    this.resetFilter = this.resetFilter.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onSortClick = this.onSortClick.bind(this);
+  }
+
+  filterUsed(
     type: "keyword" | "author" | "category" | "tag" | "difficulty"
-  ) => boolean;
-  onChange: (
+  ): boolean {
+    switch (type) {
+      case "keyword":
+        return this.state.keyword !== "";
+      case "author":
+        return this.state.author !== "";
+      case "category":
+        return !Object.values(this.state.category).reduce(
+          (a, b) => a && !b,
+          true
+        ); // just cant all be false/undefined
+      case "tag":
+        return !Object.values(this.props.clickedTags).reduce(
+          (a, b) => a && !b,
+          true
+        );
+      case "difficulty":
+        return (
+          this.state.difficulty.start !== this.props.difficultyRange.start ||
+          this.state.difficulty.end !== this.props.difficultyRange.end
+        );
+    }
+  }
+
+  resetFilter() {
+    const { keyword, author, category } = this.state;
+    const { difficultyRange, clickedTags, setFilter } = this.props;
+    const { filterUsed } = this;
+
+    setFilter((problem: Problem) => {
+      if (filterUsed("keyword")) {
+        if (
+          !problem.text
+            .toLocaleLowerCase()
+            .includes(keyword.toLocaleLowerCase()) &&
+          !problem.title
+            .toLocaleLowerCase()
+            .includes(keyword.toLocaleLowerCase())
+        ) {
+          return false;
+        }
+      }
+      if (filterUsed("author")) {
+        if (!problem.author.startsWith(author)) return false;
+      }
+      if (filterUsed("category")) {
+        if (!category[problem.category]) return false;
+      }
+      if (filterUsed("tag")) {
+        let works = false;
+        for (let i = 0; i < problem.tags.length; i++) {
+          if (clickedTags[problem.tags[i]]) {
+            works = true;
+            break;
+          }
+        }
+        if (!works) return false;
+      }
+      if (filterUsed("difficulty")) {
+        if (
+          difficultyRange.start >= problem.difficulty ||
+          problem.difficulty >= difficultyRange.end
+        )
+          return false;
+      }
+      return true;
+    });
+  }
+
+  resetSort() {
+    const { dataPoint, direction } = this.state.sort;
+    const { setSortWeight } = this.props;
+    const sign = direction === "asc" ? 1 : -1;
+
+    setSortWeight((problem: Problem) => {
+      let magnitude = 0;
+      switch (dataPoint) {
+        case "ind":
+          magnitude = problem.ind;
+          break;
+        case "difficulty":
+          magnitude = problem.difficulty;
+          break;
+        case "votes":
+          magnitude =
+            Object.values(problem.votes).length === 0
+              ? 0
+              : (Object.values(problem.votes) as number[]).reduce(
+                  (a, b) => a + b
+                );
+          break;
+      }
+      return { p: sign * magnitude, s: sign * problem.ind };
+    });
+  }
+
+  onChange(
     name: string,
     value: any,
     type: "keyword" | "author" | "category" | "tag" | "difficulty"
-  ) => void;
-  onClickTag: (tagText: string, callBack?: () => void) => void;
-  onSortClick: (
-    e: React.MouseEvent<HTMLButtonElement>,
+  ) {
+    switch (type) {
+      case "keyword":
+        this.setState({ keyword: value as string }, this.resetFilter);
+        break;
+      case "author":
+        this.setState({ author: value as string }, this.resetFilter);
+        break;
+      case "category":
+        this.setState(
+          {
+            category: {
+              ...this.state.category,
+              [name]: !this.state.category[name],
+            },
+          },
+          this.resetFilter
+        );
+        break;
+      case "tag":
+        break;
+      case "difficulty":
+        const difficultyArray = value as number[];
+        this.setState(
+          {
+            difficulty: {
+              start: difficultyArray[0],
+              end: difficultyArray[1],
+            },
+          },
+          this.resetFilter
+        );
+        break;
+    }
+  }
+
+  onSortClick(
+    event: React.MouseEvent<HTMLButtonElement>,
     dataPoint: "ind" | "difficulty" | "votes"
-  ) => void;
-}
+  ) {
+    let sort = { dataPoint: dataPoint, direction: "asc" as SortDirection };
+    if (dataPoint === this.state.sort.dataPoint) {
+      sort = {
+        dataPoint,
+        direction: this.state.sort.direction === "asc" ? "desc" : "asc",
+      };
+    }
+    this.setState({ sort }, this.resetSort);
+  }
 
-type Props = SidebarProps & FilterProps & WithStyles<typeof styles> & WithTheme;
+  componentDidMount() {
+    this.setState({ difficulty: this.props.difficultyRange });
+    this.resetSort(); // nothing should be filtered out at the beginning, but the problems will not be sorted
+  }
 
-class Filter extends React.Component<Props> {
   render() {
+    const { resetFilter, filterUsed, onChange, onSortClick } = this;
     const {
       keyword,
       author,
       category: categorySelected,
       difficulty,
+      sort,
+    } = this.state;
+    const {
       difficultyRange,
       categoryColors,
       allTags,
       clickedTags,
-      sort,
-      resetFilter,
-      filterUsed,
-      onChange,
       onClickTag,
-      onSortClick,
       classes,
       width,
       theme,
@@ -142,6 +316,7 @@ class Filter extends React.Component<Props> {
                     value={keyword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
+                      e.stopPropagation();
 
                       onChange(e.target.name, e.target.value, "keyword");
                     }}
@@ -165,6 +340,7 @@ class Filter extends React.Component<Props> {
                     value={author}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
+                      e.stopPropagation();
 
                       onChange(e.target.name, e.target.value, "author");
                     }}
@@ -196,6 +372,9 @@ class Filter extends React.Component<Props> {
                           e: React.ChangeEvent<{}>,
                           checked: boolean
                         ) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+
                           onChange(category, checked, "category");
                         }}
                         label={
@@ -258,6 +437,9 @@ class Filter extends React.Component<Props> {
                       e: React.ChangeEvent<{}>,
                       value: number | number[]
                     ) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+
                       onChange("difficulty", value, "difficulty");
                     }}
                     min={difficultyRange.start}
@@ -324,7 +506,7 @@ class Filter extends React.Component<Props> {
   }
 }
 
-export default compose<Props, SidebarProps & FilterProps>(
+export default compose<FilterProps, SidebarProps & FilterPropsBase>(
   withStyles(styles),
   withTheme
 )(Filter);

@@ -57,6 +57,16 @@ class ScrollBase extends React.Component<
       this.scrollSet = this.scrollSet + 1;
     }
 
+    // bodge cast to get around what I assume is a typo in @types/react or react-scrollbars-custom
+    // jsx has a default onScroll prop while the custom scrollbar has a custom onScroll prop
+    // with different function parameters, but the type of onScroll is given as
+    // (event: React.UIEvent<HTMLDivElement, UIEvent>) => void) & ((scrollValues: ScrollState, prevScrollState: ScrollState) => void
+    // which is clearly impossible since a function cannot have 2 different numbers of required parameters
+    const onScroll = this.setScroll as ((
+      event: React.UIEvent<HTMLDivElement, UIEvent>
+    ) => void) &
+      ((scrollValues: ScrollState, prevScrollState: ScrollState) => void);
+
     return (
       <div
         className={classes.container}
@@ -67,19 +77,7 @@ class ScrollBase extends React.Component<
           noScrollX
           disableTrackYWidthCompensation
           scrollTop={this.scrollSet > 1 ? undefined : defaultScroll}
-          onScroll={
-            this.setScroll as ((
-              event: React.UIEvent<HTMLDivElement, UIEvent>
-            ) => void) &
-              ((
-                scrollValues: ScrollState,
-                prevScrollState: ScrollState
-              ) => void)
-          } // bodge cast to get around what I assume is a typo in @types/react or react-scrollbars-custom
-          // jsx has a default onScroll prop while the custom scrollbar has a custom onScroll prop
-          // with different function parameters, but the type of onScroll is given as
-          // (event: React.UIEvent<HTMLDivElement, UIEvent>) => void) & ((scrollValues: ScrollState, prevScrollState: ScrollState) => void
-          // which is clearly impossible since a function cannot have 2 different numbers of required parameters
+          onScroll={onScroll}
         >
           <div
             className={`${classes.container} ${classes.centered}`}

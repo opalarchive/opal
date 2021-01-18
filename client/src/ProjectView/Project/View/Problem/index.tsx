@@ -1,6 +1,6 @@
 import React from "react";
 
-import { darken, Paper, WithStyles, withStyles } from "@material-ui/core";
+import { Paper, WithStyles, withStyles } from "@material-ui/core";
 import {
   FiAlignLeft,
   FiArrowDown,
@@ -25,7 +25,7 @@ interface ProblemProps extends ProblemDetails {
   onClickTag?: (tagText: string) => void;
 }
 
-class Problem extends React.Component<
+class Problem extends React.PureComponent<
   ProblemProps & WithStyles<typeof styles>
 > {
   render() {
