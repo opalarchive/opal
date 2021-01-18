@@ -84,7 +84,7 @@ class Problem extends React.PureComponent<
           </div>
         </div>
         <div className={classes.body}>
-          <div className={classes.bodyTitle}>{title}</div>
+          <div className={classes.bodyTitle}><Link to={`${ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}/p${ind}`}>{title}</Link></div>
           <div className={classes.bodyAuthor}>Proposed by {author}</div>
           <div className={classes.bodyText}>
             <Latex>{text}</Latex>

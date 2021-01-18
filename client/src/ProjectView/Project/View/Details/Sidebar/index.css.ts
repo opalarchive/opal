@@ -13,6 +13,30 @@ const styles = (theme: Theme) =>
       paddingLeft: spacingRem(theme, 1.5),
       paddingRight: spacingRem(theme, 3),
     },
+    paper: {
+      marginBottom: spacingRem(theme, 3),
+      paddingBottom: spacingRem(theme, 1.5),
+    },
+    title: {
+      fontSize: spacingRem(theme, 2.5),
+      padding: `${spacingRem(theme, 2)} ${spacingRem(theme, 2)} 0 ${spacingRem(
+        theme,
+        2
+      )}`,
+    },
+    divider: { marginTop: `${spacingRem(theme, 1)}` },
+    accordion: {
+      "&:before": { opacity: 0 },
+      margin: "0 !important",
+    },
+    accordionDetails: {
+      paddingTop: 0,
+      display: "flex",
+      flexDirection: "column",
+    },
+    formControl: {
+      margin: theme.spacing(3),
+    },
   });
 
 export default styles;

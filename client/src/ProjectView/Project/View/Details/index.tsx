@@ -143,13 +143,17 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
-  console.log(match.params);
 
   return (
     <SidebaredBase
       sidebarWidth={18}
       Sidebar={Sidebar}
       right
+      sidebarProps={{
+        project,
+        uuid,
+        ind
+      }}
       fixedSidebar={fixedSidebar}
       sidebarYOffset={sidebarYOffset}
       height={height}
