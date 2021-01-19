@@ -7,15 +7,31 @@ import styles from "./index.css";
 export interface ScrollBaseProps {
   maxWidth?: number;
   background: string;
-  defaultScroll?: number;
+  customScrollTop?: number;
   onScrollTopChange?: (scrollTop: number) => void;
   onBodyHeightChange?: (height: number) => void;
 }
+// const relevantProps: (keyof ScrollBaseProps)[] = [
+//   "maxWidth",
+//   "background",
+//   "customScrollTop",
+// ];
 
 class ScrollBase extends React.Component<
   ScrollBaseProps & WithStyles<typeof styles>
 > {
-  private scrollSet = 0;
+  // shouldComponentUpdate(nextProps: ScrollBaseProps) {
+  //   for (let i = 0; i < relevantProps.length; i++) {
+  //     if (
+  //       JSON.stringify(nextProps[relevantProps[i]]) !==
+  //       JSON.stringify(this.props[relevantProps[i]])
+  //     ) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+
   private body = React.createRef<HTMLDivElement>();
 
   constructor(props: ScrollBaseProps & WithStyles<typeof styles>) {
@@ -48,14 +64,10 @@ class ScrollBase extends React.Component<
     const {
       maxWidth,
       background,
-      defaultScroll,
+      customScrollTop,
       children,
       classes,
     } = this.props;
-
-    if (defaultScroll !== undefined) {
-      this.scrollSet = this.scrollSet + 1;
-    }
 
     // bodge cast to get around what I assume is a typo in @types/react or react-scrollbars-custom
     // jsx has a default onScroll prop while the custom scrollbar has a custom onScroll prop
@@ -76,7 +88,7 @@ class ScrollBase extends React.Component<
         <Scrollbar
           noScrollX
           disableTrackYWidthCompensation
-          scrollTop={this.scrollSet > 1 ? undefined : defaultScroll}
+          scrollTop={customScrollTop}
           onScroll={onScroll}
         >
           <div

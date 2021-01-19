@@ -34,9 +34,6 @@ const styles = (theme: Theme) =>
       display: "flex",
       flexDirection: "column",
     },
-    formControl: {
-      margin: theme.spacing(3),
-    },
     tagContainer: {
       lineHeight: "200%",
     },

@@ -196,7 +196,12 @@ export const tryProblemAction = async (
   );
 };
 
-export const changeList = async (uuid: string, listSelection: boolean[], problemInd: number, authUser: firebase.User) => {
+export const changeList = async (
+  uuid: string,
+  listSelection: boolean[],
+  problemInd: number,
+  authUser: firebase.User
+) => {
   return await post<string>(
     "private/changeList",
     {
@@ -206,7 +211,7 @@ export const changeList = async (uuid: string, listSelection: boolean[], problem
     },
     authUser
   );
-}
+};
 
 export const changeTags = async (uuid: string, clickedTags: object, problemInd: number, authUser: firebase.User) => {
   return await post<string>(

@@ -25,6 +25,10 @@ const styles = (theme: Theme) =>
       )}`,
     },
     divider: { marginTop: `${spacingRem(theme, 1)}` },
+    valueDescriptor: {
+      color: "rgba(0, 0, 0, 0.69)",
+      paddingRight: spacingRem(theme, 1),
+    },
     accordion: {
       "&:before": { opacity: 0 },
       margin: "0 !important",

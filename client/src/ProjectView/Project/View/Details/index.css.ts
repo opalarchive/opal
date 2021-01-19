@@ -26,8 +26,8 @@ const styles = (theme: Theme) =>
     },
     topIcon: {
       position: "relative",
-      top: "0.12em",
-      marginRight: "0.25em",
+      top: "0.32rem",
+      marginRight: "0.25rem",
     },
     topFiller: {
       flexGrow: 1,

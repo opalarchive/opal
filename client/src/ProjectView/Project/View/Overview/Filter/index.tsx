@@ -7,10 +7,14 @@ import {
   Checkbox,
   Divider,
   FormControlLabel,
+  IconButton,
+  Menu,
+  MenuItem,
   Paper,
   Slider,
   TableSortLabel,
   TextField,
+  Typography,
   withStyles,
   WithStyles,
   withTheme,
@@ -19,13 +23,14 @@ import {
 import styles from "./index.css";
 import { compose } from "recompose";
 import { SidebarProps } from "../../../../Template/SidebaredBase";
-import { Problem } from "../../../../../../../.shared";
+import { List, Problem } from "../../../../../../../.shared";
 import {
   FiCheckCircle,
   FiChevronDown,
   FiArrowDown,
   FiCircle,
   FiFilter,
+  FiList,
 } from "react-icons/fi";
 import { HiOutlineSortDescending } from "react-icons/hi";
 import Dot from "../../Ornamentation/Dot";
@@ -55,6 +60,9 @@ interface FilterPropsBase {
     [tag: string]: boolean;
   };
   onClickTag: (tagText: string, callBack?: () => void) => void;
+  lists: List[];
+  currentList: number;
+  setCurrentList: (list: number) => void;
 }
 
 type FilterProps = SidebarProps &
@@ -69,11 +77,11 @@ interface FilterState {
   category: {
     [category: string]: boolean;
   };
-
   sort: {
     dataPoint: "ind" | "difficulty" | "votes";
     direction: SortDirection;
   };
+  listMenuAnchorEl: EventTarget | null;
 }
 
 class Filter extends React.PureComponent<FilterProps, FilterState> {
@@ -91,6 +99,7 @@ class Filter extends React.PureComponent<FilterProps, FilterState> {
       dataPoint: "ind" | "difficulty" | "votes";
       direction: SortDirection;
     },
+    listMenuAnchorEl: null,
   };
 
   constructor(props: FilterProps) {
@@ -100,6 +109,16 @@ class Filter extends React.PureComponent<FilterProps, FilterState> {
     this.resetFilter = this.resetFilter.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSortClick = this.onSortClick.bind(this);
+    this.openListMenu = this.openListMenu.bind(this);
+    this.closeListMenu = this.closeListMenu.bind(this);
+  }
+
+  openListMenu(event: React.MouseEvent<HTMLButtonElement>) {
+    this.setState({ listMenuAnchorEl: event.currentTarget });
+  }
+
+  closeListMenu() {
+    this.setState({ listMenuAnchorEl: null });
   }
 
   filterUsed(
@@ -267,6 +286,7 @@ class Filter extends React.PureComponent<FilterProps, FilterState> {
       category: categorySelected,
       difficulty,
       sort,
+      listMenuAnchorEl,
     } = this.state;
     const {
       difficultyRange,
@@ -274,6 +294,9 @@ class Filter extends React.PureComponent<FilterProps, FilterState> {
       allTags,
       clickedTags,
       onClickTag,
+      lists,
+      currentList,
+      setCurrentList,
       classes,
       width,
       theme,
@@ -287,6 +310,72 @@ class Filter extends React.PureComponent<FilterProps, FilterState> {
       <div className={classes.root} style={{ width: `${width}rem` }}>
         <Scrollbar>
           <div className={classes.wrapper}>
+            <Paper elevation={3} className={classes.paper}>
+              <div className={classes.title}>
+                Lists
+                <FiList
+                  style={{
+                    position: "relative",
+                    top: "0.25rem",
+                    marginLeft: "0.4rem",
+                  }}
+                />
+                <Divider className={classes.divider} />
+              </div>
+              {/* we just need to match the mui styles */}
+              <div className="MuiAccordionSummary-root">
+                <div style={{ margin: "12px 0" }}>
+                  <span className={classes.valueDescriptor}>Current:</span>
+                  {currentList < 0 ? "All Problems" : lists[currentList].name}
+                </div>
+                <IconButton
+                  color="inherit"
+                  onClick={this.openListMenu}
+                  aria-controls="list-select-menu"
+                  aria-haspopup="true"
+                  edge="end"
+                >
+                  <FiChevronDown />
+                </IconButton>
+              </div>
+              <Menu
+                id="list-select-menu"
+                anchorEl={listMenuAnchorEl}
+                keepMounted
+                open={!!listMenuAnchorEl}
+                onClose={this.closeListMenu}
+                elevation={3}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+              >
+                {lists.map((list, ind) => (
+                  <MenuItem
+                    key={`list-${ind}`}
+                    onClick={(_) => {
+                      setCurrentList(ind);
+                      this.setState({ listMenuAnchorEl: null });
+                    }}
+                  >
+                    {list.name}
+                  </MenuItem>
+                ))}
+                <MenuItem
+                  onClick={(_) => {
+                    setCurrentList(-1);
+                    this.setState({ listMenuAnchorEl: null });
+                  }}
+                >
+                  All Problems
+                </MenuItem>
+              </Menu>
+            </Paper>
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
                 Filter

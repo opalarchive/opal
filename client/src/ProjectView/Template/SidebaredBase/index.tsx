@@ -18,27 +18,27 @@ interface SidebaredBaseProps extends WithStyles<typeof styles> {
   authUser: firebase.User;
 }
 
-const relevantProps: (keyof SidebaredBaseProps)[] = [
-  "sidebarWidth",
-  "right",
-  "sidebarProps",
-  "fixedSidebar",
-  "sidebarYOffset",
-  "height",
-];
+// const relevantProps: (keyof SidebaredBaseProps)[] = [
+//   "sidebarWidth",
+//   "right",
+//   "sidebarProps",
+//   "fixedSidebar",
+//   "sidebarYOffset",
+//   "height",
+// ];
 
 class SidebaredBase extends React.Component<SidebaredBaseProps> {
-  shouldComponentUpdate(nextProps: SidebaredBaseProps) {
-    for (let i = 0; i < relevantProps.length; i++) {
-      if (
-        JSON.stringify(nextProps[relevantProps[i]]) !==
-        JSON.stringify(this.props[relevantProps[i]])
-      ) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // shouldComponentUpdate(nextProps: SidebaredBaseProps) {
+  //   for (let i = 0; i < relevantProps.length; i++) {
+  //     if (
+  //       JSON.stringify(nextProps[relevantProps[i]]) !==
+  //       JSON.stringify(this.props[relevantProps[i]])
+  //     ) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   render() {
     const {

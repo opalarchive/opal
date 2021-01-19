@@ -84,7 +84,21 @@ class Problem extends React.PureComponent<
           </div>
         </div>
         <div className={classes.body}>
-          <div className={classes.bodyTitle}><Link to={`${ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}/p${ind}`}>{title}</Link></div>
+          <div className={classes.bodyTitle}>
+            {repliable ? (
+              <Link
+                className={classes.link}
+                to={ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(
+                  ":ind",
+                  "" + ind
+                )}
+              >
+                {title}
+              </Link>
+            ) : (
+              title
+            )}
+          </div>
           <div className={classes.bodyAuthor}>Proposed by {author}</div>
           <div className={classes.bodyText}>
             <Latex>{text}</Latex>
@@ -106,8 +120,11 @@ class Problem extends React.PureComponent<
           {repliable ? (
             <div className={classes.bodyReply}>
               <Link
-                className={classes.bodyReplyLink}
-                to={`${ROUTES.PROJECT_VIEW.replace(":uuid", uuid)}/p${ind}`}
+                className={classes.link}
+                to={ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(
+                  ":ind",
+                  "" + ind
+                )}
               >
                 <FiCornerDownRight className={classes.icon} />
                 Reply

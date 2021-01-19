@@ -1,5 +1,10 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import {
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter,
+} from "react-router-dom";
 import ScrollBase from "../../Template/ScrollBase";
 
 import * as ROUTES from "../../../Constants/routes";
@@ -63,7 +68,7 @@ interface ViewState {
   navbarHeight: number;
 }
 
-class View extends React.Component<ViewProps, ViewState> {
+class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   state = {
     categoryColors: {
       algebra: [241, 37, 30],
@@ -90,7 +95,7 @@ class View extends React.Component<ViewProps, ViewState> {
   private scrollSet = 0;
   private navbarRef = React.createRef<HTMLDivElement>();
 
-  constructor(props: ViewProps) {
+  constructor(props: ViewProps & RouteComponentProps) {
     super(props);
 
     this.getCategoryColor = this.getCategoryColor.bind(this);
@@ -134,13 +139,13 @@ class View extends React.Component<ViewProps, ViewState> {
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
   ): ProblemDetails {
-    const replyTypes = Object.fromEntries(
+    const types = Object.fromEntries(
       Object.keys(ReplyType).map((replyType) => [replyType, 0])
     ) as replyTypes;
 
     if (!!prob.replies) {
       prob.replies.forEach((reply) => {
-        replyTypes[reply.type]++;
+        types[reply.type]++;
       });
     }
 
@@ -167,9 +172,9 @@ class View extends React.Component<ViewProps, ViewState> {
         Object.values(prob.votes).length === 0
           ? 0
           : prob.votes[authUser.displayName!],
-      tryProblemAction: (data: data, type: problemAction) =>
-        tryProblemAction(prob.ind, data, type),
-      replyTypes,
+      tryProblemAction: (problemActionData: data, type: problemAction) =>
+        tryProblemAction(prob.ind, problemActionData, type),
+      replyTypes: types,
       authUser: authUser,
     };
   }
@@ -177,6 +182,12 @@ class View extends React.Component<ViewProps, ViewState> {
   setDefaultScroll(defaultScroll: number) {
     if (this.scrollSet === 0) {
       this.setState({ defaultScroll });
+    }
+  }
+
+  componentDidUpdate(prevProps: ViewProps & RouteComponentProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this.scrollSet = 0;
     }
   }
 
@@ -207,7 +218,7 @@ class View extends React.Component<ViewProps, ViewState> {
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
     // don't set the scroll again if you've already done it once
-    if (!!this.state.defaultScroll) {
+    if (!!this.state.defaultScroll || this.state.defaultScroll === 0) {
       this.scrollSet++;
     }
 
@@ -241,7 +252,7 @@ class View extends React.Component<ViewProps, ViewState> {
       <ScrollBase
         maxWidth={1320}
         background={loadBackground}
-        defaultScroll={
+        customScrollTop={
           this.scrollSet > 1 ? undefined : this.state.defaultScroll
         }
         onBodyHeightChange={this.onBodyHeightChange}
@@ -305,4 +316,4 @@ class View extends React.Component<ViewProps, ViewState> {
   }
 }
 
-export default View;
+export default withRouter(View);

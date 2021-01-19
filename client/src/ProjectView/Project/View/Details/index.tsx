@@ -23,6 +23,10 @@ interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
 }
 
 class Details extends React.Component<DetailProps> {
+  shouldComponentUpdate(nextProps: DetailProps) {
+    return JSON.stringify(this.props) !== JSON.stringify(nextProps);
+  }
+
   private top = React.createRef<HTMLDivElement>();
   private prob = React.createRef<HTMLDivElement>();
   private commentRefs = [...Array(this.props.replies.length).keys()].map((_) =>
@@ -58,6 +62,7 @@ class Details extends React.Component<DetailProps> {
 
   render() {
     const { classes, replies, reply: replyNumber, ...otherProps } = this.props;
+    console.log("i");
 
     return (
       <div className={classes.root}>
@@ -157,7 +162,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
         project,
         uuid,
         ind,
-        allTags
+        allTags,
       }}
       fixedSidebar={fixedSidebar}
       sidebarYOffset={sidebarYOffset}

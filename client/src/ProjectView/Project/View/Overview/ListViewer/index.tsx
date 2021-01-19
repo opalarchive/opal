@@ -1,9 +1,5 @@
 import React from "react";
-import { CategoryColors } from "../..";
-import {
-  Problem as ProblemType,
-  ProjectPrivate,
-} from "../../../../../../../.shared";
+import { Problem as ProblemType } from "../../../../../../../.shared";
 import {
   ProblemDetails,
   tryProblemAction,
@@ -11,8 +7,7 @@ import {
 import Problem from "../../Problem";
 
 interface ListViewerProps {
-  problems: ProblemType[];
-  problemInds: number[];
+  problemList: ProblemType[];
   uuid: string;
   authUser: firebase.User;
   problemProps: (
@@ -33,8 +28,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
 
   render() {
     const {
-      problems,
-      problemInds,
+      problemList,
       problemProps,
       uuid,
       tryProblemAction,
@@ -42,10 +36,11 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       onClickTag,
       authUser,
     } = this.props;
-    return problemInds.map((ind) => (
+
+    return problemList.map((prob) => (
       <Problem
-        key={`problem-${ind}`}
-        {...problemProps(uuid, problems[ind], tryProblemAction, authUser)}
+        key={`problem-${prob.ind}`}
+        {...problemProps(uuid, prob, tryProblemAction, authUser)}
         repliable
         clickedTags={clickedTags}
         onClickTag={onClickTag}

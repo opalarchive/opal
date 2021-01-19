@@ -1,13 +1,4 @@
-import {
-  withStyles,
-  WithStyles,
-  AppBar,
-  Toolbar,
-  Menu,
-  MenuItem,
-  IconButton,
-} from "@material-ui/core";
-import { ArrowDropDownCircleSharp } from "@material-ui/icons";
+import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { CategoryColors, ViewSectionProps } from "..";
 
@@ -35,59 +26,46 @@ interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
 }
 
 interface OverviewState {
-  // filter: (problem: ProblemType) => boolean;
-  // sortWeight: (problem: ProblemType) => { p: number, s: number }; // sorting by weight from least to greatest without fallback number
+  filter: (problem: ProblemType) => boolean;
+  sortWeight: (problem: ProblemType) => { p: number; s: number }; // sorting by weight from least to greatest without fallback number
   clickedTags: {
     [tag: string]: boolean;
   };
-  listMenuAnchorEl: EventTarget | null;
   currentList: number;
-  problemList: number[];
 }
 
 class Overview extends React.PureComponent<OverviewProps, OverviewState> {
-  private filter = (problem: ProblemType) => true;
-  private sortWeight: (problem: ProblemType) => { p: number; s: number } = (
-    problem: ProblemType
-  ) => ({ p: problem.ind, s: problem.ind });
-
   state = {
-    // filter: (problem: ProblemType) => true,
-    // sortWeight: (problem: ProblemType) => problem.ind,
+    filter: (problem: ProblemType) => true,
+    sortWeight: (problem: ProblemType) => ({
+      p: -problem.ind,
+      s: problem.ind,
+    }),
     clickedTags: {} as { [tag: string]: boolean },
-    listMenuAnchorEl: null,
     currentList: -1,
-    problemList: [],
   };
 
   constructor(props: OverviewProps) {
     super(props);
 
+    this.setCurrentList = this.setCurrentList.bind(this);
     this.setFilter = this.setFilter.bind(this);
     this.setSortWeight = this.setSortWeight.bind(this);
     this.onClickTag = this.onClickTag.bind(this);
-    this.openListMenu = this.openListMenu.bind(this);
-    this.closeListMenu = this.closeListMenu.bind(this);
   }
 
-  openListMenu(event: React.MouseEvent<HTMLButtonElement>) {
-    this.setState({ listMenuAnchorEl: event.currentTarget });
-  }
-
-  closeListMenu() {
-    this.setState({ listMenuAnchorEl: null });
+  setCurrentList(list: number) {
+    this.setState({ currentList: list });
   }
 
   setFilter(filter: (problem: ProblemType) => boolean) {
-    this.filter = filter;
-    this.resetProblemIndexList();
+    this.setState({ filter });
   }
 
   setSortWeight(
     sortWeight: (problem: ProblemType) => { p: number; s: number }
   ) {
-    this.sortWeight = sortWeight;
-    this.resetProblemIndexList();
+    this.setState({ sortWeight });
   }
 
   onClickTag(tagText: string) {
@@ -97,34 +75,6 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
         [tagText]: !this.state.clickedTags[tagText],
       },
     });
-  }
-
-  getProblemIndexList() {
-    const {
-      project: { problems, lists },
-    } = this.props;
-
-    return [...Array(problems.length).keys()]
-      .filter(
-        (ind) =>
-          this.filter(problems[ind]) &&
-          (this.state.currentList < 0 ||
-            lists[this.state.currentList].problems.includes(ind))
-      )
-      .sort((ind1, ind2) => {
-        const w1 = this.sortWeight(problems[ind1]),
-          w2 = this.sortWeight(problems[ind2]);
-        if (w1.p === w2.p) return w1.s - w2.s;
-        return w1.p - w2.p;
-      });
-  }
-
-  resetProblemIndexList() {
-    this.setState({ problemList: this.getProblemIndexList() });
-  }
-
-  componentDidMount() {
-    this.resetProblemIndexList();
   }
 
   render() {
@@ -142,8 +92,6 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
       classes,
     } = this.props;
 
-    const { listMenuAnchorEl } = this.state;
-
     const allTags = new Set<string>();
 
     const listProblems =
@@ -152,6 +100,15 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
         : project.lists[this.state.currentList].problems.map(
             (probIndex) => project.problems[probIndex]
           );
+
+    const problemList = listProblems
+      .filter((prob) => this.state.filter(prob))
+      .sort((p1, p2) => {
+        const w1 = this.state.sortWeight(p1),
+          w2 = this.state.sortWeight(p2);
+        if (w1.p === w2.p) return w1.s - w2.s;
+        return w1.p - w2.p;
+      });
 
     listProblems.forEach((prob) => {
       prob.tags.forEach((tag) => allTags.add(tag));
@@ -170,65 +127,18 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
           allTags,
           clickedTags: this.state.clickedTags,
           onClickTag: this.onClickTag,
+          lists: project.lists,
+          currentList: this.state.currentList,
+          setCurrentList: this.setCurrentList,
         }}
         fixedSidebar={fixedSidebar}
         sidebarYOffset={sidebarYOffset}
         height={height}
         authUser={authUser}
       >
-        <AppBar position="sticky" className={classes.headerWrapper}>
-          <Toolbar>
-            <div className={classes.logo}>
-              <div className={classes.filler} />
-              <IconButton
-                color="inherit"
-                onClick={this.openListMenu}
-                aria-controls="simple-menu"
-                aria-haspopup="true"
-              >
-                <ArrowDropDownCircleSharp />{" "}
-                {this.state.currentList < 0
-                  ? "All Problems"
-                  : project.lists[this.state.currentList].name}
-              </IconButton>
-              <Menu
-                id="customized-menu"
-                anchorEl={listMenuAnchorEl}
-                keepMounted
-                open={Boolean(listMenuAnchorEl)}
-                onClose={this.closeListMenu}
-                elevation={0}
-                getContentAnchorEl={null}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "center",
-                }}
-              >
-                {project.lists.map((list, ind) => (
-                  <MenuItem
-                    key={`list-${ind}`}
-                    onClick={() => this.setState({ currentList: ind })}
-                  >
-                    {list.name}
-                  </MenuItem>
-                ))}
-                <MenuItem onClick={() => this.setState({ currentList: -1 })}>
-                  All Problems
-                </MenuItem>
-              </Menu>
-              <div className={classes.filler} />
-            </div>
-            <div className={classes.filler} />
-          </Toolbar>
-        </AppBar>
         <div className={classes.root}>
           <ListViewer
-            problems={project.problems}
-            problemInds={this.state.problemList}
+            problemList={problemList}
             uuid={uuid}
             authUser={authUser}
             problemProps={problemProps}

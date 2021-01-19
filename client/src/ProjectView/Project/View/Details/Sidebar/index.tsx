@@ -4,33 +4,23 @@ import {
   Paper,
   withStyles,
   WithStyles,
-  withTheme,
-  WithTheme,
   Divider,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   FormControl,
-  FormLabel,
   Checkbox,
   FormGroup,
   FormControlLabel,
-  FormHelperText,
   Button,
-  TextField
+  TextField,
 } from "@material-ui/core";
-import { amber } from "@material-ui/core/colors";
-import {
-  FiList,
-  FiChevronDown,
-  FiTag
-} from "react-icons/fi";
+import { FiList, FiChevronDown, FiTag } from "react-icons/fi";
 import styles from "./index.css";
-import { compose } from "recompose";
 import { SidebarProps } from "../../../../Template/SidebaredBase";
 import { ProjectPrivate } from "../../../../../../../.shared";
 import { changeList, changeTags, newTag } from "../../../../../Firebase";
-import Tag from "../../Ornamentation/Tag"
+import Tag from "../../Ornamentation/Tag";
 import Scrollbar from "react-scrollbars-custom";
 
 interface SidebarListProps {
@@ -40,7 +30,7 @@ interface SidebarListProps {
   allTags: Set<string>;
 }
 
-type Props = SidebarProps & SidebarListProps & WithStyles<typeof styles> & WithTheme;
+type Props = SidebarProps & SidebarListProps & WithStyles<typeof styles>;
 
 interface State {
   changingList: boolean;
@@ -67,7 +57,7 @@ class Sidebar extends React.Component<Props, State> {
     originalClickedTags: {} as { [tag: string]: boolean },
     clickedTags: {} as { [tag: string]: boolean },
     canChangeTags: false,
-  }
+  };
 
   constructor(props: Props) {
     super(props);
@@ -83,7 +73,7 @@ class Sidebar extends React.Component<Props, State> {
   componentDidMount() {
     let listSelection = [];
     const lists = this.props.project.lists;
-    for (let i=0; i<this.props.project.lists.length; i++) {
+    for (let i = 0; i < this.props.project.lists.length; i++) {
       if (lists[i].problems.includes(this.props.ind)) {
         listSelection.push(true);
       } else {
@@ -93,17 +83,27 @@ class Sidebar extends React.Component<Props, State> {
 
     let clickedTags = {} as { [tag: string]: boolean };
     [...this.props.allTags].forEach((tag: string) => {
-      clickedTags[tag] = this.props.project.problems[this.props.ind].tags.includes(tag);
+      clickedTags[tag] = this.props.project.problems[
+        this.props.ind
+      ].tags.includes(tag);
     });
 
-    this.setState({ originalListSelection: [...listSelection], listSelection, originalClickedTags: { ...clickedTags }, clickedTags });
+    this.setState({
+      originalListSelection: [...listSelection],
+      listSelection,
+      originalClickedTags: { ...clickedTags },
+      clickedTags,
+    });
   }
 
-  onChangeListSelection(e: React.ChangeEvent<HTMLInputElement>, listInd: number) {
+  onChangeListSelection(
+    e: React.ChangeEvent<HTMLInputElement>,
+    listInd: number
+  ) {
     const listSelection = this.state.listSelection;
     listSelection[listInd] = !listSelection[listInd];
     let canChangeList = false;
-    for (let i=0; i<listSelection.length; i++) {
+    for (let i = 0; i < listSelection.length; i++) {
       if (listSelection[i] != this.state.originalListSelection[i]) {
         canChangeList = true;
         break;
@@ -114,7 +114,10 @@ class Sidebar extends React.Component<Props, State> {
 
   onChangeNewTag(e: React.ChangeEvent<HTMLInputElement>) {
     let canNewTag = true;
-    if ([...this.props.allTags].includes(e.target.value) || e.target.value == "") {
+    if (
+      [...this.props.allTags].includes(e.target.value) ||
+      e.target.value == ""
+    ) {
       canNewTag = false;
     }
     this.setState({ newTag: e.target.value, canNewTag });
@@ -134,25 +137,56 @@ class Sidebar extends React.Component<Props, State> {
   }
 
   async changeList() {
-    this.setState({ changingList: true, originalListSelection: [...this.state.listSelection], canChangeList: false });
-    await changeList(this.props.uuid, this.state.listSelection, this.props.ind, this.props.authUser);
+    this.setState({
+      changingList: true,
+      originalListSelection: [...this.state.listSelection],
+      canChangeList: false,
+    });
+    await changeList(
+      this.props.uuid,
+      this.state.listSelection,
+      this.props.ind,
+      this.props.authUser
+    );
     this.setState({ changingList: false });
   }
 
   async changeTags() {
-    this.setState({ changingTags: true, originalClickedTags: { ...this.state.clickedTags }, canChangeTags: false });
-    await changeTags(this.props.uuid, this.state.clickedTags, this.props.ind, this.props.authUser);
+    this.setState({
+      changingTags: true,
+      originalClickedTags: { ...this.state.clickedTags },
+      canChangeTags: false,
+    });
+    await changeTags(
+      this.props.uuid,
+      this.state.clickedTags,
+      this.props.ind,
+      this.props.authUser
+    );
     this.setState({ changingTags: false });
   }
 
   async newTag() {
     this.setState({ changingTags: true, canNewTag: false });
-    await newTag(this.props.uuid, this.state.newTag, this.props.ind, this.props.authUser);
+    await newTag(
+      this.props.uuid,
+      this.state.newTag,
+      this.props.ind,
+      this.props.authUser
+    );
     this.setState({ changingTags: false });
   }
 
   render() {
-    const { classes, width, authUser, theme, project, ind, uuid, allTags } = this.props;
+    const {
+      classes,
+      width,
+      authUser,
+      project,
+      ind,
+      uuid,
+      allTags,
+    } = this.props;
     return (
       <div className={classes.root} style={{ width: `${width}rem` }}>
         <Scrollbar>
@@ -178,13 +212,21 @@ class Sidebar extends React.Component<Props, State> {
                   Change Lists
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
-                  <FormControl component="fieldset" className={classes.formControl}>
+                  <FormControl component="fieldset">
                     <FormGroup>
                       {project.lists.map((list, listInd) => (
                         <FormControlLabel
-                          control={<Checkbox onChange={(e) => this.onChangeListSelection(e, listInd)} name={list.name} />}
+                          key={`list-${listInd}`}
+                          control={
+                            <Checkbox
+                              onChange={(e) =>
+                                this.onChangeListSelection(e, listInd)
+                              }
+                              checked={!!this.state.listSelection[listInd]}
+                              name={list.name}
+                            />
+                          }
                           label={list.name}
-                          checked={this.state.listSelection[listInd]}
                         />
                       ))}
                     </FormGroup>
@@ -193,13 +235,18 @@ class Sidebar extends React.Component<Props, State> {
                         changing...
                       </Button>
                     ) : (
-                      <Button variant="contained" color="primary" disabled={!this.state.canChangeList} onClick={() => this.changeList()}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={!this.state.canChangeList}
+                        onClick={() => this.changeList()}
+                      >
                         change
                       </Button>
                     )}
                   </FormControl>
                 </AccordionDetails>
-              </Accordion>          
+              </Accordion>
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
@@ -233,7 +280,12 @@ class Sidebar extends React.Component<Props, State> {
                       changing...
                     </Button>
                   ) : (
-                    <Button variant="contained" color="primary" disabled={!this.state.canChangeTags} onClick={() => this.changeTags()}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      disabled={!this.state.canChangeTags}
+                      onClick={() => this.changeTags()}
+                    >
                       change
                     </Button>
                   )}
@@ -265,7 +317,12 @@ class Sidebar extends React.Component<Props, State> {
                       adding...
                     </Button>
                   ) : (
-                    <Button variant="contained" color="primary" disabled={!this.state.canNewTag} onClick={() => this.newTag()}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      disabled={!this.state.canNewTag}
+                      onClick={() => this.newTag()}
+                    >
                       add
                     </Button>
                   )}
@@ -279,10 +336,4 @@ class Sidebar extends React.Component<Props, State> {
   }
 }
 
-export default compose<
-  SidebarProps & SidebarListProps & WithStyles<typeof styles> & WithTheme,
-  SidebarProps
->(
-  withStyles(styles),
-  withTheme
-)(Sidebar);
+export default withStyles(styles)(Sidebar);
