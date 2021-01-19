@@ -143,6 +143,10 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
+  const allTags = new Set<string>();
+  project.problems.forEach((prob) => {
+    prob.tags.forEach((tag) => allTags.add(tag));
+  });
 
   return (
     <SidebaredBase
@@ -152,7 +156,8 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
       sidebarProps={{
         project,
         uuid,
-        ind
+        ind,
+        allTags
       }}
       fixedSidebar={fixedSidebar}
       sidebarYOffset={sidebarYOffset}

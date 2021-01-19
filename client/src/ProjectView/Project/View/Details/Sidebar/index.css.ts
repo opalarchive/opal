@@ -37,6 +37,9 @@ const styles = (theme: Theme) =>
     formControl: {
       margin: theme.spacing(3),
     },
+    tagContainer: {
+      lineHeight: "200%",
+    },
   });
 
 export default styles;

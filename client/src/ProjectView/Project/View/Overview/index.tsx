@@ -156,7 +156,6 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
     listProblems.forEach((prob) => {
       prob.tags.forEach((tag) => allTags.add(tag));
     });
-    console.log(this.state.currentList);
 
     return (
       <SidebaredBase
