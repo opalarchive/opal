@@ -14,7 +14,6 @@ import {
   Slider,
   TableSortLabel,
   TextField,
-  Typography,
   withStyles,
   WithStyles,
   withTheme,
@@ -84,7 +83,17 @@ interface FilterState {
   listMenuAnchorEl: EventTarget | null;
 }
 
-class Filter extends React.PureComponent<FilterProps, FilterState> {
+class Filter extends React.Component<FilterProps, FilterState> {
+  shouldComponentUpdate(nextProps: FilterProps, nextState: FilterState) {
+    const { listMenuAnchorEl: prevAnchor, ...prev } = this.state;
+    const { listMenuAnchorEl: nextAnchor, ...next } = nextState;
+    return (
+      JSON.stringify(this.props) !== JSON.stringify(nextProps) ||
+      JSON.stringify(prev) !== JSON.stringify(next) ||
+      !!prevAnchor !== !!nextAnchor
+    );
+  }
+
   state = {
     keyword: "",
     author: "",

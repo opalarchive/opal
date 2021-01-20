@@ -30,9 +30,9 @@ interface SidebarListProps {
   allTags: Set<string>;
 }
 
-type Props = SidebarProps & SidebarListProps & WithStyles<typeof styles>;
+type ActionProps = SidebarProps & SidebarListProps & WithStyles<typeof styles>;
 
-interface State {
+interface ActionState {
   changingList: boolean;
   canChangeList: boolean;
   originalListSelection: boolean[];
@@ -45,7 +45,14 @@ interface State {
   canChangeTags: boolean;
 }
 
-class Sidebar extends React.Component<Props, State> {
+class Action extends React.Component<ActionProps, ActionState> {
+  shouldComponentUpdate(nextProps: ActionProps, nextState: ActionState) {
+    return (
+      JSON.stringify(this.props) !== JSON.stringify(nextProps) ||
+      JSON.stringify(this.state) !== JSON.stringify(nextState)
+    );
+  }
+
   state = {
     changingList: false, //when thing is changing in db
     canChangeList: false, //when original lists is same as selection
@@ -59,7 +66,7 @@ class Sidebar extends React.Component<Props, State> {
     canChangeTags: false,
   };
 
-  constructor(props: Props) {
+  constructor(props: ActionProps) {
     super(props);
 
     this.onChangeListSelection = this.onChangeListSelection.bind(this);
@@ -104,7 +111,7 @@ class Sidebar extends React.Component<Props, State> {
     listSelection[listInd] = !listSelection[listInd];
     let canChangeList = false;
     for (let i = 0; i < listSelection.length; i++) {
-      if (listSelection[i] != this.state.originalListSelection[i]) {
+      if (listSelection[i] !== this.state.originalListSelection[i]) {
         canChangeList = true;
         break;
       }
@@ -116,7 +123,7 @@ class Sidebar extends React.Component<Props, State> {
     let canNewTag = true;
     if (
       [...this.props.allTags].includes(e.target.value) ||
-      e.target.value == ""
+      e.target.value === ""
     ) {
       canNewTag = false;
     }
@@ -128,7 +135,7 @@ class Sidebar extends React.Component<Props, State> {
     clickedTags[tagText] = !clickedTags[tagText];
     let canChangeTags = false;
     for (const tag in this.state.originalClickedTags) {
-      if (clickedTags[tag] != this.state.originalClickedTags[tag]) {
+      if (clickedTags[tag] !== this.state.originalClickedTags[tag]) {
         canChangeTags = true;
         break;
       }
@@ -178,15 +185,7 @@ class Sidebar extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      classes,
-      width,
-      authUser,
-      project,
-      ind,
-      uuid,
-      allTags,
-    } = this.props;
+    const { classes, width, project, allTags } = this.props;
     return (
       <div className={classes.root} style={{ width: `${width}rem` }}>
         <Scrollbar>
@@ -336,4 +335,4 @@ class Sidebar extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(Sidebar);
+export default withStyles(styles)(Action);

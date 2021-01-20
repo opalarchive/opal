@@ -127,7 +127,7 @@ export interface List {
 
 export interface ProjectPrivate {
   lists: List[];
-  problems: Problem[]
+  problems: Problem[];
 }
 
 export enum ProjectActionProtected {

@@ -12,7 +12,7 @@ import {
 } from "../../../../../../.shared";
 import styles from "./index.css";
 import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
-import Sidebar from "./Sidebar";
+import Action from "./Action";
 import SidebaredBase from "../../../Template/SidebaredBase";
 import { ViewSectionProps } from "..";
 
@@ -62,7 +62,6 @@ class Details extends React.Component<DetailProps> {
 
   render() {
     const { classes, replies, reply: replyNumber, ...otherProps } = this.props;
-    console.log("i");
 
     return (
       <div className={classes.root}>
@@ -156,7 +155,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   return (
     <SidebaredBase
       sidebarWidth={18}
-      Sidebar={Sidebar}
+      Sidebar={Action}
       right
       sidebarProps={{
         project,

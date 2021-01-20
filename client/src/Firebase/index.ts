@@ -213,7 +213,12 @@ export const changeList = async (
   );
 };
 
-export const changeTags = async (uuid: string, clickedTags: object, problemInd: number, authUser: firebase.User) => {
+export const changeTags = async (
+  uuid: string,
+  clickedTags: object,
+  problemInd: number,
+  authUser: firebase.User
+) => {
   return await post<string>(
     "private/changeTags",
     {
@@ -223,9 +228,14 @@ export const changeTags = async (uuid: string, clickedTags: object, problemInd: 
     },
     authUser
   );
-}
+};
 
-export const newTag = async (uuid: string, newTag: string, problemInd: number, authUser: firebase.User) => {
+export const newTag = async (
+  uuid: string,
+  newTag: string,
+  problemInd: number,
+  authUser: firebase.User
+) => {
   return await post<string>(
     "private/newTag",
     {
@@ -235,7 +245,7 @@ export const newTag = async (uuid: string, newTag: string, problemInd: number, a
     },
     authUser
   );
-}
+};
 
 export const understandSignupError = (e: string) => {
   switch (e) {
