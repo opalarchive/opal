@@ -1,10 +1,16 @@
 import React from "react";
 import katex from "katex";
+
+// there are no types in these two packages
+import { render as renderBBCode } from "@bbob/react";
+import bbcodePreset from "@bbob/preset-react";
+
 import "katex/dist/katex.min.css";
+import customBBCode, { allowedBBCodeTags } from "./customBBCode";
 
 interface Block {
   string: string;
-  type: "text" | "inline" | "block" | "special";
+  type: "text" | "latexInline" | "latexBlock";
 }
 
 // parse entire string with latex/bbcode/other markup stuff
@@ -25,7 +31,13 @@ export const render = (string: string, katexOptions: katex.KatexOptions) => {
       : stringToStrip.slice(2, -2);
 
   const getDisplay = (stringToDisplay: string) =>
-    stringToDisplay.match(blockLatex) ? "block" : "inline";
+    stringToDisplay.match(blockLatex) ? "latexBlock" : "latexInline";
+
+  const renderBBCodeString = (string: string): (JSX.Element | string)[] => {
+    return renderBBCode(string, [customBBCode(), bbcodePreset()], {
+      onlyAllowTags: allowedBBCodeTags,
+    });
+  };
 
   // render a string block into string containing html elements for the tex
   // or an object containing an error
@@ -34,7 +46,10 @@ export const render = (string: string, katexOptions: katex.KatexOptions) => {
     const strippedString = stripDelimiters(string);
     let renderedString: string;
     try {
-      const newOptions = { ...katexOptions, displayMode: type === "block" };
+      const newOptions = {
+        ...katexOptions,
+        displayMode: type === "latexBlock",
+      };
       // returns HTML markup
       renderedString = katex.renderToString(strippedString, newOptions);
     } catch (err) {
@@ -65,19 +80,10 @@ export const render = (string: string, katexOptions: katex.KatexOptions) => {
     // so we can always just push the string with latex after the corresponding
     // one without latex
     stringWithoutLatex.forEach((s, index) => {
-      // split by newlines and add by line
-      const lines = s.split(newLine);
-      lines.forEach((line, ind) => {
-        result.push({
-          string: line,
-          type: "text",
-        });
-        if (ind !== lines.length - 1) {
-          result.push({
-            string: "br",
-            type: "special",
-          });
-        }
+      // normal text
+      result.push({
+        string: s,
+        type: "text",
       });
       // render and add latex
       if (!!latexMatch && !!latexMatch[index]) {
@@ -90,16 +96,22 @@ export const render = (string: string, katexOptions: katex.KatexOptions) => {
     return result;
   };
 
-  const processResult = (resultToProcess: Block[]) => {
+  const renderResult = (resultToProcess: Block[]) => {
     const newResult: RenderedElement[] = resultToProcess.map((block) => {
       if (block.type === "text") {
-        return block.string;
+        const renderedBBCode = renderBBCodeString(block.string);
+        // replace all "\n" with <br />
+        return (
+          <>
+            {renderedBBCode.map((el, ind) => (
+              <React.Fragment key={`bbcode-result-${ind}`}>
+                {el === "\n" ? <br /> : el}
+              </React.Fragment>
+            ))}
+          </>
+        );
       }
-      if (block.type === "special") {
-        if (block.string === "br") {
-          return <br />;
-        }
-      }
+
       let rendered = renderLatexString(block.string, block.type);
 
       if (typeof rendered !== "string") {
@@ -111,7 +123,7 @@ export const render = (string: string, katexOptions: katex.KatexOptions) => {
     return newResult;
   };
   // Returns list of spans with latex and non-latex strings.
-  let toReturn = processResult(tokenize(string));
+  let toReturn = renderResult(tokenize(string));
   return toReturn;
 };
 
@@ -132,13 +144,9 @@ function isLatexElement(obj: object): obj is LatexElement {
 }
 
 type SpecialElement = JSX.Element;
-type RenderedElement = string | LatexElement | SpecialElement;
+type RenderedElement = LatexElement | SpecialElement;
 
-const renderElement = (render: RenderedElement) => {
-  // if its normal text
-  if (typeof render === "string") {
-    return render;
-  }
+const processRendered = (render: RenderedElement) => {
   // if its latex
   if (isLatexElement(render)) {
     // if the latex compiled without error
@@ -209,7 +217,7 @@ class Markup extends React.Component<MarkupProps> {
       <span>
         {renderUs.map((render, index) => (
           <React.Fragment key={id + index}>
-            {renderElement(render)}
+            {processRendered(render)}
           </React.Fragment>
         ))}
       </span>
