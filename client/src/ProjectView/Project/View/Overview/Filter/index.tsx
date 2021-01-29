@@ -356,12 +356,12 @@ class Filter extends React.Component<FilterProps, FilterState> {
                 elevation={3}
                 getContentAnchorEl={null}
                 anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 transformOrigin={{
                   vertical: "top",
-                  horizontal: "left",
+                  horizontal: "right",
                 }}
               >
                 {lists.map((list, ind) => (
@@ -371,6 +371,9 @@ class Filter extends React.Component<FilterProps, FilterState> {
                       setCurrentList(ind);
                       this.setState({ listMenuAnchorEl: null });
                     }}
+                    className={
+                      currentList === ind ? classes.currentList : undefined
+                    }
                   >
                     {list.name}
                   </MenuItem>
@@ -380,6 +383,9 @@ class Filter extends React.Component<FilterProps, FilterState> {
                     setCurrentList(-1);
                     this.setState({ listMenuAnchorEl: null });
                   }}
+                  className={
+                    currentList === -1 ? classes.currentList : undefined
+                  }
                 >
                   All Problems
                 </MenuItem>

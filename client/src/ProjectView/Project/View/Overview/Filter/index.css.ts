@@ -29,6 +29,9 @@ const styles = (theme: Theme) =>
       color: "rgba(0, 0, 0, 0.69)",
       paddingRight: spacingRem(theme, 1),
     },
+    currentList: {
+      backgroundColor: theme.palette.secondary.light,
+    },
     accordion: {
       "&:before": { opacity: 0 },
       margin: "0 !important",
