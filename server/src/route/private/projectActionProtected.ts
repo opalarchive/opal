@@ -75,6 +75,9 @@ const tryAction = async (
 ): Promise<Result<string>> => {
   const now = Date.now();
 
+  let userinfo: UsernameInfo | null = null;
+  let ownerUsername: string = "";
+
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
       await db.ref(`projectPublic/${uuid}/name`).set(data);
@@ -82,10 +85,15 @@ const tryAction = async (
     case ProjectActionProtected.DELETE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(true);
 
+      ownerUsername = await db
+        .ref(`userInformation/${uid}/username`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
       await Promise.all(
         Object.keys(projectPublic.editors).map((editor) =>
           pushNotification(editor, {
-            content: `${uid} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! The OPAL project will now only be view-only until the owner chooses to restore it.`,
+            content: `${ownerUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This OPAL project will now only be view-only until the owner chooses to restore it.`,
             timestamp: now,
             link: `/project/view/${uuid}`,
             read: false,
@@ -98,7 +106,7 @@ const tryAction = async (
       await db.ref(`projectPublic/${uuid}/trashed`).set(false);
       break;
     case ProjectActionProtected.SHARE:
-      const userinfo: UsernameInfo | null = await db
+      userinfo = await db
         .ref(`users/${data}`)
         .once("value")
         .then((snapshot) => snapshot.val());
@@ -116,7 +124,7 @@ const tryAction = async (
         starred: false,
       });
 
-      const ownerUsername = await db
+      ownerUsername = await db
         .ref(`userInformation/${uid}/username`)
         .once("value")
         .then((snapshot) => snapshot.val());
