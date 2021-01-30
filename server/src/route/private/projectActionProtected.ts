@@ -18,12 +18,12 @@ const validateData = (
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
       return data.match(/^[ A-Za-z0-9]+$/g) && data.length <= 32;
-    // case ProjectActionProtected.DELETE:
-    //   return !!data;
-    // case ProjectActionProtected.RESTORE:
-    //   return !!data;
-    // case ProjectActionProtected.SHARE:
-    //   return !!data;
+    case ProjectActionProtected.DELETE:
+      return true; // delete doesn't need data
+    case ProjectActionProtected.RESTORE:
+      return true; // see above
+    case ProjectActionProtected.SHARE:
+      return !!data;
     default:
       return !!data;
   }
@@ -167,7 +167,10 @@ export const execute = async (req, res) => {
     return;
   }
 
-  if (projectPublic.trashed) {
+  if (
+    ProjectActionProtected[type] !== ProjectActionProtected.RESTORE &&
+    projectPublic.trashed
+  ) {
     res.status(403).send("project-trashed");
     return;
   }

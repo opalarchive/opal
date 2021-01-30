@@ -131,7 +131,7 @@ export const tryProjectActionProtected = async (
   data?: string
 ): Promise<Result<string>> => {
   return await post<string>(
-    "private/projectAction",
+    "private/projectActionProtected",
     {
       uuid,
       type,

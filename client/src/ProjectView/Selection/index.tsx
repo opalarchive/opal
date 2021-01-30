@@ -15,7 +15,6 @@ import {
   ProjectViewSort,
   ProjectDataPoint,
   ProjectViewType,
-  Result,
   ProjectViewFilter,
 } from "../../Constants/types";
 
@@ -26,27 +25,16 @@ interface SelectionBaseProps {
   authUser: firebase.User;
 }
 
-interface SelectionBaseState {
-  projects: Client.Publico;
-  data: ProjectDataPoint[];
-  fixed: boolean;
-  defaultSort: ProjectViewSort;
-  loading: boolean;
-}
-
-class SelectionBase extends React.Component<
-  SelectionBaseProps,
-  SelectionBaseState
-> {
-  state = {
-    projects: {} as Client.Publico,
-    data: [] as ProjectDataPoint[],
-    fixed: false, // whether we can't sort (i.e. fixed => no sorting)
-    defaultSort: {} as ProjectViewSort,
-    loading: true,
+class SelectionBase extends React.Component<SelectionBaseProps> {
+  private projects: Client.Publico = {};
+  private data: ProjectDataPoint[] = [];
+  private fixed: boolean = false; // whether we can't sort (i.e. fixed => no sorting)
+  private defaultSort: ProjectViewSort = {
+    dataPoint: "name",
+    direction: "asc",
   };
 
-  componentDidMount() {
+  resetProjects() {
     let projectsKeys = Object.keys(this.props.visibleProjects).filter((id) =>
       this.isIncludable(
         this.props.visibleProjects[id],
@@ -54,17 +42,18 @@ class SelectionBase extends React.Component<
       )
     );
 
-    if (projectsKeys && projectsKeys[0]) {
+    if (projectsKeys.length > 0) {
       let projects = Object.fromEntries(
         projectsKeys.map((id) => [id, this.props.visibleProjects[id]])
       );
-      let data = projectViewTypes[this.props.type].data;
-      let fixed = projectViewTypes[this.props.type].fixed;
-      let defaultSort = projectViewTypes[this.props.type].defaultSort;
-
-      this.setState({ projects, data, fixed, defaultSort, loading: false });
+      this.projects = projects;
+    } else {
+      this.projects = {};
     }
-    this.setState({ loading: false });
+
+    this.data = projectViewTypes[this.props.type].data;
+    this.fixed = projectViewTypes[this.props.type].fixed;
+    this.defaultSort = projectViewTypes[this.props.type].defaultSort;
   }
 
   isIncludable(project: Client.ProjectPublic, filter: ProjectViewFilter) {
@@ -88,14 +77,15 @@ class SelectionBase extends React.Component<
   }
 
   render() {
-    if (this.state.loading) return <div></div>;
-
+    this.resetProjects();
+    console.log(this.projects);
+    console.log(this.props.visibleProjects);
     return (
       <Table
-        projects={this.state.projects}
-        data={this.state.data}
-        fixed={this.state.fixed}
-        defaultSort={this.state.defaultSort}
+        projects={this.projects}
+        data={this.data}
+        fixed={this.fixed}
+        defaultSort={this.defaultSort}
         authUser={this.props.authUser}
         name={this.props.type}
         refreshProjects={this.props.refreshProjects}
