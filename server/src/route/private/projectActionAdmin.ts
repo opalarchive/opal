@@ -1,9 +1,9 @@
 import {
-  projectAction,
   ProjectActionProtected,
   projectActionProtected,
   Server,
   UsernameInfo,
+  ProjectRole,
 } from "../../../../.shared/src/types";
 import { editProject } from "../../helpers/editProject";
 import { sendEmail } from "../../helpers/emailSetup";
@@ -23,6 +23,8 @@ const validateData = (
     case ProjectActionProtected.RESTORE:
       return true; // see above
     case ProjectActionProtected.SHARE:
+      return !!data;
+    case ProjectActionProtected.UNSHARE:
       return !!data;
     default:
       return !!data;
@@ -61,6 +63,8 @@ const onSuccess = (
       return `proj-${uuid}-restored`;
     case ProjectActionProtected.SHARE:
       return `proj-${uuid}-shared-with-${data}.`;
+    case ProjectActionProtected.UNSHARE:
+      return `proj-${uuid}-unshared-with-${data}.`;
     default:
       return "bad-input";
   }
@@ -121,6 +125,7 @@ const tryAction = async (
       await db.ref(`projectPublic/${uuid}/editors/${userinfo.uid}`).set({
         lastEdit: now,
         shareDate: now,
+        role: "EDITOR",
         starred: false,
       });
 
@@ -169,8 +174,14 @@ export const execute = async (req, res) => {
     return;
   }
 
-  if (projectPublic.owner !== authuid) {
-    // you're not the owner
+  console.log(ProjectRole[projectPublic.editors[authuid].role]);
+
+  if (
+    !projectPublic.editors[authuid] ||
+    (ProjectRole[projectPublic.editors[authuid].role] !== ProjectRole.ADMIN &&
+      ProjectRole[projectPublic.editors[authuid].role] !== ProjectRole.OWNER)
+  ) {
+    // you're not owner or admin
     res.status(403).send("forbidden");
     return;
   }

@@ -46,6 +46,7 @@ export const execute = async (req, res) => {
         trashed: proj.trashed,
         starred: proj.editors[authuid].starred,
         shareDate: proj.editors[authuid].shareDate,
+        role: proj.editors[authuid].role,
       };
 
       return [uuid, projectPublic];

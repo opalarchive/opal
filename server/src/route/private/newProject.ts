@@ -1,6 +1,7 @@
 // must be run on a single thread to prevent race conditions
 
 import { v4 as uuidv4 } from "uuid";
+import { ProjectRole } from "../../../../.shared/src/types";
 import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
@@ -32,6 +33,7 @@ export const execute = async (req, res) => {
       [authuid]: {
         lastEdit: now,
         shareDate: now,
+        role: "OWNER",
         starred: false,
       },
     },

@@ -17,7 +17,7 @@ import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
-import { starProject, tryProjectActionProtected } from "../../../Firebase";
+import { starProject, tryProjectActionAdmin } from "../../../Firebase";
 import { camelToTitle } from "../../../Constants";
 import { FiArrowDown } from "react-icons/fi";
 import {
@@ -193,7 +193,7 @@ class ProjectTable extends React.Component<
     let attempt: Result<string> = { success: false, value: "" };
 
     if (isProjectActionProtected(this.state.modal.type)) {
-      attempt = await tryProjectActionProtected(
+      attempt = await tryProjectActionAdmin(
         this.state.modal.activeProject,
         this.props.authUser,
         this.state.modal.type,

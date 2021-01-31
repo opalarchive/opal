@@ -60,6 +60,7 @@ class ProjectRow extends React.Component<ProjectRowProps, ProjectRowState> {
       CHANGE_NAME: false,
       RESTORE: false,
       STAR: false,
+      UNSHARE: false,
     },
   };
 
@@ -89,6 +90,7 @@ class ProjectRow extends React.Component<ProjectRowProps, ProjectRowState> {
         CHANGE_NAME: changeName,
         RESTORE: restore,
         STAR: star,
+        UNSHARE: false,
       },
     });
   }
