@@ -1,3 +1,7 @@
+/**
+ * General project management types
+ */
+
 export interface Config {
   type: string;
   project_id: string;
@@ -34,11 +38,13 @@ export interface UserInfo {
   username: string;
 }
 
+// server only, contains all data
 export namespace Server {
   export interface EditStatus {
     lastEdit: number;
     shareDate: number;
     starred: boolean;
+    role: projectRole;
   }
 
   export interface Editors {
@@ -57,6 +63,7 @@ export namespace Server {
   }
 }
 
+// client only, contains only relevant data
 export namespace Client {
   export interface EditStatus {
     lastEdit: number;
@@ -73,12 +80,114 @@ export namespace Client {
     trashed: boolean;
     starred: boolean;
     shareDate: number;
+    role: projectRole;
   }
 
   export interface Publico {
     [uuid: string]: ProjectPublic;
   }
 }
+
+/**
+ * Project related types
+ */
+
+export interface List {
+  name: string;
+  problems: number[];
+}
+
+export interface ProjectPrivate {
+  lists: List[];
+  problems: Problem[];
+}
+
+export enum ProjectRole {
+  OWNER,
+  ADMIN,
+  EDITOR,
+  REMOVED,
+}
+
+export type projectRole = keyof typeof ProjectRole;
+
+// project actions
+
+export enum ProjectActionOwner {
+  MAKE_OWNER,
+}
+
+export type projectActionOwner = keyof typeof ProjectActionOwner;
+
+export const isProjectActionOwner = (
+  input: projectAction
+): input is projectActionOwner => {
+  return Object.keys(ProjectActionOwner).includes(input);
+};
+
+export enum ProjectActionAdmin {
+  SHARE,
+  DELETE,
+  CHANGE_NAME,
+  RESTORE,
+  UNSHARE,
+  PROMOTE,
+  DEMOTE,
+}
+
+export type projectActionAdmin = keyof typeof ProjectActionAdmin;
+
+export const isProjectActionAdmin = (
+  input: projectAction
+): input is projectActionAdmin => {
+  return Object.keys(ProjectActionAdmin).includes(input);
+};
+
+export enum ProjectActionEditor {
+  STAR,
+}
+
+export type projectActionEditor = keyof typeof ProjectActionEditor;
+
+export const isProjectActionEditor = (
+  input: projectAction
+): input is projectActionEditor => {
+  return Object.keys(ProjectActionEditor).includes(input);
+};
+
+export type projectAction =
+  | projectActionOwner
+  | projectActionAdmin
+  | projectActionEditor;
+
+/**
+ * Problem related types
+ */
+
+export type vote = 0 | 1 | -1;
+export type data = string | number;
+
+export interface Votes {
+  [uid: string]: vote;
+}
+
+export interface Problem {
+  ind: number;
+  author: string;
+  category: string;
+  difficulty: number;
+  replies: reply[];
+  tags: string[];
+  text: string;
+  title: string;
+  votes: Votes;
+}
+
+export type problemAction = "vote" | "comment";
+
+/**
+ * Reply related types
+ */
 
 export enum ReplyType {
   COMMENT = "COMMENT",
@@ -100,62 +209,3 @@ export interface Solution extends Post {
 }
 
 export type reply = Comment | Solution;
-export type vote = 0 | 1 | -1;
-
-export type data = string | number;
-
-export interface Votes {
-  [uid: string]: vote;
-}
-
-export interface Problem {
-  ind: number;
-  author: string;
-  category: string;
-  difficulty: number;
-  replies: reply[];
-  tags: string[];
-  text: string;
-  title: string;
-  votes: Votes;
-}
-
-export interface List {
-  name: string;
-  problems: number[];
-}
-
-export interface ProjectPrivate {
-  lists: List[];
-  problems: Problem[];
-}
-
-export enum ProjectActionProtected {
-  SHARE,
-  DELETE,
-  CHANGE_NAME,
-  RESTORE,
-}
-
-export type projectActionProtected = keyof typeof ProjectActionProtected;
-
-export const isProjectActionProtected = (
-  input: projectAction
-): input is projectActionProtected => {
-  return Object.keys(ProjectActionProtected).includes(input);
-};
-
-export enum ProjectActionTrivial {
-  STAR,
-}
-
-export type projectActionTrivial = keyof typeof ProjectActionTrivial;
-
-export const isProjectActionTrivial = (
-  input: projectAction
-): input is projectActionTrivial => {
-  return Object.keys(ProjectActionTrivial).includes(input);
-};
-
-export type projectAction = projectActionTrivial | projectActionProtected;
-export type problemAction = "vote" | "comment";

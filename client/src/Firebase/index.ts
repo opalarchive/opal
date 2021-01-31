@@ -6,7 +6,7 @@ import {
   ProjectPrivate,
   Notification,
   Client,
-  projectActionProtected,
+  projectActionAdmin,
   data,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
@@ -124,14 +124,14 @@ export const getVisibleProjects = async (authUser: firebase.User) => {
   return await post<Client.Publico>("private/visibleProjects", {}, authUser);
 };
 
-export const tryProjectActionProtected = async (
+export const tryProjectActionAdmin = async (
   uuid: string,
   authUser: firebase.User,
-  type: projectActionProtected,
+  type: projectActionAdmin,
   data?: string
 ): Promise<Result<string>> => {
   return await post<string>(
-    "private/projectAction",
+    "private/projectActionAdmin",
     {
       uuid,
       type,
