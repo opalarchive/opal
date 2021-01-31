@@ -225,9 +225,6 @@ class ProjectTable extends React.Component<
       (proj) => this.state.selected[proj]
     );
 
-    // console.log("------");
-    // console.log(projects);
-
     const sortedProjectKeys = this.sortProjectKeys(
       this.props.defaultSort,
       Object.keys(this.props.projects)

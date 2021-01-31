@@ -78,8 +78,6 @@ class SelectionBase extends React.Component<SelectionBaseProps> {
 
   render() {
     this.resetProjects();
-    console.log(this.projects);
-    console.log(this.props.visibleProjects);
     return (
       <Table
         projects={this.projects}
