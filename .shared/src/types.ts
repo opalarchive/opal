@@ -96,7 +96,7 @@ export interface ProjectPrivate {
   problems: Problem[];
 }
 
-export enum ProjectActionProtected {
+export enum ProjectActionAdmin {
   SHARE,
   DELETE,
   CHANGE_NAME,
@@ -106,27 +106,27 @@ export enum ProjectActionProtected {
   DEMOTE,
 }
 
-export type projectActionProtected = keyof typeof ProjectActionProtected;
+export type projectActionAdmin = keyof typeof ProjectActionAdmin;
 
-export const isProjectActionProtected = (
+export const isProjectActionAdmin = (
   input: projectAction
-): input is projectActionProtected => {
-  return Object.keys(ProjectActionProtected).includes(input);
+): input is projectActionAdmin => {
+  return Object.keys(ProjectActionAdmin).includes(input);
 };
 
-export enum ProjectActionTrivial {
+export enum ProjectActionEditor {
   STAR,
 }
 
-export type projectActionTrivial = keyof typeof ProjectActionTrivial;
+export type projectActionEditor = keyof typeof ProjectActionEditor;
 
-export const isProjectActionTrivial = (
+export const isProjectActionEditor = (
   input: projectAction
-): input is projectActionTrivial => {
-  return Object.keys(ProjectActionTrivial).includes(input);
+): input is projectActionEditor => {
+  return Object.keys(ProjectActionEditor).includes(input);
 };
 
-export type projectAction = projectActionTrivial | projectActionProtected;
+export type projectAction = projectActionEditor | projectActionAdmin;
 
 export enum ProjectRole {
   OWNER,

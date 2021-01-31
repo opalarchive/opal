@@ -1,6 +1,6 @@
 import {
-  ProjectActionProtected,
-  projectActionProtected,
+  ProjectActionAdmin,
+  projectActionAdmin,
   Server,
   UsernameInfo,
   ProjectRole,
@@ -12,35 +12,32 @@ import { pushNotification } from "../../helpers/notification";
 import { Result } from "../../helpers/types";
 
 const validateData = (
-  type: projectActionProtected,
+  type: projectActionAdmin,
   data: string
 ): boolean | null => {
-  switch (ProjectActionProtected[type]) {
-    case ProjectActionProtected.CHANGE_NAME:
+  switch (ProjectActionAdmin[type]) {
+    case ProjectActionAdmin.CHANGE_NAME:
       return data.match(/^[ A-Za-z0-9]+$/g) && data.length <= 32;
-    case ProjectActionProtected.DELETE:
+    case ProjectActionAdmin.DELETE:
       return true; // delete doesn't need data
-    case ProjectActionProtected.RESTORE:
+    case ProjectActionAdmin.RESTORE:
       return true; // see above
-    case ProjectActionProtected.SHARE:
+    case ProjectActionAdmin.SHARE:
       return !!data;
-    case ProjectActionProtected.UNSHARE:
+    case ProjectActionAdmin.UNSHARE:
       return !!data;
-    case ProjectActionProtected.PROMOTE:
+    case ProjectActionAdmin.PROMOTE:
       return !!data;
-    case ProjectActionProtected.DEMOTE:
+    case ProjectActionAdmin.DEMOTE:
       return !!data;
     default:
       return !!data;
   }
 };
 
-const validateDataError = (
-  type: projectActionProtected,
-  data: string
-): string => {
-  switch (ProjectActionProtected[type]) {
-    case ProjectActionProtected.CHANGE_NAME:
+const validateDataError = (type: projectActionAdmin, data: string): string => {
+  switch (ProjectActionAdmin[type]) {
+    case ProjectActionAdmin.CHANGE_NAME:
       return "bad-project-name";
     // case ProjectActionProtected.DELETE:
     //   return "";
@@ -58,24 +55,24 @@ const validateDataError = (
 };
 
 const onSuccess = (
-  type: projectActionProtected,
+  type: projectActionAdmin,
   uuid: string,
   data: string
 ): string => {
-  switch (ProjectActionProtected[type]) {
-    case ProjectActionProtected.CHANGE_NAME:
+  switch (ProjectActionAdmin[type]) {
+    case ProjectActionAdmin.CHANGE_NAME:
       return `proj-${uuid}-name-changed-to-${data}`;
-    case ProjectActionProtected.DELETE:
+    case ProjectActionAdmin.DELETE:
       return `proj-${uuid}-deleted`;
-    case ProjectActionProtected.RESTORE:
+    case ProjectActionAdmin.RESTORE:
       return `proj-${uuid}-restored`;
-    case ProjectActionProtected.SHARE:
+    case ProjectActionAdmin.SHARE:
       return `proj-${uuid}-shared-with-${data}`;
-    case ProjectActionProtected.UNSHARE:
+    case ProjectActionAdmin.UNSHARE:
       return `proj-${uuid}-unshared-with-${data}`;
-    case ProjectActionProtected.PROMOTE:
+    case ProjectActionAdmin.PROMOTE:
       return `proj-${uuid}-promoted-${data}`;
-    case ProjectActionProtected.DEMOTE:
+    case ProjectActionAdmin.DEMOTE:
       return `proj-${uuid}-demoted-${data}`;
     default:
       return "bad-input";
@@ -86,7 +83,7 @@ const tryAction = async (
   uuid: string,
   projectPublic: Server.ProjectPublic,
   data: string,
-  type: projectActionProtected,
+  type: projectActionAdmin,
   uid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
@@ -94,11 +91,11 @@ const tryAction = async (
   let userinfo: UsernameInfo | null = null;
   let sourceUsername: string = "";
 
-  switch (ProjectActionProtected[type]) {
-    case ProjectActionProtected.CHANGE_NAME:
+  switch (ProjectActionAdmin[type]) {
+    case ProjectActionAdmin.CHANGE_NAME:
       await db.ref(`projectPublic/${uuid}/name`).set(data);
       break;
-    case ProjectActionProtected.DELETE:
+    case ProjectActionAdmin.DELETE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(true);
 
       sourceUsername = await db
@@ -118,10 +115,10 @@ const tryAction = async (
         )
       );
       break;
-    case ProjectActionProtected.RESTORE:
+    case ProjectActionAdmin.RESTORE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(false);
       break;
-    case ProjectActionProtected.SHARE:
+    case ProjectActionAdmin.SHARE:
       userinfo = await db
         .ref(`users/${data}`)
         .once("value")
@@ -165,7 +162,7 @@ const tryAction = async (
       });
 
       break;
-    case ProjectActionProtected.UNSHARE:
+    case ProjectActionAdmin.UNSHARE:
       userinfo = await db
         .ref(`users/${data}`)
         .once("value")
@@ -195,7 +192,7 @@ const tryAction = async (
       // });
 
       break;
-    case ProjectActionProtected.PROMOTE:
+    case ProjectActionAdmin.PROMOTE:
       userinfo = await db
         .ref(`users/${data}`)
         .once("value")
@@ -226,7 +223,7 @@ const tryAction = async (
       });
 
       break;
-    case ProjectActionProtected.DEMOTE:
+    case ProjectActionAdmin.DEMOTE:
       userinfo = await db
         .ref(`users/${data}`)
         .once("value")
@@ -269,7 +266,7 @@ export const execute = async (req, res) => {
   const data: string = req.body.data;
   const uuid: string = req.body.uuid;
   const authuid: string = req.body.authuid;
-  const type: projectActionProtected = req.body.type;
+  const type: projectActionAdmin = req.body.type;
 
   const projectPublic: Server.ProjectPublic = await db
     .ref(`projectPublic/${uuid}`)
@@ -293,7 +290,7 @@ export const execute = async (req, res) => {
   }
 
   if (
-    ProjectActionProtected[type] !== ProjectActionProtected.RESTORE &&
+    ProjectActionAdmin[type] !== ProjectActionAdmin.RESTORE &&
     projectPublic.trashed
   ) {
     res.status(403).send("project-trashed");

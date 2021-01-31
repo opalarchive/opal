@@ -23,8 +23,8 @@ import { FiArrowDown } from "react-icons/fi";
 import {
   Client,
   projectAction,
-  isProjectActionProtected,
-  isProjectActionTrivial,
+  isProjectActionAdmin,
+  isProjectActionEditor,
 } from "../../../../../.shared";
 import {
   ProjectDataPoint,
@@ -192,14 +192,14 @@ class ProjectTable extends React.Component<
 
     let attempt: Result<string> = { success: false, value: "" };
 
-    if (isProjectActionProtected(this.state.modal.type)) {
+    if (isProjectActionAdmin(this.state.modal.type)) {
       attempt = await tryProjectActionAdmin(
         this.state.modal.activeProject,
         this.props.authUser,
         this.state.modal.type,
         this.state.modal.input
       );
-    } else if (isProjectActionTrivial(this.state.modal.type)) {
+    } else if (isProjectActionEditor(this.state.modal.type)) {
       // currently this is the only trivial action, but this may change
       // TODO: generalize this
       attempt = await starProject(

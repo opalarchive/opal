@@ -10,11 +10,11 @@ import {
 } from "@material-ui/core";
 import { FiTrash2, FiUserPlus, FiEdit2, FiCornerLeftUp } from "react-icons/fi";
 import {
-  isProjectActionProtected,
-  isProjectActionTrivial,
+  isProjectActionAdmin,
+  isProjectActionEditor,
   projectAction,
-  ProjectActionProtected,
-  ProjectActionTrivial,
+  ProjectActionAdmin,
+  ProjectActionEditor,
 } from "../../../../../.shared";
 
 interface ModalProps {
@@ -39,9 +39,9 @@ const Modal: React.FC<ModalProps> = ({
     reason: "backdropClick" | "escapeKeyDown"
   ) => closeModal(event);
 
-  if (isProjectActionProtected(type)) {
-    switch (ProjectActionProtected[type]) {
-      case ProjectActionProtected.SHARE:
+  if (isProjectActionAdmin(type)) {
+    switch (ProjectActionAdmin[type]) {
+      case ProjectActionAdmin.SHARE:
         return (
           <Dialog
             open={show}
@@ -82,7 +82,7 @@ const Modal: React.FC<ModalProps> = ({
             </DialogActions>
           </Dialog>
         );
-      case ProjectActionProtected.DELETE:
+      case ProjectActionAdmin.DELETE:
         return (
           <Dialog
             open={show}
@@ -119,7 +119,7 @@ const Modal: React.FC<ModalProps> = ({
             </DialogActions>
           </Dialog>
         );
-      case ProjectActionProtected.CHANGE_NAME:
+      case ProjectActionAdmin.CHANGE_NAME:
         return (
           <Dialog
             open={show}
@@ -158,7 +158,7 @@ const Modal: React.FC<ModalProps> = ({
             </DialogActions>
           </Dialog>
         );
-      case ProjectActionProtected.RESTORE:
+      case ProjectActionAdmin.RESTORE:
         return (
           <Dialog
             open={show}
@@ -193,9 +193,9 @@ const Modal: React.FC<ModalProps> = ({
       default:
         return <h1>BLARGH</h1>;
     }
-  } else if (isProjectActionTrivial(type)) {
-    switch (ProjectActionTrivial[type]) {
-      case ProjectActionTrivial.STAR:
+  } else if (isProjectActionEditor(type)) {
+    switch (ProjectActionEditor[type]) {
+      case ProjectActionEditor.STAR:
         if (show) modalSuccess();
         return <></>;
       default:
