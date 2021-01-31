@@ -96,6 +96,29 @@ export interface ProjectPrivate {
   problems: Problem[];
 }
 
+export enum ProjectRole {
+  OWNER,
+  ADMIN,
+  EDITOR,
+  REMOVED,
+}
+
+export type projectRole = keyof typeof ProjectRole;
+
+// project actions
+
+export enum ProjectActionOwner {
+  MAKE_OWNER,
+}
+
+export type projectActionOwner = keyof typeof ProjectActionOwner;
+
+export const isProjectActionOwner = (
+  input: projectAction
+): input is projectActionOwner => {
+  return Object.keys(ProjectActionOwner).includes(input);
+};
+
 export enum ProjectActionAdmin {
   SHARE,
   DELETE,
@@ -126,16 +149,10 @@ export const isProjectActionEditor = (
   return Object.keys(ProjectActionEditor).includes(input);
 };
 
-export type projectAction = projectActionEditor | projectActionAdmin;
-
-export enum ProjectRole {
-  OWNER,
-  ADMIN,
-  EDITOR,
-  REMOVED,
-}
-
-export type projectRole = keyof typeof ProjectRole;
+export type projectAction =
+  | projectActionOwner
+  | projectActionAdmin
+  | projectActionEditor;
 
 /**
  * Problem related types
