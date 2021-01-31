@@ -124,14 +124,14 @@ export const getVisibleProjects = async (authUser: firebase.User) => {
   return await post<Client.Publico>("private/visibleProjects", {}, authUser);
 };
 
-export const tryProjectActionProtected = async (
+export const tryProjectActionAdmin = async (
   uuid: string,
   authUser: firebase.User,
   type: projectActionProtected,
   data?: string
 ): Promise<Result<string>> => {
   return await post<string>(
-    "private/projectActionProtected",
+    "private/projectActionAdmin",
     {
       uuid,
       type,

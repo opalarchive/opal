@@ -1,9 +1,9 @@
 import {
-  projectAction,
   ProjectActionProtected,
   projectActionProtected,
   Server,
   UsernameInfo,
+  ProjectRole,
 } from "../../../../.shared/src/types";
 import { editProject } from "../../helpers/editProject";
 import { sendEmail } from "../../helpers/emailSetup";
@@ -24,6 +24,12 @@ const validateData = (
       return true; // see above
     case ProjectActionProtected.SHARE:
       return !!data;
+    case ProjectActionProtected.UNSHARE:
+      return !!data;
+    case ProjectActionProtected.PROMOTE:
+      return !!data;
+    case ProjectActionProtected.DEMOTE:
+      return !!data;
     default:
       return !!data;
   }
@@ -42,6 +48,10 @@ const validateDataError = (
     //   return "";
     // case ProjectActionProtected.SHARE:
     //   return "";
+    // case ProjectActionProtected.PROMOTE:
+    //   return "";
+    // case ProjectActionProtected.DEMOTE:
+    //   return "";
     default:
       return "bad-input";
   }
@@ -54,13 +64,19 @@ const onSuccess = (
 ): string => {
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
-      return `proj-${uuid}-name-changed-to-${data}.`;
+      return `proj-${uuid}-name-changed-to-${data}`;
     case ProjectActionProtected.DELETE:
-      return `proj-${uuid}-deleted.`;
+      return `proj-${uuid}-deleted`;
     case ProjectActionProtected.RESTORE:
       return `proj-${uuid}-restored`;
     case ProjectActionProtected.SHARE:
-      return `proj-${uuid}-shared-with-${data}.`;
+      return `proj-${uuid}-shared-with-${data}`;
+    case ProjectActionProtected.UNSHARE:
+      return `proj-${uuid}-unshared-with-${data}`;
+    case ProjectActionProtected.PROMOTE:
+      return `proj-${uuid}-promoted-${data}`;
+    case ProjectActionProtected.DEMOTE:
+      return `proj-${uuid}-demoted-${data}`;
     default:
       return "bad-input";
   }
@@ -76,7 +92,7 @@ const tryAction = async (
   const now = Date.now();
 
   let userinfo: UsernameInfo | null = null;
-  let ownerUsername: string = "";
+  let sourceUsername: string = "";
 
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
@@ -85,7 +101,7 @@ const tryAction = async (
     case ProjectActionProtected.DELETE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(true);
 
-      ownerUsername = await db
+      sourceUsername = await db
         .ref(`userInformation/${uid}/username`)
         .once("value")
         .then((snapshot) => snapshot.val());
@@ -93,7 +109,7 @@ const tryAction = async (
       await Promise.all(
         Object.keys(projectPublic.editors).map((editor) =>
           pushNotification(editor, {
-            content: `${ownerUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This OPAL project will now only be view-only until the owner chooses to restore it.`,
+            content: `${sourceUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This project will now only be view-only until the owner chooses to restore it.`,
             timestamp: now,
             link: `/project/view/${uuid}`,
             read: false,
@@ -114,33 +130,130 @@ const tryAction = async (
       if (!userinfo) {
         return { status: 404, value: "username-does-not-exist" };
       }
-      if (projectPublic.editors[userinfo.uid]) {
+      // the enum is (should) be arranged in order of decreasing power
+      if (
+        ProjectRole[projectPublic.editors[userinfo.uid].role] <=
+        ProjectRole.EDITOR
+      ) {
         return { status: 403, value: "user-is-already-editor" };
       }
 
       await db.ref(`projectPublic/${uuid}/editors/${userinfo.uid}`).set({
         lastEdit: now,
         shareDate: now,
+        role: "EDITOR",
         starred: false,
       });
 
-      ownerUsername = await db
+      sourceUsername = await db
         .ref(`userInformation/${uid}/username`)
         .once("value")
         .then((snapshot) => snapshot.val());
 
       await sendEmail({
         targetEmail: userinfo.email,
-        subject: `${projectPublic.name} was shared with you by ${ownerUsername}, ${data}`,
-        content: `Hello ${data},<br /><br />You were invited to <a href="/project/view/${uuid}">${projectPublic.name}</a> by the owner, ${ownerUsername}. We hope you enjoy proposing problems and our system!<br /><br />Sincerely,<br />The OPAL Team`,
+        subject: `${projectPublic.name} was shared with you by ${sourceUsername}, ${data}`,
+        content: `Hello ${data},<br /><br />You were invited to <a href="/project/view/${uuid}">${projectPublic.name}</a> by the owner, ${sourceUsername}. We hope you enjoy proposing problems and our system!<br /><br />Sincerely,<br />The OPAL Team`,
       });
 
       await pushNotification(userinfo.uid, {
-        content: `${ownerUsername} has shared <a href="/project/view/${uuid}">${projectPublic.name}</a> with you!`,
+        content: `${sourceUsername} has shared <a href="/project/view/${uuid}">${projectPublic.name}</a> with you!`,
         timestamp: now,
         link: `/project/view/${uuid}`,
         read: false,
         title: `New Project Shared!`,
+      });
+
+      break;
+    case ProjectActionProtected.UNSHARE:
+      userinfo = await db
+        .ref(`users/${data}`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
+      if (!userinfo) {
+        return { status: 404, value: "username-does-not-exist" };
+      }
+      if (
+        !projectPublic.editors[userinfo.uid] ||
+        ProjectRole[projectPublic.editors[userinfo.uid].role] ===
+          ProjectRole.REMOVED
+      ) {
+        return { status: 403, value: "user-is-not-shared" };
+      }
+
+      await db
+        .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
+        .set("REMOVED");
+
+      // await pushNotification(userinfo.uid, {
+      //   content: `${sourceUsername} removed you from the project ${projectPublic.name}.`,
+      //   timestamp: now,
+      //   link: `/project/view/${uuid}`,
+      //   read: false,
+      //   title: `Removed from Project!`,
+      // });
+
+      break;
+    case ProjectActionProtected.PROMOTE:
+      userinfo = await db
+        .ref(`users/${data}`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
+      if (!userinfo) {
+        return { status: 404, value: "username-does-not-exist" };
+      }
+
+      if (
+        !projectPublic.editors[userinfo.uid] ||
+        ProjectRole[projectPublic.editors[userinfo.uid].role] !==
+          ProjectRole.EDITOR
+      ) {
+        return { status: 403, value: "user-is-not-editor" };
+      }
+
+      await db
+        .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
+        .set("ADMIN");
+
+      await pushNotification(userinfo.uid, {
+        content: `Your role in the project <a href="/project/view/${uuid}">${projectPublic.name}</a> has been changed to admin by ${sourceUsername}.`,
+        timestamp: now,
+        link: `/project/view/${uuid}`,
+        read: false,
+        title: `Role Changed!`,
+      });
+
+      break;
+    case ProjectActionProtected.DEMOTE:
+      userinfo = await db
+        .ref(`users/${data}`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
+      if (!userinfo) {
+        return { status: 404, value: "username-does-not-exist" };
+      }
+
+      if (
+        !projectPublic.editors[userinfo.uid] ||
+        ProjectRole[projectPublic.editors[userinfo.uid].role] !==
+          ProjectRole.ADMIN
+      ) {
+        return { status: 403, value: "user-is-not-admin" };
+      }
+
+      await db
+        .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
+        .set("EDITOR");
+
+      await pushNotification(userinfo.uid, {
+        content: `Your role in the project <a href="/project/view/${uuid}">${projectPublic.name}</a> has been changed to editor by ${sourceUsername}.`,
+        timestamp: now,
+        link: `/project/view/${uuid}`,
+        read: false,
+        title: `Role Changed!`,
       });
 
       break;
@@ -169,8 +282,12 @@ export const execute = async (req, res) => {
     return;
   }
 
-  if (projectPublic.owner !== authuid) {
-    // you're not the owner
+  if (
+    !projectPublic.editors[authuid] ||
+    (ProjectRole[projectPublic.editors[authuid].role] !== ProjectRole.ADMIN &&
+      ProjectRole[projectPublic.editors[authuid].role] !== ProjectRole.OWNER)
+  ) {
+    // you're not owner or admin
     res.status(403).send("forbidden");
     return;
   }
