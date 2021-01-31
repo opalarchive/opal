@@ -80,7 +80,7 @@ const tryAction = async (
   const now = Date.now();
 
   let userinfo: UsernameInfo | null = null;
-  let ownerUsername: string = "";
+  let sourceUsername: string = "";
 
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
@@ -89,7 +89,7 @@ const tryAction = async (
     case ProjectActionProtected.DELETE:
       await db.ref(`projectPublic/${uuid}/trashed`).set(true);
 
-      ownerUsername = await db
+      sourceUsername = await db
         .ref(`userInformation/${uid}/username`)
         .once("value")
         .then((snapshot) => snapshot.val());
@@ -97,7 +97,7 @@ const tryAction = async (
       await Promise.all(
         Object.keys(projectPublic.editors).map((editor) =>
           pushNotification(editor, {
-            content: `${ownerUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This OPAL project will now only be view-only until the owner chooses to restore it.`,
+            content: `${sourceUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This OPAL project will now only be view-only until the owner chooses to restore it.`,
             timestamp: now,
             link: `/project/view/${uuid}`,
             read: false,
@@ -118,7 +118,11 @@ const tryAction = async (
       if (!userinfo) {
         return { status: 404, value: "username-does-not-exist" };
       }
-      if (projectPublic.editors[userinfo.uid]) {
+      // the enum is (should) be arranged in order of decreasing power
+      if (
+        ProjectRole[projectPublic.editors[userinfo.uid].role] <=
+        ProjectRole.EDITOR
+      ) {
         return { status: 403, value: "user-is-already-editor" };
       }
 
@@ -129,24 +133,54 @@ const tryAction = async (
         starred: false,
       });
 
-      ownerUsername = await db
+      sourceUsername = await db
         .ref(`userInformation/${uid}/username`)
         .once("value")
         .then((snapshot) => snapshot.val());
 
       await sendEmail({
         targetEmail: userinfo.email,
-        subject: `${projectPublic.name} was shared with you by ${ownerUsername}, ${data}`,
-        content: `Hello ${data},<br /><br />You were invited to <a href="/project/view/${uuid}">${projectPublic.name}</a> by the owner, ${ownerUsername}. We hope you enjoy proposing problems and our system!<br /><br />Sincerely,<br />The OPAL Team`,
+        subject: `${projectPublic.name} was shared with you by ${sourceUsername}, ${data}`,
+        content: `Hello ${data},<br /><br />You were invited to <a href="/project/view/${uuid}">${projectPublic.name}</a> by the owner, ${sourceUsername}. We hope you enjoy proposing problems and our system!<br /><br />Sincerely,<br />The OPAL Team`,
       });
 
       await pushNotification(userinfo.uid, {
-        content: `${ownerUsername} has shared <a href="/project/view/${uuid}">${projectPublic.name}</a> with you!`,
+        content: `${sourceUsername} has shared <a href="/project/view/${uuid}">${projectPublic.name}</a> with you!`,
         timestamp: now,
         link: `/project/view/${uuid}`,
         read: false,
         title: `New Project Shared!`,
       });
+
+      break;
+    case ProjectActionProtected.UNSHARE:
+      userinfo = await db
+        .ref(`users/${data}`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
+      if (!userinfo) {
+        return { status: 404, value: "username-does-not-exist" };
+      }
+      if (
+        !projectPublic.editors[userinfo.uid] ||
+        ProjectRole[projectPublic.editors[userinfo.uid].role] ===
+          ProjectRole.REMOVED
+      ) {
+        return { status: 403, value: "user-is-not-already-shared" };
+      }
+
+      await db
+        .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
+        .set("REMOVED");
+
+      // await pushNotification(userinfo.uid, {
+      //   content: `${sourceUsername} removed you from the project ${projectPublic.name}.`,
+      //   timestamp: now,
+      //   link: `/project/view/${uuid}`,
+      //   read: false,
+      //   title: `Removed from Project!`,
+      // });
 
       break;
     default:
@@ -173,8 +207,6 @@ export const execute = async (req, res) => {
     res.status(404).send("project-not-found");
     return;
   }
-
-  console.log(ProjectRole[projectPublic.editors[authuid].role]);
 
   if (
     !projectPublic.editors[authuid] ||
