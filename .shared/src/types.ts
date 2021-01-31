@@ -102,6 +102,8 @@ export enum ProjectActionProtected {
   CHANGE_NAME,
   RESTORE,
   UNSHARE,
+  PROMOTE,
+  DEMOTE,
 }
 
 export type projectActionProtected = keyof typeof ProjectActionProtected;

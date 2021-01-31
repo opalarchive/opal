@@ -26,6 +26,10 @@ const validateData = (
       return !!data;
     case ProjectActionProtected.UNSHARE:
       return !!data;
+    case ProjectActionProtected.PROMOTE:
+      return !!data;
+    case ProjectActionProtected.DEMOTE:
+      return !!data;
     default:
       return !!data;
   }
@@ -44,6 +48,10 @@ const validateDataError = (
     //   return "";
     // case ProjectActionProtected.SHARE:
     //   return "";
+    // case ProjectActionProtected.PROMOTE:
+    //   return "";
+    // case ProjectActionProtected.DEMOTE:
+    //   return "";
     default:
       return "bad-input";
   }
@@ -56,15 +64,19 @@ const onSuccess = (
 ): string => {
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
-      return `proj-${uuid}-name-changed-to-${data}.`;
+      return `proj-${uuid}-name-changed-to-${data}`;
     case ProjectActionProtected.DELETE:
-      return `proj-${uuid}-deleted.`;
+      return `proj-${uuid}-deleted`;
     case ProjectActionProtected.RESTORE:
       return `proj-${uuid}-restored`;
     case ProjectActionProtected.SHARE:
-      return `proj-${uuid}-shared-with-${data}.`;
+      return `proj-${uuid}-shared-with-${data}`;
     case ProjectActionProtected.UNSHARE:
-      return `proj-${uuid}-unshared-with-${data}.`;
+      return `proj-${uuid}-unshared-with-${data}`;
+    case ProjectActionProtected.PROMOTE:
+      return `proj-${uuid}-promoted-${data}`;
+    case ProjectActionProtected.DEMOTE:
+      return `proj-${uuid}-demoted-${data}`;
     default:
       return "bad-input";
   }
@@ -97,7 +109,7 @@ const tryAction = async (
       await Promise.all(
         Object.keys(projectPublic.editors).map((editor) =>
           pushNotification(editor, {
-            content: `${sourceUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This OPAL project will now only be view-only until the owner chooses to restore it.`,
+            content: `${sourceUsername} has deleted <a href="/project/view/${uuid}">${projectPublic.name}</a>! This project will now only be view-only until the owner chooses to restore it.`,
             timestamp: now,
             link: `/project/view/${uuid}`,
             read: false,
@@ -167,7 +179,7 @@ const tryAction = async (
         ProjectRole[projectPublic.editors[userinfo.uid].role] ===
           ProjectRole.REMOVED
       ) {
-        return { status: 403, value: "user-is-not-already-shared" };
+        return { status: 403, value: "user-is-not-shared" };
       }
 
       await db
@@ -181,6 +193,68 @@ const tryAction = async (
       //   read: false,
       //   title: `Removed from Project!`,
       // });
+
+      break;
+    case ProjectActionProtected.PROMOTE:
+      userinfo = await db
+        .ref(`users/${data}`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
+      if (!userinfo) {
+        return { status: 404, value: "username-does-not-exist" };
+      }
+
+      if (
+        !projectPublic.editors[userinfo.uid] ||
+        ProjectRole[projectPublic.editors[userinfo.uid].role] !==
+          ProjectRole.EDITOR
+      ) {
+        return { status: 403, value: "user-is-not-editor" };
+      }
+
+      await db
+        .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
+        .set("ADMIN");
+
+      await pushNotification(userinfo.uid, {
+        content: `Your role in the project <a href="/project/view/${uuid}">${projectPublic.name}</a> has been changed to admin by ${sourceUsername}.`,
+        timestamp: now,
+        link: `/project/view/${uuid}`,
+        read: false,
+        title: `Role Changed!`,
+      });
+
+      break;
+    case ProjectActionProtected.DEMOTE:
+      userinfo = await db
+        .ref(`users/${data}`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
+
+      if (!userinfo) {
+        return { status: 404, value: "username-does-not-exist" };
+      }
+
+      if (
+        !projectPublic.editors[userinfo.uid] ||
+        ProjectRole[projectPublic.editors[userinfo.uid].role] !==
+          ProjectRole.ADMIN
+      ) {
+        return { status: 403, value: "user-is-not-admin" };
+      }
+
+      await db
+        .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
+        .set("EDITOR");
+
+      await pushNotification(userinfo.uid, {
+        content: `Your role in the project <a href="/project/view/${uuid}">${projectPublic.name}</a> has been changed to editor by ${sourceUsername}.`,
+        timestamp: now,
+        link: `/project/view/${uuid}`,
+        read: false,
+        title: `Role Changed!`,
+      });
 
       break;
     default:

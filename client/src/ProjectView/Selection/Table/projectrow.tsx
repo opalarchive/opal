@@ -61,6 +61,8 @@ class ProjectRow extends React.Component<ProjectRowProps, ProjectRowState> {
       RESTORE: false,
       STAR: false,
       UNSHARE: false,
+      PROMOTE: false,
+      DEMOTE: false,
     },
   };
 
@@ -91,6 +93,8 @@ class ProjectRow extends React.Component<ProjectRowProps, ProjectRowState> {
         RESTORE: restore,
         STAR: star,
         UNSHARE: false,
+        PROMOTE: false,
+        DEMOTE: false,
       },
     });
   }
