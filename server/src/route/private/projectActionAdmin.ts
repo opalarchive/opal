@@ -183,6 +183,11 @@ const tryAction = async (
         .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
         .set("REMOVED");
 
+      // sourceUsername = await db
+      //   .ref(`userInformation/${uid}/username`)
+      //   .once("value")
+      //   .then((snapshot) => snapshot.val());
+      //
       // await pushNotification(userinfo.uid, {
       //   content: `${sourceUsername} removed you from the project ${projectPublic.name}.`,
       //   timestamp: now,
@@ -209,6 +214,11 @@ const tryAction = async (
       ) {
         return { status: 403, value: "user-is-not-editor" };
       }
+
+      sourceUsername = await db
+        .ref(`userInformation/${uid}/username`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
 
       await db
         .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
@@ -240,6 +250,11 @@ const tryAction = async (
       ) {
         return { status: 403, value: "user-is-not-admin" };
       }
+
+      sourceUsername = await db
+        .ref(`userInformation/${uid}/username`)
+        .once("value")
+        .then((snapshot) => snapshot.val());
 
       await db
         .ref(`projectPublic/${uuid}/editors/${userinfo.uid}/role`)
