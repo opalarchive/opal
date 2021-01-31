@@ -54,13 +54,13 @@ const onSuccess = (
 ): string => {
   switch (ProjectActionProtected[type]) {
     case ProjectActionProtected.CHANGE_NAME:
-      return `Project ${uuid}'s name successfully changed to ${data}.`;
+      return `proj-${uuid}-name-changed-to-${data}.`;
     case ProjectActionProtected.DELETE:
-      return `Project ${uuid} successfully deleted.`;
+      return `proj-${uuid}-deleted.`;
     case ProjectActionProtected.RESTORE:
-      return `Project ${uuid} successfully restored.`;
+      return `proj-${uuid}-restored`;
     case ProjectActionProtected.SHARE:
-      return `Project ${uuid} successfully shared with ${data}.`;
+      return `proj-${uuid}-shared-with-${data}.`;
     default:
       return "bad-input";
   }
