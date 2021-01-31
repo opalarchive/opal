@@ -7,14 +7,14 @@ import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import * as ROUTES from "../../../../Constants/routes";
 import Reply from "./Reply";
 import {
-  ProjectPrivate,
   reply as replyType,
   Problem as ProblemType,
 } from "../../../../../../.shared";
 import styles from "./index.css";
 import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
-import MenuBase, { MenuBaseProps } from "../../../MenuBase";
-import Sidebar from "./Sidebar";
+import Action from "./Action";
+import SidebaredBase from "../../../Template/SidebaredBase";
+import { ViewSectionProps } from "..";
 
 interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
@@ -23,6 +23,10 @@ interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
 }
 
 class Details extends React.Component<DetailProps> {
+  shouldComponentUpdate(nextProps: DetailProps) {
+    return JSON.stringify(this.props) !== JSON.stringify(nextProps);
+  }
+
   private top = React.createRef<HTMLDivElement>();
   private prob = React.createRef<HTMLDivElement>();
   private commentRefs = [...Array(this.props.replies.length).keys()].map((_) =>
@@ -114,9 +118,11 @@ interface DetailsMatch {
   reply?: string;
 }
 
-interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
-  project: ProjectPrivate;
-  uuid: string;
+interface RoutedDetailsProps
+  extends RouteComponentProps<DetailsMatch>,
+    ViewSectionProps {
+  fixedSidebar: boolean;
+  sidebarYOffset: number;
   problemProps: (
     uuid: string,
     prob: ProblemType,
@@ -124,11 +130,13 @@ interface RoutedDetailsProps extends RouteComponentProps<DetailsMatch> {
     authUser: firebase.User
   ) => ProblemDetails;
   tryProblemAction: tryProblemAction;
-  authUser: firebase.User;
   setDefaultScroll: (scroll: number) => void;
 }
 
 const RoutedDetails: React.FC<RoutedDetailsProps> = ({
+  height,
+  fixedSidebar,
+  sidebarYOffset,
   project,
   uuid,
   problemProps,
@@ -139,27 +147,40 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
+  const allTags = new Set<string>();
+  project.problems.forEach((prob) => {
+    prob.tags.forEach((tag) => allTags.add(tag));
+  });
 
   return (
-    <StyledDetails
-      replies={project.problems[ind].replies}
-      {...problemProps(uuid, project.problems[ind], tryProblemAction, authUser)}
-      setDefaultScroll={setDefaultScroll}
-      reply={reply}
-    />
+    <SidebaredBase
+      sidebarWidth={18}
+      Sidebar={Action}
+      right
+      sidebarProps={{
+        project,
+        uuid,
+        ind,
+        allTags,
+      }}
+      fixedSidebar={fixedSidebar}
+      sidebarYOffset={sidebarYOffset}
+      height={height}
+      authUser={authUser}
+    >
+      <StyledDetails
+        replies={project.problems[ind].replies}
+        {...problemProps(
+          uuid,
+          project.problems[ind],
+          tryProblemAction,
+          authUser
+        )}
+        setDefaultScroll={setDefaultScroll}
+        reply={reply}
+      />
+    </SidebaredBase>
   );
 };
 
-const DetailsPage: React.FC<
-  RoutedDetailsProps & {
-    menuBaseProps: Omit<MenuBaseProps, "Sidebar" | "children">;
-  }
-> = ({ menuBaseProps, ...rest }) => {
-  return (
-    <MenuBase Sidebar={Sidebar} {...menuBaseProps} right>
-      <RoutedDetails {...rest} />
-    </MenuBase>
-  );
-};
-
-export default withRouter(DetailsPage);
+export default withRouter(RoutedDetails);

@@ -75,7 +75,7 @@ const styles = (theme: Theme) =>
       padding: "0.5rem 0.5rem 0.5rem 0.5rem",
       display: "flex",
     },
-    bodyReplyLink: {
+    link: {
       color: "rgba(0, 0, 0, 0.87)",
       textDecoration: "none",
       "&:hover": {

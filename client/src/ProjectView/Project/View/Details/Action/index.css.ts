@@ -10,8 +10,8 @@ const styles = (theme: Theme) =>
     },
     wrapper: {
       paddingTop: spacingRem(theme, 0.2),
-      paddingLeft: spacingRem(theme, 3),
-      paddingRight: spacingRem(theme, 1.5),
+      paddingLeft: spacingRem(theme, 1.5),
+      paddingRight: spacingRem(theme, 3),
     },
     paper: {
       marginBottom: spacingRem(theme, 3),
@@ -25,13 +25,6 @@ const styles = (theme: Theme) =>
       )}`,
     },
     divider: { marginTop: `${spacingRem(theme, 1)}` },
-    valueDescriptor: {
-      color: "rgba(0, 0, 0, 0.69)",
-      paddingRight: spacingRem(theme, 1),
-    },
-    currentList: {
-      backgroundColor: theme.palette.secondary.light,
-    },
     accordion: {
       "&:before": { opacity: 0 },
       margin: "0 !important",
@@ -43,12 +36,6 @@ const styles = (theme: Theme) =>
     },
     tagContainer: {
       lineHeight: "200%",
-    },
-    sort: {
-      padding: `${spacingRem(theme, 1)} ${spacingRem(theme, 2)} ${spacingRem(
-        theme,
-        1
-      )} ${spacingRem(theme, 2)}`,
     },
   });
 

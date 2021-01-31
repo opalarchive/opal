@@ -92,7 +92,13 @@ export namespace Client {
  * Project related types
  */
 
+export interface List {
+  name: string;
+  problems: number[];
+}
+
 export interface ProjectPrivate {
+  lists: List[];
   problems: Problem[];
 }
 

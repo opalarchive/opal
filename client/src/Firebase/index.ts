@@ -196,6 +196,57 @@ export const tryProblemAction = async (
   );
 };
 
+export const changeList = async (
+  uuid: string,
+  listSelection: boolean[],
+  problemInd: number,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/changeList",
+    {
+      uuid,
+      listSelection,
+      problemInd,
+    },
+    authUser
+  );
+};
+
+export const changeTags = async (
+  uuid: string,
+  clickedTags: object,
+  problemInd: number,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/changeTags",
+    {
+      uuid,
+      clickedTags,
+      problemInd,
+    },
+    authUser
+  );
+};
+
+export const newTag = async (
+  uuid: string,
+  newTag: string,
+  problemInd: number,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/newTag",
+    {
+      uuid,
+      newTag,
+      problemInd,
+    },
+    authUser
+  );
+};
+
 export const understandSignupError = (e: string) => {
   switch (e) {
     case "auth/email-already-in-use":

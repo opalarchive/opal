@@ -40,7 +40,7 @@ interface ReplyPropsBase {
 
 type ReplyProps = WithStyles<typeof styles> & WithTheme & ReplyPropsBase;
 
-class ReplyBase<State> extends React.Component<ReplyProps, State> {
+class ReplyBase<State> extends React.PureComponent<ReplyProps, State> {
   constructor(props: ReplyProps) {
     super(props);
 
