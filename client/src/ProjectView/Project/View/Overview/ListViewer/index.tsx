@@ -21,6 +21,7 @@ interface ListViewerProps {
   clickedTags: {
     [tag: string]: boolean;
   };
+  allTags: Set<string>;
 }
 
 export default class ListViewer extends React.Component<ListViewerProps> {
@@ -35,6 +36,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       clickedTags,
       onClickTag,
       authUser,
+      allTags
     } = this.props;
 
     return problemList.map((prob) => (
@@ -44,6 +46,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
         repliable
         clickedTags={clickedTags}
         onClickTag={onClickTag}
+        allTags={allTags}
       />
     ));
   }

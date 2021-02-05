@@ -213,6 +213,7 @@ export const changeList = async (
   );
 };
 
+/*
 export const changeTags = async (
   uuid: string,
   clickedTags: object,
@@ -246,6 +247,7 @@ export const newTag = async (
     authUser
   );
 };
+*/
 
 export const understandSignupError = (e: string) => {
   switch (e) {

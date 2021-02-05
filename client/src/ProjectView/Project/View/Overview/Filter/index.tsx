@@ -514,6 +514,7 @@ class Filter extends React.Component<FilterProps, FilterState> {
                         onClickTag={(tagText: string) =>
                           onClickTag(tagText, resetFilter)
                         }
+                        filterTag
                       />
                     ))}
                   </div>

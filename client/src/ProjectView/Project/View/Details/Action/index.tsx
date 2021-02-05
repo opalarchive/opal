@@ -19,7 +19,7 @@ import { FiList, FiChevronDown, FiTag } from "react-icons/fi";
 import styles from "./index.css";
 import { SidebarProps } from "../../../../Template/SidebaredBase";
 import { ProjectPrivate } from "../../../../../../../.shared";
-import { changeList, changeTags, newTag } from "../../../../../Firebase";
+import { changeList } from "../../../../../Firebase";
 import Tag from "../../Ornamentation/Tag";
 import Scrollbar from "react-scrollbars-custom";
 
@@ -37,12 +37,12 @@ interface ActionState {
   canChangeList: boolean;
   originalListSelection: boolean[];
   listSelection: boolean[];
-  changingTags: boolean;
-  newTag: string;
-  canNewTag: boolean;
-  originalClickedTags: object;
-  clickedTags: object;
-  canChangeTags: boolean;
+  // changingTags: boolean;
+  // newTag: string;
+  // canNewTag: boolean;
+  // originalClickedTags: object;
+  // clickedTags: object;
+  // canChangeTags: boolean;
 }
 
 class Action extends React.Component<ActionProps, ActionState> {
@@ -58,23 +58,23 @@ class Action extends React.Component<ActionProps, ActionState> {
     canChangeList: false, //when original lists is same as selection
     originalListSelection: [] as boolean[], //original boolean array of which lists the problem is in
     listSelection: [] as boolean[],
-    changingTags: false, //this will be used for both changeTag and newTag
-    newTag: "",
-    canNewTag: false, //we don't support empty length, which it is when this state is initialized
-    originalClickedTags: {} as { [tag: string]: boolean },
-    clickedTags: {} as { [tag: string]: boolean },
-    canChangeTags: false,
+    // changingTags: false, //this will be used for both changeTag and newTag
+    // newTag: "",
+    // canNewTag: false, //we don't support empty length, which it is when this state is initialized
+    // originalClickedTags: {} as { [tag: string]: boolean },
+    // clickedTags: {} as { [tag: string]: boolean },
+    // canChangeTags: false,
   };
 
   constructor(props: ActionProps) {
     super(props);
 
     this.onChangeListSelection = this.onChangeListSelection.bind(this);
-    this.onChangeNewTag = this.onChangeNewTag.bind(this);
-    this.onClickTag = this.onClickTag.bind(this);
+    //this.onChangeNewTag = this.onChangeNewTag.bind(this);
+    //this.onClickTag = this.onClickTag.bind(this);
     this.changeList = this.changeList.bind(this);
-    this.changeTags = this.changeTags.bind(this);
-    this.newTag = this.newTag.bind(this);
+    //this.changeTags = this.changeTags.bind(this);
+    //this.newTag = this.newTag.bind(this);
   }
 
   componentDidMount() {
@@ -88,19 +88,21 @@ class Action extends React.Component<ActionProps, ActionState> {
       }
     }
 
-    let clickedTags = {} as { [tag: string]: boolean };
+    /*let clickedTags = {} as { [tag: string]: boolean };
     [...this.props.allTags].forEach((tag: string) => {
       clickedTags[tag] = this.props.project.problems[
         this.props.ind
       ].tags.includes(tag);
     });
+    */
 
     this.setState({
       originalListSelection: [...listSelection],
       listSelection,
-      originalClickedTags: { ...clickedTags },
-      clickedTags,
+      // originalClickedTags: { ...clickedTags },
+      // clickedTags,
     });
+
   }
 
   onChangeListSelection(
@@ -119,7 +121,7 @@ class Action extends React.Component<ActionProps, ActionState> {
     this.setState({ listSelection, canChangeList });
   }
 
-  onChangeNewTag(e: React.ChangeEvent<HTMLInputElement>) {
+  /*onChangeNewTag(e: React.ChangeEvent<HTMLInputElement>) {
     let canNewTag = true;
     if (
       [...this.props.allTags].includes(e.target.value) ||
@@ -141,7 +143,7 @@ class Action extends React.Component<ActionProps, ActionState> {
       }
     }
     this.setState({ clickedTags, canChangeTags });
-  }
+  }*/
 
   async changeList() {
     this.setState({
@@ -158,7 +160,7 @@ class Action extends React.Component<ActionProps, ActionState> {
     this.setState({ changingList: false });
   }
 
-  async changeTags() {
+  /*async changeTags() {
     this.setState({
       changingTags: true,
       originalClickedTags: { ...this.state.clickedTags },
@@ -182,10 +184,10 @@ class Action extends React.Component<ActionProps, ActionState> {
       this.props.authUser
     );
     this.setState({ changingTags: false });
-  }
+  }*/
 
   render() {
-    const { classes, width, project, allTags } = this.props;
+    const { classes, width, project } = this.props;
     return (
       <div className={classes.root} style={{ width: `${width}rem` }}>
         <Scrollbar>
@@ -247,6 +249,7 @@ class Action extends React.Component<ActionProps, ActionState> {
                 </AccordionDetails>
               </Accordion>
             </Paper>
+            {/*
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
                 Tags
@@ -328,6 +331,7 @@ class Action extends React.Component<ActionProps, ActionState> {
                 </AccordionDetails>
               </Accordion>
             </Paper>
+            */}
           </div>
         </Scrollbar>
       </div>

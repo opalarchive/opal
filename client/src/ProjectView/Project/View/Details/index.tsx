@@ -20,6 +20,7 @@ interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
   setDefaultScroll: (scroll: number) => void;
   reply?: number;
+  allTags: Set<string>;
 }
 
 class Details extends React.Component<DetailProps> {
@@ -61,7 +62,7 @@ class Details extends React.Component<DetailProps> {
   }
 
   render() {
-    const { classes, replies, reply: replyNumber, ...otherProps } = this.props;
+    const { classes, replies, reply: replyNumber, allTags, ...otherProps } = this.props;
 
     return (
       <div className={classes.root}>
@@ -77,7 +78,7 @@ class Details extends React.Component<DetailProps> {
         </div>
 
         <div ref={this.prob}>
-          <Problem {...otherProps} repliable={false} />
+          <Problem allTags={allTags} {...otherProps} repliable={false} />
         </div>
 
         <div className={classes.replyOffset}>
@@ -176,6 +177,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
           tryProblemAction,
           authUser
         )}
+        allTags={allTags}
         setDefaultScroll={setDefaultScroll}
         reply={reply}
       />

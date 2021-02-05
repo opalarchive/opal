@@ -145,6 +145,7 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
             tryProblemAction={tryProblemAction}
             onClickTag={this.onClickTag}
             clickedTags={this.state.clickedTags}
+            allTags={allTags}
           />
         </div>
       </SidebaredBase>

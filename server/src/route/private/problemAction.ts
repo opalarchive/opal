@@ -18,7 +18,8 @@ const tryAction = async (
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
-
+  let tags: string[] = problem.tags || [];
+  let newTags: string[] = [];
   switch (type) {
     case "vote":
       if (data !== 1 && data !== -1) {
@@ -46,6 +47,36 @@ const tryAction = async (
         time: now,
         type: ReplyType.COMMENT,
       });
+
+      break;
+    case "removeTag":
+      if (typeof data !== "string") {
+        return { status: 400, value: "invalid-input" };
+      }
+      
+      newTags = tags.filter((tag) => tag !== data);
+
+      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
+
+      break;
+    case "addTag":
+      if (typeof data !== "object") {
+        return { status: 400, value: "invalid-input" };
+      }
+
+      if (data.length == 0) {
+        break;
+      }
+
+      newTags = [...tags];
+
+      for (let i=0; i<data.length; i++) {
+        if (data[i].length > 0 && !tags.includes(data[i])) {
+          newTags.push(data[i]);
+        }
+      }
+
+      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
 
       break;
     default:

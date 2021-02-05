@@ -1,6 +1,7 @@
 import React from "react";
 
-import { Paper, WithStyles, withStyles } from "@material-ui/core";
+import { Paper, WithStyles, withStyles, TextField, Button } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
 import {
   FiAlignLeft,
   FiArrowDown,
@@ -8,6 +9,7 @@ import {
   FiCornerDownRight,
   FiMessageSquare,
 } from "react-icons/fi";
+import { FaCheck } from "react-icons/fa";
 import Latex from "../../../../Constants/latex";
 import { Link } from "react-router-dom";
 
@@ -23,11 +25,42 @@ interface ProblemProps extends ProblemDetails {
     [tag: string]: boolean;
   };
   onClickTag?: (tagText: string) => void;
+  allTags: Set<string>;
+}
+
+interface ProblemState {
+  hoverRemoveTag: boolean;
+  hoverAddTag: boolean;
+  editAddTag: boolean;
+  inputAddTag: string[];
 }
 
 class Problem extends React.PureComponent<
-  ProblemProps & WithStyles<typeof styles>
+  ProblemProps & WithStyles<typeof styles>, ProblemState
 > {
+  state = {
+    hoverRemoveTag: false,
+    hoverAddTag: false,
+    editAddTag: false,
+    inputAddTag: [],
+  }
+
+  constructor(props: ProblemProps & WithStyles<typeof styles>) {
+    super(props);
+
+    this.handleChangeAddTag = this.handleChangeAddTag.bind(this);
+    this.addTag = this.addTag.bind(this);
+  }
+
+  handleChangeAddTag(e: React.ChangeEvent<{}>, value: string[]) {
+    this.setState({ inputAddTag: value });
+  }
+
+  async addTag() {
+    await this.props.tryProblemAction(this.state.inputAddTag, "addTag");
+    this.setState({ editAddTag: false, inputAddTag: [] });
+  }
+
   render() {
     const {
       classes,
@@ -47,7 +80,10 @@ class Problem extends React.PureComponent<
       clickedTags,
       onClickTag,
       authUser,
+      allTags,
     } = this.props;
+
+    const availableTags = [...allTags].filter((tag) => tags.indexOf(tag) < 0);
 
     return (
       <Paper elevation={3} className={classes.root}>
@@ -113,9 +149,45 @@ class Problem extends React.PureComponent<
                     text={tag}
                     clicked={!!clickedTags && !!clickedTags[tag]}
                     onClickTag={onClickTag}
+                    tryProblemAction={tryProblemAction}
                   />
                 ))
               : null}
+            {this.state.editAddTag ? (
+              <>
+                <Autocomplete
+                  multiple
+                  freeSolo
+                  id="tags-autocomplete"
+                  options={availableTags}
+                  value={this.state.inputAddTag}
+                  onChange={this.handleChangeAddTag}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Add Tags"
+                      margin="normal"
+                      InputProps={{ ...params.InputProps }}
+                    />
+                  )}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={this.addTag}>
+                  <FaCheck />
+                </Button>
+              </>
+            ) : (
+              <Tag
+                key={"addTag"}
+                text={""}
+                clicked={false}
+                onClickAddTag={() => this.setState({ editAddTag: true })}
+                tryProblemAction={tryProblemAction}
+                addTag
+              />
+            )}
           </div>
           {repliable ? (
             <div className={classes.bodyReply}>

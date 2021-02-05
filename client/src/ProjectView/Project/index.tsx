@@ -110,6 +110,8 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       return project;
     }
 
+    var tags = project.value.problems[ind].tags;
+
     switch (type) {
       case "vote":
         if (data !== 1 && data !== -1) {
@@ -143,6 +145,30 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           time: now.getTime(),
           type: ReplyType.COMMENT,
         };
+
+        break;
+      case "removeTag":
+        if (typeof data !== "string") {
+          break;
+        }
+
+        project.value.problems[ind].tags = tags.filter((tag) => tag !== data);
+
+        break;
+      case "addTag":
+        if (typeof data !== "object") {
+          break;
+        }
+
+        if (data.length == 0) {
+          break;
+        }
+
+        for (let i=0; i<data.length; i++) {
+          if (data[i].length > 0 && !tags.includes(data[i])) {
+            project.value.problems[ind].tags.push(data[i]);
+          }
+        }
 
         break;
       default:
