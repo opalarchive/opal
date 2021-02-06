@@ -41,9 +41,6 @@ const styles = (theme: Theme) =>
       display: "flex",
       flexDirection: "column",
     },
-    tagContainer: {
-      lineHeight: "200%",
-    },
     sort: {
       padding: `${spacingRem(theme, 1)} ${spacingRem(theme, 2)} ${spacingRem(
         theme,

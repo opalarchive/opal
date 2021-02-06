@@ -1,28 +1,31 @@
 import { createStyles, Theme } from "@material-ui/core";
+import { transform } from "typescript";
 
 const styles = (theme: Theme) =>
   createStyles({
-    abnormalTag: {
+    tag: {
+      display: "inline-block",
       marginRight: "0.25rem",
       backgroundColor: "#eaecec",
+      cursor: "pointer",
+      margin: "0.25rem 0 0.25rem 0",
+    },
+    tagBody: {
       padding: "0.1rem 0.4rem 0.1rem 0.2rem",
       borderBottomRightRadius: "1rem",
       borderTopRightRadius: "1rem",
-      cursor: "pointer",
     },
     tagText: {
-      //marginRight: "0.25rem",
-      backgroundColor: "#eaecec",
-      padding: "0.1rem 0.4rem 0.1rem 0.2rem",
-      cursor: "pointer",
-    },
-    tagRemove: {
       marginRight: "0.25rem",
-      backgroundColor: "#eaecec",
-      padding: "0.1rem 0.4rem 0.1rem 0.2rem",
-      borderBottomRightRadius: "1rem",
-      borderTopRightRadius: "1rem",
-      cursor: "pointer",
+    },
+    addTag: {
+      padding: "0.1rem 0.1rem 0.1rem 0.1rem",
+      position: "relative",
+      borderRadius: "1rem",
+      "&hover": { backgroundColor: theme.palette.secondary.light },
+    },
+    icon: {
+      transform: "translateY(10%)",
     },
   });
 export default styles;

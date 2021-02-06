@@ -505,7 +505,7 @@ class Filter extends React.Component<FilterProps, FilterState> {
                   {filterUsed("tag") && filterUsedDot}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
-                  <div className={classes.tagContainer}>
+                  <div>
                     {[...allTags].map((tag) => (
                       <Tag
                         key={tag}

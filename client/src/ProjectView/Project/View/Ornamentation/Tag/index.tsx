@@ -3,15 +3,11 @@ import {
   WithStyles,
   WithTheme,
   withTheme,
-  Theme,
-  TextField,
-  Button,
 } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
-import { FaCheck } from "react-icons/fa";
 import React from "react";
+import { FiPlus } from "react-icons/fi";
 import { compose } from "recompose";
-import {data, problemAction } from "../../../../../../../.shared";
+import { data, problemAction } from "../../../../../../../.shared";
 import styles from "./index.css";
 
 interface TagProps {
@@ -25,48 +21,14 @@ interface TagProps {
   addTag?: boolean;
 }
 
-interface TagState {
-  hoverRemoveTag: boolean;
-  hoverAddTag: boolean;
-  editAddTag: boolean;
-  inputAddTag: string;
-}
-
-class Tag extends React.PureComponent<TagProps & WithStyles<typeof styles> & WithTheme, TagState> {
-  state = {
-    hoverRemoveTag: false,
-    hoverAddTag: false,
-    editAddTag: false,
-    inputAddTag: "",
-  }
-
+class Tag extends React.PureComponent<
+  TagProps & WithStyles<typeof styles> & WithTheme
+> {
   constructor(props: TagProps & WithStyles<typeof styles> & WithTheme) {
     super(props);
-
-    this.hoverRemoveTag = this.hoverRemoveTag.bind(this);
-    this.unHoverRemoveTag = this.unHoverRemoveTag.bind(this);
-    this.hoverAddTag = this.hoverAddTag.bind(this);
-    this.unHoverAddTag = this.unHoverAddTag.bind(this);
-  }
-
-  hoverRemoveTag() {
-    this.setState({ hoverRemoveTag: true });
-  }
-
-  unHoverRemoveTag() {
-    this.setState({ hoverRemoveTag: false });
-  }
-
-  hoverAddTag() {
-    this.setState({ hoverAddTag: true });
-  }
-
-  unHoverAddTag() {
-    this.setState({ hoverAddTag: false });
   }
 
   render() {
-
     const {
       text,
       clicked,
@@ -80,75 +42,73 @@ class Tag extends React.PureComponent<TagProps & WithStyles<typeof styles> & Wit
       theme,
     } = this.props;
 
+    // a simple tag that can only be used as filtering by clicking on it
+    if (filterTag) {
+      return (
+        <span
+          className={`${classes.tag} ${classes.tagBody}`}
+          style={{
+            ...(clicked
+              ? { backgroundColor: theme.palette.secondary.light }
+              : {}),
+            ...style,
+          }}
+          onClick={
+            !!onClickTag
+              ? (e: React.MouseEvent<HTMLSpanElement>) => onClickTag(text)
+              : undefined
+          }
+        >
+          {text.replace(/ /g, "\u00a0")}
+        </span>
+      );
+    }
+
+    // not a real tag, but just a "+" sign for adding new tags that should have the same stylings as a tag
+    if (addTag) {
+      return (
+        <span
+          className={`${classes.tag} ${classes.addTag}`}
+          style={style}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            !!onClickAddTag && onClickAddTag()
+          }
+        >
+          <FiPlus className={classes.icon} />
+        </span>
+      );
+    }
+
+    // normal tag with click to filter and x to remove
+
     return (
-      <>
-        {filterTag ? (
-            <span
-              className={classes.abnormalTag}
-              style={{
-                ...(clicked ? { backgroundColor: theme.palette.secondary.light } : {}),
-                ...style,
-              }}
-              onClick={
-                !!onClickTag
-                  ? (e: React.MouseEvent<HTMLSpanElement>) => onClickTag(text)
-                  : undefined
-              }
-            >
-              {text.replace(/ /g, "\u00a0")}{" "}
-            </span>
-          ) : (
-            <>
-              {addTag ? (
-                <span
-                  className={classes.abnormalTag}
-                  style={{
-                    ...(this.state.hoverAddTag ? { backgroundColor: theme.palette.secondary.light } : {}),
-                    ...style,
-                  }}
-                  onMouseEnter={this.hoverAddTag}
-                  onMouseLeave={this.unHoverAddTag}
-                  onClick={!!onClickAddTag ? (e: React.MouseEvent<HTMLSpanElement>) => onClickAddTag() : undefined}
-                >
-                  +
-                </span>
-              ) : (
-                <>
-                  <span
-                    className={classes.tagText}
-                    style={{
-                      ...(clicked ? { backgroundColor: theme.palette.secondary.light } : {}),
-                      ...style,
-                    }}
-                    onClick={
-                      !!onClickTag
-                        ? (e: React.MouseEvent<HTMLSpanElement>) => onClickTag(text)
-                        : undefined
-                    }
-                  >
-                    {text.replace(/ /g, "\u00a0")}
-                  </span>
-                  <span
-                    className={classes.tagRemove}
-                    style={{
-                      ...(this.state.hoverRemoveTag ? { backgroundColor: theme.palette.secondary.light } : {}),
-                      ...style,
-                    }}
-                    onMouseEnter={this.hoverRemoveTag}
-                    onMouseLeave={this.unHoverRemoveTag}
-                    onClick={!!tryProblemAction ? () => tryProblemAction(text, "removeTag") : () => undefined}
-                  >
-                    X
-                  </span>
-                </>
-              )}
-            </>
-          )
-        }
-      </>
+      <span
+        className={`${classes.tag} ${classes.tagBody}`}
+        style={{
+          ...(clicked
+            ? { backgroundColor: theme.palette.secondary.light }
+            : {}),
+          ...style,
+        }}
+      >
+        <span
+          className={classes.tagText}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            !!onClickTag && onClickTag(text)
+          }
+        >
+          {text.replace(/ /g, "\u00a0")}
+        </span>
+        <span
+          onClick={() =>
+            !!tryProblemAction && tryProblemAction(text, "removeTag")
+          }
+        >
+          X
+        </span>
+      </span>
     );
   }
-
 }
 
 export default compose<
