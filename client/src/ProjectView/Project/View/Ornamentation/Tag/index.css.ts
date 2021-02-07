@@ -7,7 +7,6 @@ const styles = (theme: Theme) =>
       display: "inline-block",
       marginRight: "0.25rem",
       backgroundColor: "#eaecec",
-      cursor: "pointer",
       margin: "0.25rem 0 0.25rem 0",
     },
     tagBody: {
@@ -23,6 +22,9 @@ const styles = (theme: Theme) =>
       position: "relative",
       borderRadius: "1rem",
       "&hover": { backgroundColor: theme.palette.secondary.light },
+    },
+    pointer: {
+      cursor: "pointer",
     },
     icon: {
       transform: "translateY(10%)",

@@ -5,7 +5,7 @@ import {
   withTheme,
 } from "@material-ui/core";
 import React from "react";
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiX } from "react-icons/fi";
 import { compose } from "recompose";
 import { data, problemAction } from "../../../../../../../.shared";
 import styles from "./index.css";
@@ -42,11 +42,13 @@ class Tag extends React.PureComponent<
       theme,
     } = this.props;
 
-    // a simple tag that can only be used as filtering by clicking on it
+    let tag: JSX.Element = <></>;
+
     if (filterTag) {
-      return (
+      // a simple tag that can only be used as filtering by clicking on it
+      tag = (
         <span
-          className={`${classes.tag} ${classes.tagBody}`}
+          className={`${classes.tag} ${classes.tagBody} ${classes.pointer}`}
           style={{
             ...(clicked
               ? { backgroundColor: theme.palette.secondary.light }
@@ -62,11 +64,9 @@ class Tag extends React.PureComponent<
           {text.replace(/ /g, "\u00a0")}
         </span>
       );
-    }
-
-    // not a real tag, but just a "+" sign for adding new tags that should have the same stylings as a tag
-    if (addTag) {
-      return (
+    } else if (addTag) {
+      // not a real tag, but just a "+" sign for adding new tags that should have the same stylings as a tag
+      tag = (
         <span
           className={`${classes.tag} ${classes.addTag}`}
           style={style}
@@ -74,40 +74,42 @@ class Tag extends React.PureComponent<
             !!onClickAddTag && onClickAddTag()
           }
         >
-          <FiPlus className={classes.icon} />
+          <FiPlus className={`${classes.icon} ${classes.pointer}`} />
+        </span>
+      );
+    } else {
+      // normal tag with click to filter and x to remove
+      tag = (
+        <span
+          className={`${classes.tag} ${classes.tagBody}`}
+          style={{
+            ...(clicked
+              ? { backgroundColor: theme.palette.secondary.light }
+              : {}),
+            ...style,
+          }}
+        >
+          <span
+            className={`${classes.tagText}${
+              !!onClickTag ? ` ${classes.pointer}` : ""
+            }`} // add pointer on hover if clicking does something
+            onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+              !!onClickTag && onClickTag(text)
+            }
+          >
+            {text.replace(/ /g, "\u00a0")}
+          </span>
+          <span
+            onClick={() =>
+              !!tryProblemAction && tryProblemAction(text, "removeTag")
+            }
+          >
+            <FiX className={`${classes.icon} ${classes.pointer}`} />
+          </span>
         </span>
       );
     }
-
-    // normal tag with click to filter and x to remove
-
-    return (
-      <span
-        className={`${classes.tag} ${classes.tagBody}`}
-        style={{
-          ...(clicked
-            ? { backgroundColor: theme.palette.secondary.light }
-            : {}),
-          ...style,
-        }}
-      >
-        <span
-          className={classes.tagText}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-            !!onClickTag && onClickTag(text)
-          }
-        >
-          {text.replace(/ /g, "\u00a0")}
-        </span>
-        <span
-          onClick={() =>
-            !!tryProblemAction && tryProblemAction(text, "removeTag")
-          }
-        >
-          X
-        </span>
-      </span>
-    );
+    return <>{tag}&#8203;</>; // zero width space, makes it so that double clicking on a tag doesn't select adjacent ones as well (separates without adding space)
   }
 }
 

@@ -1,6 +1,12 @@
 import React from "react";
 
-import { Paper, WithStyles, withStyles, TextField, Button } from "@material-ui/core";
+import {
+  Paper,
+  WithStyles,
+  withStyles,
+  TextField,
+  Button,
+} from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import {
   FiAlignLeft,
@@ -29,21 +35,18 @@ interface ProblemProps extends ProblemDetails {
 }
 
 interface ProblemState {
-  hoverRemoveTag: boolean;
-  hoverAddTag: boolean;
   editAddTag: boolean;
   inputAddTag: string[];
 }
 
 class Problem extends React.PureComponent<
-  ProblemProps & WithStyles<typeof styles>, ProblemState
+  ProblemProps & WithStyles<typeof styles>,
+  ProblemState
 > {
   state = {
-    hoverRemoveTag: false,
-    hoverAddTag: false,
     editAddTag: false,
     inputAddTag: [],
-  }
+  };
 
   constructor(props: ProblemProps & WithStyles<typeof styles>) {
     super(props);
@@ -174,7 +177,8 @@ class Problem extends React.PureComponent<
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={this.addTag}>
+                  onClick={this.addTag}
+                >
                   <FaCheck />
                 </Button>
               </>
