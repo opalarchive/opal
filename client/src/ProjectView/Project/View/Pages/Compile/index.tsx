@@ -1,9 +1,12 @@
 import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
-import { CategoryColors, ViewSectionProps } from "..";
+import { CategoryColors, ViewSectionProps } from "../..";
 
-import { Problem as ProblemType } from "../../../../../../.shared";
-import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
+import { Problem as ProblemType } from "../../../../../../../.shared";
+import {
+  ProblemDetails,
+  tryProblemAction,
+} from "../../../../../Constants/types";
 import styles from "./index.css";
 
 interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {

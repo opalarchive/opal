@@ -13,14 +13,12 @@ import {
   FormGroup,
   FormControlLabel,
   Button,
-  TextField,
 } from "@material-ui/core";
 import { FiList, FiChevronDown, FiTag } from "react-icons/fi";
 import styles from "./index.css";
-import { SidebarProps } from "../../../../Template/SidebaredBase";
-import { ProjectPrivate } from "../../../../../../../.shared";
-import { changeList } from "../../../../../Firebase";
-import Tag from "../../Ornamentation/Tag";
+import { SidebarProps } from "../../../../../Template/SidebaredBase";
+import { ProjectPrivate } from "../../../../../../../../.shared";
+import { changeList } from "../../../../../../Firebase";
 import Scrollbar from "react-scrollbars-custom";
 
 interface SidebarListProps {
@@ -102,7 +100,6 @@ class Action extends React.Component<ActionProps, ActionState> {
       // originalClickedTags: { ...clickedTags },
       // clickedTags,
     });
-
   }
 
   onChangeListSelection(

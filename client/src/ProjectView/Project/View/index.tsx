@@ -8,7 +8,7 @@ import {
 import ScrollBase from "../../Template/ScrollBase";
 
 import * as ROUTES from "../../../Constants/routes";
-import Details from "./Details";
+import Details from "./Pages/Details";
 import {
   tupleToRGBString,
   camelToTitle,
@@ -27,9 +27,9 @@ import {
   replyTypes,
   tryProblemAction,
 } from "../../../Constants/types";
-import Overview from "./Overview";
+import Overview from "./Pages/Overview";
 import Navbar from "./Navbar";
-import Compile from "./Compile";
+import Compile from "./Pages/Compile";
 
 interface ViewProps {
   project: ProjectPrivate;

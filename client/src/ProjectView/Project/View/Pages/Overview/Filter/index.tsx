@@ -21,8 +21,8 @@ import {
 } from "@material-ui/core";
 import styles from "./index.css";
 import { compose } from "recompose";
-import { SidebarProps } from "../../../../Template/SidebaredBase";
-import { List, Problem } from "../../../../../../../.shared";
+import { SidebarProps } from "../../../../../Template/SidebaredBase";
+import { List, Problem } from "../../../../../../../../.shared";
 import {
   FiCheckCircle,
   FiChevronDown,
@@ -32,16 +32,16 @@ import {
   FiList,
 } from "react-icons/fi";
 import { HiOutlineSortDescending } from "react-icons/hi";
-import Dot from "../../Ornamentation/Dot";
-import { CategoryColors } from "../..";
+import Dot from "../../../Embedded/Dot";
+import { CategoryColors } from "../../..";
 import {
   camelToTitle,
   spacingRem,
   tupleToRGBString,
-} from "../../../../../Constants";
+} from "../../../../../../Constants";
 import Scrollbar from "react-scrollbars-custom";
-import Tag from "../../Ornamentation/Tag";
-import { SortDirection } from "../../../../../Constants/types";
+import Tag from "../../../Embedded/Tag";
+import { SortDirection } from "../../../../../../Constants/types";
 
 interface FilterPropsBase {
   setFilter: (filter: (problem: Problem) => boolean) => void;

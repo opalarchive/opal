@@ -16,14 +16,14 @@ import {
   FiMessageSquare,
 } from "react-icons/fi";
 import { FaCheck } from "react-icons/fa";
-import Latex from "../../../../Constants/latex";
+import Latex from "../../../../../Constants/latex";
 import { Link } from "react-router-dom";
 
-import * as ROUTES from "../../../../Constants/routes";
+import * as ROUTES from "../../../../../Constants/routes";
 import styles from "./index.css";
-import { ProblemDetails } from "../../../../Constants/types";
-import Dot from "../Ornamentation/Dot";
-import Tag from "../Ornamentation/Tag";
+import { ProblemDetails } from "../../../../../Constants/types";
+import Dot from "../Dot";
+import Tag from "../Tag";
 
 interface ProblemProps extends ProblemDetails {
   repliable: boolean;

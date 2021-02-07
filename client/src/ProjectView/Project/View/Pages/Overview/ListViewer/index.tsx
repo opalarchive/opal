@@ -1,10 +1,10 @@
 import React from "react";
-import { Problem as ProblemType } from "../../../../../../../.shared";
+import { Problem as ProblemType } from "../../../../../../../../.shared";
 import {
   ProblemDetails,
   tryProblemAction,
-} from "../../../../../Constants/types";
-import Problem from "../../Problem";
+} from "../../../../../../Constants/types";
+import Problem from "../../../Embedded/Problem";
 
 interface ListViewerProps {
   problemList: ProblemType[];
@@ -36,7 +36,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       clickedTags,
       onClickTag,
       authUser,
-      allTags
+      allTags,
     } = this.props;
 
     return problemList.map((prob) => (

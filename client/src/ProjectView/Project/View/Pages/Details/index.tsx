@@ -1,20 +1,23 @@
 import React from "react";
 import { FiChevronLeft } from "react-icons/fi";
 import { withStyles, WithStyles } from "@material-ui/core";
-import Problem from "../Problem";
+import Problem from "../../Embedded/Problem";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 
-import * as ROUTES from "../../../../Constants/routes";
+import * as ROUTES from "../../../../../Constants/routes";
 import Reply from "./Reply";
 import {
   reply as replyType,
   Problem as ProblemType,
-} from "../../../../../../.shared";
+} from "../../../../../../../.shared";
 import styles from "./index.css";
-import { ProblemDetails, tryProblemAction } from "../../../../Constants/types";
+import {
+  ProblemDetails,
+  tryProblemAction,
+} from "../../../../../Constants/types";
 import Action from "./Action";
-import SidebaredBase from "../../../Template/SidebaredBase";
-import { ViewSectionProps } from "..";
+import SidebaredBase from "../../../../Template/SidebaredBase";
+import { ViewSectionProps } from "../..";
 
 interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
   replies: replyType[];
@@ -62,7 +65,13 @@ class Details extends React.Component<DetailProps> {
   }
 
   render() {
-    const { classes, replies, reply: replyNumber, allTags, ...otherProps } = this.props;
+    const {
+      classes,
+      replies,
+      reply: replyNumber,
+      allTags,
+      ...otherProps
+    } = this.props;
 
     return (
       <div className={classes.root}>
