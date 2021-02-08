@@ -42,6 +42,7 @@ import {
 import Scrollbar from "react-scrollbars-custom";
 import Tag from "../../../Embedded/Tag";
 import { SortDirection } from "../../../../../../Constants/types";
+import TagGroup from "../../../Embedded/TagGroup";
 
 interface FilterPropsBase {
   setFilter: (filter: (problem: Problem) => boolean) => void;
@@ -506,17 +507,16 @@ class Filter extends React.Component<FilterProps, FilterState> {
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
                   <div>
-                    {[...allTags].map((tag) => (
-                      <Tag
-                        key={tag}
-                        text={tag}
-                        clicked={!!clickedTags[tag]}
+                    {!!allTags && (
+                      <TagGroup
+                        text={[...allTags]} // convert from set to array
+                        clickedTags={clickedTags}
                         onClickTag={(tagText: string) =>
                           onClickTag(tagText, resetFilter)
                         }
                         filterTag
                       />
-                    ))}
+                    )}
                   </div>
                 </AccordionDetails>
               </Accordion>

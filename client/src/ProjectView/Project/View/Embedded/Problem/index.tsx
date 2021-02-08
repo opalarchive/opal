@@ -24,6 +24,7 @@ import styles from "./index.css";
 import { ProblemDetails } from "../../../../../Constants/types";
 import Dot from "../Dot";
 import Tag from "../Tag";
+import TagGroup from "../TagGroup";
 
 interface ProblemProps extends ProblemDetails {
   repliable: boolean;
@@ -34,34 +35,11 @@ interface ProblemProps extends ProblemDetails {
   allTags: Set<string>;
 }
 
-interface ProblemState {
-  editAddTag: boolean;
-  inputAddTag: string[];
-}
-
 class Problem extends React.PureComponent<
-  ProblemProps & WithStyles<typeof styles>,
-  ProblemState
+  ProblemProps & WithStyles<typeof styles>
 > {
-  state = {
-    editAddTag: false,
-    inputAddTag: [],
-  };
-
   constructor(props: ProblemProps & WithStyles<typeof styles>) {
     super(props);
-
-    this.handleChangeAddTag = this.handleChangeAddTag.bind(this);
-    this.addTag = this.addTag.bind(this);
-  }
-
-  handleChangeAddTag(e: React.ChangeEvent<{}>, value: string[]) {
-    this.setState({ inputAddTag: value });
-  }
-
-  async addTag() {
-    await this.props.tryProblemAction(this.state.inputAddTag, "addTag");
-    this.setState({ editAddTag: false, inputAddTag: [] });
   }
 
   render() {
@@ -145,51 +123,14 @@ class Problem extends React.PureComponent<
           <div className={classes.bodyFiller} />
           <div className={classes.bodyTags}>
             Tags:{" "}
-            {!!tags
-              ? tags.map((tag) => (
-                  <Tag
-                    key={tag}
-                    text={tag}
-                    clicked={!!clickedTags && !!clickedTags[tag]}
-                    onClickTag={onClickTag}
-                    tryProblemAction={tryProblemAction}
-                  />
-                ))
-              : null}
-            {this.state.editAddTag ? (
-              <>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  id="tags-autocomplete"
-                  options={availableTags}
-                  value={this.state.inputAddTag}
-                  onChange={this.handleChangeAddTag}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Add Tags"
-                      margin="normal"
-                      InputProps={{ ...params.InputProps }}
-                    />
-                  )}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={this.addTag}
-                >
-                  <FaCheck />
-                </Button>
-              </>
-            ) : (
-              <Tag
-                key={"addTag"}
-                text={""}
-                clicked={false}
-                onClickAddTag={() => this.setState({ editAddTag: true })}
+            {!!tags && (
+              <TagGroup
+                text={tags}
+                clickedTags={clickedTags}
+                onClickTag={onClickTag}
                 tryProblemAction={tryProblemAction}
-                addTag
+                canAddTag
+                availableTags={availableTags}
               />
             )}
           </div>
