@@ -9,7 +9,6 @@ export interface ScrollBaseProps {
   background: string;
   customScrollTop?: number;
   onScrollTopChange?: (scrollTop: number) => void;
-  onBodyHeightChange?: (height: number) => void;
 }
 // const relevantProps: (keyof ScrollBaseProps)[] = [
 //   "maxWidth",
@@ -32,32 +31,15 @@ class ScrollBase extends React.Component<
   //   return false;
   // }
 
-  private body = React.createRef<HTMLDivElement>();
-
   constructor(props: ScrollBaseProps & WithStyles<typeof styles>) {
     super(props);
 
-    this.changeBodyHeight = this.changeBodyHeight.bind(this);
     this.setScroll = this.setScroll.bind(this);
-  }
-
-  changeBodyHeight() {
-    !!this.props.onBodyHeightChange &&
-      this.props.onBodyHeightChange(this.body.current!.clientHeight!);
   }
 
   setScroll(scrollValues: ScrollState, prevScrollState: ScrollState) {
     !!this.props.onScrollTopChange &&
       this.props.onScrollTopChange(scrollValues.scrollTop);
-  }
-
-  componentDidMount() {
-    this.changeBodyHeight();
-    window.addEventListener("resize", this.changeBodyHeight);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.changeBodyHeight);
   }
 
   render() {
@@ -83,7 +65,6 @@ class ScrollBase extends React.Component<
       <div
         className={classes.container}
         style={{ backgroundColor: background }}
-        ref={this.body}
       >
         <Scrollbar
           noScrollX
