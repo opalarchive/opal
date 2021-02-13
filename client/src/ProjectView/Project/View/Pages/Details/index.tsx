@@ -25,6 +25,8 @@ interface DetailProps extends WithStyles<typeof styles>, FrontendProblem {
   setDefaultScroll: (scroll: number) => void;
   reply?: number;
   allTags: Set<string>;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
 }
 
 class Details extends React.Component<DetailProps> {
@@ -71,6 +73,8 @@ class Details extends React.Component<DetailProps> {
       replies,
       reply: replyNumber,
       allTags,
+      getCategoryColor,
+      getDifficultyColor,
       ...otherProps
     } = this.props;
 
@@ -88,7 +92,7 @@ class Details extends React.Component<DetailProps> {
         </div>
 
         <div ref={this.prob}>
-          <Problem allTags={allTags} {...otherProps} repliable={false} />
+          <Problem getCategoryColor={getCategoryColor} getDifficultyColor={getDifficultyColor} allTags={allTags} {...otherProps} repliable={false} />
         </div>
 
         <div className={classes.replyOffset}>
@@ -143,6 +147,8 @@ interface RoutedDetailsProps
     authUser: firebase.User
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
   setDefaultScroll: (scroll: number) => void;
 }
 
@@ -153,6 +159,8 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   problemProps,
   tryProblemAction,
   tryProblemActionPrivileged,
+  getCategoryColor,
+  getDifficultyColor,
   authUser,
   setDefaultScroll,
   match,
@@ -187,6 +195,8 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
           tryProblemActionPrivileged,
           authUser
         )}
+        getCategoryColor={getCategoryColor}
+        getDifficultyColor={getDifficultyColor}
         allTags={allTags}
         setDefaultScroll={setDefaultScroll}
         reply={reply}

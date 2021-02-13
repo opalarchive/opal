@@ -20,6 +20,8 @@ interface ListViewerProps {
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
   tryProblemActionPrivileged: tryProblemActionPrivileged;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
   onClickTag: (tagText: string) => void;
   clickedTags: {
     [tag: string]: boolean;
@@ -37,6 +39,8 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       uuid,
       tryProblemAction,
       tryProblemActionPrivileged,
+      getCategoryColor,
+      getDifficultyColor,
       clickedTags,
       onClickTag,
       authUser,
@@ -48,6 +52,8 @@ export default class ListViewer extends React.Component<ListViewerProps> {
         key={`problem-${prob.ind}`}
         {...problemProps(uuid, prob, tryProblemAction, tryProblemActionPrivileged, authUser)}
         repliable
+        getCategoryColor={getCategoryColor}
+        getDifficultyColor={getDifficultyColor}
         clickedTags={clickedTags}
         onClickTag={onClickTag}
         allTags={allTags}

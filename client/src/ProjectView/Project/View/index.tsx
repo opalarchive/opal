@@ -52,6 +52,8 @@ export interface ViewSectionProps {
   authUser: firebase.User;
   tryProblemAction: tryProblemAction;
   tryProblemActionPrivileged: tryProblemActionPrivileged;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
 }
 
 export interface CategoryColors {
@@ -232,6 +234,8 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       authUser,
       tryProblemAction,
       tryProblemActionPrivileged,
+      getCategoryColor: this.getCategoryColor,
+      getDifficultyColor: this.getDifficultyColor,
     };
 
     return (

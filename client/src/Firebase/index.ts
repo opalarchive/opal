@@ -205,7 +205,7 @@ export const tryProblemActionPrivileged = async (
   authUser: firebase.User
 ) => {
   return await post<string>(
-    "private/problemActioPrivileged",
+    "private/problemActionPrivileged",
     {
       uuid,
       problemInd,

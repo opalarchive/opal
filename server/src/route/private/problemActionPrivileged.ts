@@ -6,77 +6,66 @@ import {
   problemAction,
   vote,
   ReplyType,
+  problemActionPrivileged,
 } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
-const tryActionPrivate = async (
+const tryActionPrivileged = async (
   cdb: firebase.database.Database,
   problem: Problem,
   problemInd: number,
   data: data,
-  type: problemAction,
+  type: problemActionPrivileged,
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
   let tags: string[] = problem.tags || [];
   let newTags: string[] = [];
   switch (type) {
-    case "vote":
-      if (data !== 1 && data !== -1) {
-        return { status: 400, value: "invalid-input" };
-      }
-
-      const newVote: vote =
-        !!problem.votes && problem.votes[authuid] === data ? 0 : data;
-      await cdb.ref(`problems/${problemInd}/votes/${authuid}`).set(newVote);
-
-      break;
-    case "comment":
+    case "title":
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
       }
 
-      let index = 0;
-      if (!!problem.replies) {
-        index = problem.replies.length;
-      }
-
-      await cdb.ref(`problems/${problemInd}/replies/${index}`).set({
-        author: authuid,
-        text: data,
-        time: now,
-        type: ReplyType.COMMENT,
-      });
+      await cdb.ref(`problems/${problemInd}/title`).set(data);
 
       break;
-    case "removeTag":
+    case "text":
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
       }
-      
-      newTags = tags.filter((tag) => tag !== data);
 
-      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
+      await cdb.ref(`problems/${problemInd}/text`).set(data);
 
       break;
-    case "addTag":
-      if (typeof data !== "object") {
+    case "category":
+      if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
       }
 
-      if (data.length == 0) {
+      if (!["algebra", "geometry", "numberTheory", "combinatorics"].includes(data)) {
+        data = "miscellaneous";
+      }
+
+      await cdb.ref(`problems/${problemInd}/category`).set(data);
+
+      break;
+    case "difficulty":
+      if (typeof data !== "number") {
         break;
       }
 
-      newTags = [...tags];
+      //these two checks usually wont pass through since there's a slider, but its just in case
 
-      for (let i=0; i<data.length; i++) {
-        if (data[i].length > 0 && !tags.includes(data[i])) {
-          newTags.push(data[i]);
-        }
+      if (data < 0) {
+        data = 0;
       }
 
-      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
+      if (data > 100) {
+        data = 100;
+      }
+
+      await cdb.ref(`problems/${problemInd}/difficulty`).set(data);
 
       break;
     default:
@@ -89,7 +78,7 @@ export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const problemInd: number = req.body.problemInd;
   let data: data = req.body.data;
-  const type: problemAction = req.body.type;
+  const type: problemActionPrivileged = req.body.type;
   const authuid: string = req.body.authuid;
 
   if (!data) {
@@ -114,7 +103,7 @@ export const execute = async (req, res) => {
     return;
   }
 
-  const result = await tryActionPrivate(
+  const result = await tryActionPrivileged(
     trydb.value,
     problem,
     problemInd,

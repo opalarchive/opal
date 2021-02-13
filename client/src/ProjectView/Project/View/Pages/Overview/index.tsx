@@ -29,6 +29,8 @@ interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
   tryProblemActionPrivileged: tryProblemActionPrivileged;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
   setDefaultScroll: (scroll: number) => void;
 }
 
@@ -94,6 +96,8 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
       uuid,
       tryProblemAction,
       tryProblemActionPrivileged,
+      getCategoryColor,
+      getDifficultyColor,
       authUser,
       classes,
     } = this.props;
@@ -158,6 +162,8 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
             problemProps={problemProps}
             tryProblemAction={tryProblemAction}
             tryProblemActionPrivileged={tryProblemActionPrivileged}
+            getCategoryColor={getCategoryColor}
+            getDifficultyColor={getDifficultyColor}
             onClickTag={this.onClickTag}
             clickedTags={this.state.clickedTags}
             allTags={allTags}

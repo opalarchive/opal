@@ -216,70 +216,49 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       return project;
     }
 
-    // var tags = project.value.problems[ind].tags;
+    switch (type) {
+      case "title":
+        if (typeof data !== "string") {
+          break;
+        }
 
-    // switch (type) {
-    //   case "vote":
-    //     if (data !== 1 && data !== -1) {
-    //       break;
-    //     }
-    //     if (!project.value.problems[ind].votes) {
-    //       project.value.problems[ind].votes = {};
-    //     }
+        project.value.problems[ind].title = data;
+      case "text":
+        if (typeof data !== "string") {
+          break;
+        }
 
-    //     const newVote: vote =
-    //       project.value.problems[ind].votes[displayName] === data ? 0 : data;
-    //     project.value.problems[ind].votes[displayName] = newVote;
+        project.value.problems[ind].text = data;
+      case "category":
+        if (typeof data !== "string") {
+          break;
+        }
 
-    //     break;
-    //   case "comment":
-    //     if (typeof data !== "string") {
-    //       break;
-    //     }
+        if (!["algebra", "geometry", "numberTheory", "combinatorics"].includes(data)) {
+          data = "miscellaneous";
+        }
 
-    //     let index = 0;
-    //     if (!!project.value.problems[ind].replies) {
-    //       index = project.value.problems[ind].replies.length;
-    //     } else {
-    //       project.value.problems[ind].replies = [];
-    //     }
+        project.value.problems[ind].category = data;
+      case "difficulty":
+        if (typeof data !== "number") {
+          break;
+        }
 
-    //     const now = new Date();
-    //     project.value.problems[ind].replies[index] = {
-    //       author: displayName,
-    //       text: data,
-    //       time: now.getTime(),
-    //       type: ReplyType.COMMENT,
-    //     };
+        //these two checks usually wont pass through since there's a slider, but its just in case
 
-    //     break;
-    //   case "removeTag":
-    //     if (typeof data !== "string") {
-    //       break;
-    //     }
+        if (data < 0) {
+          data = 0;
+        }
 
-    //     project.value.problems[ind].tags = tags.filter((tag) => tag !== data);
+        if (data > 100) {
+          data = 100;
+        }
 
-    //     break;
-    //   case "addTag":
-    //     if (typeof data !== "object") {
-    //       break;
-    //     }
-
-    //     if (data.length == 0) {
-    //       break;
-    //     }
-
-    //     for (let i = 0; i < data.length; i++) {
-    //       if (data[i].length > 0 && !tags.includes(data[i])) {
-    //         project.value.problems[ind].tags.push(data[i]);
-    //       }
-    //     }
-
-    //     break;
-    //   default:
-    //     break;
-    // }
+        project.value.problems[ind].difficulty = data;
+        break;
+      default:
+        break;
+    }
     return project;
   }
 
