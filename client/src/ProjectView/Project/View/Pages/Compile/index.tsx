@@ -6,6 +6,7 @@ import { Problem as ProblemType } from "../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
+  tryProblemActionPrivileged,
 } from "../../../../../Constants/types";
 import styles from "./index.css";
 
@@ -17,6 +18,7 @@ interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
     uuid: string,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
+    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;

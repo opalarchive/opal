@@ -8,12 +8,14 @@ import {
   problemAction,
   ReplyType,
   Client,
+  problemActionPrivileged,
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
 import {
   getProjectPrivate,
   tryProblemAction,
+  tryProblemActionPrivileged,
   newProblem,
 } from "../../Firebase";
 import { getProjectName, post } from "../../Firebase";
@@ -65,6 +67,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     super(props);
 
     this.tryProblemAction = this.tryProblemAction.bind(this);
+    this.tryProblemActionPrivileged = this.tryProblemActionPrivileged.bind(this);
     this.newProblem = this.newProblem.bind(this);
   }
 
@@ -203,6 +206,100 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
   }
 
+  clientSideActionPrivileged(ind: number, data: data, type: problemActionPrivileged) {
+    let project = this.state.project;
+    const displayName = !!this.props.authUser.displayName
+      ? this.props.authUser.displayName
+      : "";
+
+    if (!project.success || typeof project.value === "string") {
+      return project;
+    }
+
+    // var tags = project.value.problems[ind].tags;
+
+    // switch (type) {
+    //   case "vote":
+    //     if (data !== 1 && data !== -1) {
+    //       break;
+    //     }
+    //     if (!project.value.problems[ind].votes) {
+    //       project.value.problems[ind].votes = {};
+    //     }
+
+    //     const newVote: vote =
+    //       project.value.problems[ind].votes[displayName] === data ? 0 : data;
+    //     project.value.problems[ind].votes[displayName] = newVote;
+
+    //     break;
+    //   case "comment":
+    //     if (typeof data !== "string") {
+    //       break;
+    //     }
+
+    //     let index = 0;
+    //     if (!!project.value.problems[ind].replies) {
+    //       index = project.value.problems[ind].replies.length;
+    //     } else {
+    //       project.value.problems[ind].replies = [];
+    //     }
+
+    //     const now = new Date();
+    //     project.value.problems[ind].replies[index] = {
+    //       author: displayName,
+    //       text: data,
+    //       time: now.getTime(),
+    //       type: ReplyType.COMMENT,
+    //     };
+
+    //     break;
+    //   case "removeTag":
+    //     if (typeof data !== "string") {
+    //       break;
+    //     }
+
+    //     project.value.problems[ind].tags = tags.filter((tag) => tag !== data);
+
+    //     break;
+    //   case "addTag":
+    //     if (typeof data !== "object") {
+    //       break;
+    //     }
+
+    //     if (data.length == 0) {
+    //       break;
+    //     }
+
+    //     for (let i = 0; i < data.length; i++) {
+    //       if (data[i].length > 0 && !tags.includes(data[i])) {
+    //         project.value.problems[ind].tags.push(data[i]);
+    //       }
+    //     }
+
+    //     break;
+    //   default:
+    //     break;
+    // }
+    return project;
+  }
+
+  async tryProblemActionPrivileged(ind: number, data: data, type: problemActionPrivileged) {
+    const oldProject = this.state.project;
+    this.setState({ project: this.clientSideActionPrivileged(ind, data, type) });
+
+    const result = await tryProblemActionPrivileged(
+      this.props.match.params.uuid,
+      ind,
+      data,
+      type,
+      this.props.authUser
+    );
+
+    if (!result.success) {
+      this.setState({ project: oldProject });
+    }
+  }
+
   async newProblem(problem: Omit<Problem, "ind">) {
     const oldProject = this.state.project;
     let project = this.state.project;
@@ -274,6 +371,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
             editors={this.state.editors.value}
             uuid={this.props.match.params.uuid}
             tryProblemAction={this.tryProblemAction}
+            tryProblemActionPrivileged={this.tryProblemActionPrivileged}
             fail={this.props.fail}
             authUser={this.props.authUser}
             newProblem={this.newProblem}

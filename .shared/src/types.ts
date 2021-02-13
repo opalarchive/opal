@@ -184,6 +184,7 @@ export interface Problem {
 }
 
 export type problemAction = "vote" | "comment" | "addTag" | "removeTag";
+export type problemActionPrivileged = "title" | "text" | "category" | "difficulty";
 
 /**
  * Reply related types

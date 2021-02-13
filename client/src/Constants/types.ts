@@ -1,4 +1,4 @@
-import { data, problemAction, ReplyType, Problem } from "../../../.shared";
+import { data, problemAction, problemActionPrivileged, ReplyType, Problem } from "../../../.shared";
 
 /*
  * The idea here is that if success is true, the value must be of type output.
@@ -72,6 +72,12 @@ export type tryProblemAction = (
   type: problemAction
 ) => Promise<void>;
 
+export type tryProblemActionPrivileged = (
+  ind: number,
+  data: data,
+  type: problemActionPrivileged
+) => Promise<void>;
+
 export type newProblem = (
   problem: Omit<Problem, "ind">
 ) => Promise<void>;
@@ -94,6 +100,7 @@ export interface FrontendProblem {
   votes: number;
   myVote: number;
   tryProblemAction: (data: data, type: problemAction) => Promise<void>;
+  tryProblemActionPrivileged: (data: data, type: problemActionPrivileged) => Promise<void>;
   replyTypes: replyTypes;
   authUser: firebase.User;
 }

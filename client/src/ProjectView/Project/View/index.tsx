@@ -19,6 +19,7 @@ import {
   data,
   Problem as ProblemType,
   problemAction,
+  problemActionPrivileged,
   ProjectPrivate,
   ReplyType,
 } from "../../../../../.shared/src/types";
@@ -27,6 +28,7 @@ import {
   replyTypes,
   tryProblemAction,
   newProblem,
+  tryProblemActionPrivileged,
 } from "../../../Constants/types";
 import Overview from "./Pages/Overview";
 import Compile from "./Pages/Compile";
@@ -37,15 +39,19 @@ interface ViewProps {
   editors: string[];
   uuid: string;
   tryProblemAction: tryProblemAction;
+  tryProblemActionPrivileged: tryProblemActionPrivileged;
   fail: () => void;
   authUser: firebase.User;
   newProblem: newProblem;
 }
 
 export interface ViewSectionProps {
+  fixedSidebar: boolean;
   project: ProjectPrivate;
   uuid: string;
   authUser: firebase.User;
+  tryProblemAction: tryProblemAction;
+  tryProblemActionPrivileged: tryProblemActionPrivileged;
 }
 
 export interface CategoryColors {
@@ -134,6 +140,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     uuid: string,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
+    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
   ): FrontendProblem {
     const types = Object.fromEntries(
@@ -171,6 +178,8 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
           : prob.votes[authUser.displayName!],
       tryProblemAction: (problemActionData: data, type: problemAction) =>
         tryProblemAction(prob.ind, problemActionData, type),
+      tryProblemActionPrivileged: (problemActionPrivilegedData: data, type: problemActionPrivileged) =>
+        tryProblemActionPrivileged(prob.ind, problemActionPrivilegedData, type),
       replyTypes: types,
       authUser: authUser,
     };
@@ -194,6 +203,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       editors,
       uuid,
       tryProblemAction,
+      tryProblemActionPrivileged,
       authUser,
       match,
       newProblem,
@@ -215,11 +225,13 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     //   authUser: authUser,
     // };
 
-    const viewSectionProps = {
+    const viewSectionProps: ViewSectionProps = {
       fixedSidebar: true,
       project,
       uuid,
       authUser,
+      tryProblemAction,
+      tryProblemActionPrivileged,
     };
 
     return (
@@ -244,7 +256,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 difficultyRange={this.state.difficultyRange}
                 editors={editors}
                 problemProps={this.problemProps}
-                tryProblemAction={tryProblemAction}
                 setDefaultScroll={this.setDefaultScroll}
               />
             )}
@@ -259,7 +270,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               <Details
                 {...viewSectionProps}
                 problemProps={this.problemProps}
-                tryProblemAction={tryProblemAction}
                 setDefaultScroll={this.setDefaultScroll}
               />
             )}
@@ -274,7 +284,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 difficultyRange={this.state.difficultyRange}
                 editors={editors}
                 problemProps={this.problemProps}
-                tryProblemAction={tryProblemAction}
               />
             )}
           />
@@ -288,7 +297,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 difficultyRange={this.state.difficultyRange}
                 editors={editors}
                 problemProps={this.problemProps}
-                tryProblemAction={tryProblemAction}
                 newProblem={newProblem}
               />
             )}

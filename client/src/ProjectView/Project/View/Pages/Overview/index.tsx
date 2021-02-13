@@ -6,6 +6,7 @@ import { Problem as ProblemType } from "../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
+  tryProblemActionPrivileged,
 } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import Filter from "./Filter";
@@ -23,9 +24,11 @@ interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
     uuid: string,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
+    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
+  tryProblemActionPrivileged: tryProblemActionPrivileged;
   setDefaultScroll: (scroll: number) => void;
 }
 
@@ -90,6 +93,7 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
       problemProps,
       uuid,
       tryProblemAction,
+      tryProblemActionPrivileged,
       authUser,
       classes,
     } = this.props;
@@ -153,6 +157,7 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
             authUser={authUser}
             problemProps={problemProps}
             tryProblemAction={tryProblemAction}
+            tryProblemActionPrivileged={tryProblemActionPrivileged}
             onClickTag={this.onClickTag}
             clickedTags={this.state.clickedTags}
             allTags={allTags}

@@ -14,6 +14,7 @@ import styles from "./index.css";
 import {
   FrontendProblem,
   tryProblemAction,
+  tryProblemActionPrivileged
 } from "../../../../../Constants/types";
 import Action from "./Action";
 import SidebaredBase from "../../../../Template/SidebaredBase";
@@ -103,6 +104,7 @@ class Details extends React.Component<DetailProps> {
                     content={reply}
                     isHighlighted={replyNumber === id}
                     tryProblemAction={otherProps.tryProblemAction}
+                    tryProblemActionPrivileged={otherProps.tryProblemActionPrivileged}
                   />
                 </div>
               ))}
@@ -113,6 +115,7 @@ class Details extends React.Component<DetailProps> {
             reply={-1}
             isHighlighted={false}
             tryProblemAction={otherProps.tryProblemAction}
+            tryProblemActionPrivileged={otherProps.tryProblemActionPrivileged}
           />
         </div>
       </div>
@@ -136,6 +139,7 @@ interface RoutedDetailsProps
     uuid: string,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
+    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
@@ -148,6 +152,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   uuid,
   problemProps,
   tryProblemAction,
+  tryProblemActionPrivileged,
   authUser,
   setDefaultScroll,
   match,
@@ -179,6 +184,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
           uuid,
           project.problems[ind],
           tryProblemAction,
+          tryProblemActionPrivileged,
           authUser
         )}
         allTags={allTags}

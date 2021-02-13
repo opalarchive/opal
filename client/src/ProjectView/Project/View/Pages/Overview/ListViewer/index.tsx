@@ -3,6 +3,7 @@ import { Problem as ProblemType } from "../../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
+  tryProblemActionPrivileged,
 } from "../../../../../../Constants/types";
 import Problem from "../../../Embedded/Problem";
 
@@ -14,9 +15,11 @@ interface ListViewerProps {
     uuid: string,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
+    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
+  tryProblemActionPrivileged: tryProblemActionPrivileged;
   onClickTag: (tagText: string) => void;
   clickedTags: {
     [tag: string]: boolean;
@@ -33,6 +36,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       problemProps,
       uuid,
       tryProblemAction,
+      tryProblemActionPrivileged,
       clickedTags,
       onClickTag,
       authUser,
@@ -42,7 +46,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
     return problemList.map((prob) => (
       <Problem
         key={`problem-${prob.ind}`}
-        {...problemProps(uuid, prob, tryProblemAction, authUser)}
+        {...problemProps(uuid, prob, tryProblemAction, tryProblemActionPrivileged, authUser)}
         repliable
         clickedTags={clickedTags}
         onClickTag={onClickTag}

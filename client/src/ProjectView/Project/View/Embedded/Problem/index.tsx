@@ -56,6 +56,7 @@ class Problem extends React.PureComponent<
       votes,
       myVote,
       tryProblemAction,
+      tryProblemActionPrivileged,
       replyTypes,
       repliable,
       clickedTags,

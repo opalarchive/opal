@@ -7,6 +7,7 @@ import {
   FrontendProblem,
   tryProblemAction,
   newProblem,
+  tryProblemActionPrivileged,
 } from "../../../../../Constants/types";
 import TagGroup from "../../Embedded/TagGroup";
 import styles from "./index.css";
@@ -23,6 +24,7 @@ interface NewProblemProps extends ViewSectionProps {
     uuid: string,
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
+    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
   ) => FrontendProblem;
   tryProblemAction: tryProblemAction;

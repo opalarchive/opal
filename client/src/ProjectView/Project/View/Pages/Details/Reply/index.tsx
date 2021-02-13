@@ -25,6 +25,7 @@ import * as ROUTES from "../../../../../../Constants/routes";
 import { compose } from "recompose";
 import {
   problemAction,
+  problemActionPrivileged,
   reply,
   ReplyType,
 } from "../../../../../../../../.shared";
@@ -39,6 +40,10 @@ interface ReplyPropsBase {
   tryProblemAction: (
     data: string | number,
     type: problemAction
+  ) => Promise<void>;
+  tryProblemActionPrivileged: (
+    data: string | number,
+    type: problemActionPrivileged
   ) => Promise<void>;
 }
 
