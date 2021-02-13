@@ -4,7 +4,7 @@ import { CategoryColors, ViewSectionProps } from "../..";
 
 import { Problem as ProblemType } from "../../../../../../../.shared";
 import {
-  ProblemDetails,
+  FrontendProblem,
   tryProblemAction,
 } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
@@ -23,7 +23,7 @@ interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
-  ) => ProblemDetails;
+  ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
   setDefaultScroll: (scroll: number) => void;
 }

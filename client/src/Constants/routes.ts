@@ -9,6 +9,7 @@ export const PROJECT_VIEW = "/project/view/:uuid";
 export const PROJECT_OVERVIEW = "/project/view/:uuid/overview";
 export const PROJECT_PROBLEM = "/project/view/:uuid/p:ind";
 export const PROJECT_PROBLEM_REPLY = "/project/view/:uuid/p:ind/r:reply";
+export const PROJECT_NEW_PROBLEM = "/project/view/:uuid/new-problem";
 
 export const PROJECT_COMPILE = "/project/view/:uuid/compile";
 export const PROJECT_SETTINGS = "/project/view/:uuid/settings";

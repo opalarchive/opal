@@ -4,7 +4,7 @@ import { CategoryColors, ViewSectionProps } from "../..";
 
 import { Problem as ProblemType } from "../../../../../../../.shared";
 import {
-  ProblemDetails,
+  FrontendProblem,
   tryProblemAction,
 } from "../../../../../Constants/types";
 import styles from "./index.css";
@@ -18,7 +18,7 @@ interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
-  ) => ProblemDetails;
+  ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
 }
 

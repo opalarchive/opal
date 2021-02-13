@@ -8,6 +8,7 @@ import {
   Client,
   projectActionAdmin,
   data,
+  Problem,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
 
@@ -191,6 +192,21 @@ export const tryProblemAction = async (
       problemInd,
       data,
       type,
+    },
+    authUser
+  );
+};
+
+export const newProblem = async (
+  uuid: string,
+  problem: Omit<Problem, "ind">,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/newProblem",
+    {
+      uuid,
+      problem
     },
     authUser
   );

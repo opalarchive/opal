@@ -1,7 +1,7 @@
 import React from "react";
 import { Problem as ProblemType } from "../../../../../../../../.shared";
 import {
-  ProblemDetails,
+  FrontendProblem,
   tryProblemAction,
 } from "../../../../../../Constants/types";
 import Problem from "../../../Embedded/Problem";
@@ -15,7 +15,7 @@ interface ListViewerProps {
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
-  ) => ProblemDetails;
+  ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
   onClickTag: (tagText: string) => void;
   clickedTags: {

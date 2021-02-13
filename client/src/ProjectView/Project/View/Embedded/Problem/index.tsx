@@ -21,12 +21,12 @@ import { Link } from "react-router-dom";
 
 import * as ROUTES from "../../../../../Constants/routes";
 import styles from "./index.css";
-import { ProblemDetails } from "../../../../../Constants/types";
+import { FrontendProblem } from "../../../../../Constants/types";
 import Dot from "../Dot";
 import Tag from "../Tag";
 import TagGroup from "../TagGroup";
 
-interface ProblemProps extends ProblemDetails {
+interface ProblemProps extends FrontendProblem {
   repliable: boolean;
   clickedTags?: {
     [tag: string]: boolean;

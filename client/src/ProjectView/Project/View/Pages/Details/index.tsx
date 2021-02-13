@@ -12,14 +12,14 @@ import {
 } from "../../../../../../../.shared";
 import styles from "./index.css";
 import {
-  ProblemDetails,
+  FrontendProblem,
   tryProblemAction,
 } from "../../../../../Constants/types";
 import Action from "./Action";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import { ViewSectionProps } from "../..";
 
-interface DetailProps extends WithStyles<typeof styles>, ProblemDetails {
+interface DetailProps extends WithStyles<typeof styles>, FrontendProblem {
   replies: replyType[];
   setDefaultScroll: (scroll: number) => void;
   reply?: number;
@@ -138,7 +138,7 @@ interface RoutedDetailsProps
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
-  ) => ProblemDetails;
+  ) => FrontendProblem;
   tryProblemAction: tryProblemAction;
   setDefaultScroll: (scroll: number) => void;
 }

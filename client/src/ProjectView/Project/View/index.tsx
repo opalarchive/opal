@@ -23,13 +23,17 @@ import {
   ReplyType,
 } from "../../../../../.shared/src/types";
 import {
-  ProblemDetails,
+  FrontendProblem,
   replyTypes,
   tryProblemAction,
+  newProblem,
 } from "../../../Constants/types";
 import Overview from "./Pages/Overview";
 import Navbar from "./Navbar";
 import Compile from "./Pages/Compile";
+import { Button } from "@material-ui/core";
+import { FiPlus } from "react-icons/fi";
+import NewProblem from "./Pages/NewProblem";
 
 interface ViewProps {
   project: ProjectPrivate;
@@ -38,6 +42,7 @@ interface ViewProps {
   tryProblemAction: tryProblemAction;
   fail: () => void;
   authUser: firebase.User;
+  newProblem: newProblem;
 }
 
 export interface ViewSectionProps {
@@ -138,7 +143,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     prob: ProblemType,
     tryProblemAction: tryProblemAction,
     authUser: firebase.User
-  ): ProblemDetails {
+  ): FrontendProblem {
     const types = Object.fromEntries(
       Object.keys(ReplyType).map((replyType) => [replyType, 0])
     ) as replyTypes;
@@ -213,7 +218,8 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   }
 
   render() {
-    const { project, editors, uuid, tryProblemAction, authUser } = this.props;
+    const { project, editors, uuid, tryProblemAction, authUser, match, newProblem } = this.props;
+    console.log(match.url);
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -259,7 +265,14 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
         onScrollTopChange={this.onScrollTopChange}
       >
         <Navbar uuid={uuid} forwardedRef={this.navbarRef} />
-
+        <br />
+        {match.url !== ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid) && (
+          <Button variant="contained" color="secondary" href={ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)}>
+            <FiPlus /> New Problem
+          </Button>
+        )}
+        
+        <br />
         <Switch>
           <Route
             exact
@@ -307,6 +320,21 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 editors={editors}
                 problemProps={this.problemProps}
                 tryProblemAction={tryProblemAction}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={[ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)]}
+            render={(_) => (
+              <NewProblem
+                {...viewSectionProps}
+                categoryColors={this.state.categoryColors}
+                difficultyRange={this.state.difficultyRange}
+                editors={editors}
+                problemProps={this.problemProps}
+                tryProblemAction={tryProblemAction}
+                newProblem={newProblem}
               />
             )}
           />

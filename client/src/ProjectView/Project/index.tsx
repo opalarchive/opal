@@ -11,7 +11,7 @@ import {
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
-import { getProjectPrivate, tryProblemAction } from "../../Firebase";
+import { getProjectPrivate, tryProblemAction, newProblem } from "../../Firebase";
 import { getProjectName, post } from "../../Firebase";
 
 import Loading from "../../Loading";
@@ -53,6 +53,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     super(props);
 
     this.tryProblemAction = this.tryProblemAction.bind(this);
+    this.newProblem = this.newProblem.bind(this);
   }
 
   async setProject(uuid: string, authUser: firebase.User) {
@@ -194,6 +195,28 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
   }
 
+  async newProblem(problem: Omit<Problem, "ind">) {
+    const oldProject = this.state.project;
+    let project = this.state.project;
+    if (project.success && typeof project.value != "string") {
+      let problemWithInd: Problem = { ...problem, ind: project.value.problems.length };
+      let problems = [...project.value.problems, problemWithInd];
+      project.value.problems = problems;
+    }
+    
+    this.setState({ project });
+
+    const result = await newProblem(
+      this.props.match.params.uuid,
+      problem,
+      this.props.authUser
+    );
+
+    if (!result.success) {
+      this.setState({ project: oldProject });
+    }
+  }
+
   render() {
     if (this.state.loading) {
       return <Loading background="white" />;
@@ -234,6 +257,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         tryProblemAction={this.tryProblemAction}
         fail={this.props.fail}
         authUser={this.props.authUser}
+        newProblem={this.newProblem}
       />
     );
   }

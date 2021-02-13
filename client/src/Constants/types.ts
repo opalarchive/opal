@@ -1,4 +1,4 @@
-import { data, problemAction, ReplyType } from "../../../.shared";
+import { data, problemAction, ReplyType, Problem } from "../../../.shared";
 
 /*
  * The idea here is that if success is true, the value must be of type output.
@@ -72,7 +72,11 @@ export type tryProblemAction = (
   type: problemAction
 ) => Promise<void>;
 
-export interface ProblemDetails {
+export type newProblem = (
+  problem: Omit<Problem, "ind">
+) => Promise<void>;
+
+export interface FrontendProblem {
   uuid: string;
   ind: number;
   title: string;
