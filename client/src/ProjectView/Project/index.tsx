@@ -11,7 +11,11 @@ import {
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
-import { getProjectPrivate, tryProblemAction, newProblem } from "../../Firebase";
+import {
+  getProjectPrivate,
+  tryProblemAction,
+  newProblem,
+} from "../../Firebase";
 import { getProjectName, post } from "../../Firebase";
 import { NotificationsProps } from "../Template/Notifications";
 
@@ -203,11 +207,14 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     const oldProject = this.state.project;
     let project = this.state.project;
     if (project.success && typeof project.value != "string") {
-      let problemWithInd: Problem = { ...problem, ind: project.value.problems.length };
+      let problemWithInd: Problem = {
+        ...problem,
+        ind: project.value.problems.length,
+      };
       let problems = [...project.value.problems, problemWithInd];
       project.value.problems = problems;
     }
-    
+
     this.setState({ project });
 
     const result = await newProblem(
@@ -254,15 +261,25 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
     if (!this.state.editors.success) return "???"; // obviously impossible, but it shuts lint up
     return (
-      <View
-        project={this.state.project.value}
-        editors={this.state.editors.value}
-        uuid={this.props.match.params.uuid}
-        tryProblemAction={this.tryProblemAction}
-        fail={this.props.fail}
-        authUser={this.props.authUser}
-        newProblem={this.newProblem}
-      />
+      <>
+        <ProjectAppbar
+          notifs={this.props.notifs}
+          notifsLoading={this.props.notifsLoading}
+          markNotifications={this.props.markNotifications}
+          title={this.state.name.success ? this.state.name.value : ""}
+        />
+        <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
+          <View
+            project={this.state.project.value}
+            editors={this.state.editors.value}
+            uuid={this.props.match.params.uuid}
+            tryProblemAction={this.tryProblemAction}
+            fail={this.props.fail}
+            authUser={this.props.authUser}
+            newProblem={this.newProblem}
+          />
+        </div>
+      </>
     );
   }
 }
