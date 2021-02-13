@@ -17,7 +17,6 @@ export const tabContainerStyles = (theme: Theme) =>
       backgroundColor: "transparent",
       "& > span": {
         width: "30%",
-        height: 4,
         backgroundColor: theme.palette.secondary.light,
       },
     },
@@ -29,6 +28,7 @@ export const tabStyles = (theme: Theme) =>
       textTransform: "none",
       fontSize: "1.1rem",
       font: "inherit",
+      minWidth: spacingRem(theme, 12),
       "&:hover": {
         opacity: 0.95,
       },
