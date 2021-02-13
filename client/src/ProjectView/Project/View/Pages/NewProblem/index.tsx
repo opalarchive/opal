@@ -56,7 +56,10 @@ class NewProblem extends React.Component<NewProblemProps & WithStyles<typeof sty
     const uid = !!this.props.authUser.uid
       ? this.props.authUser.uid
       : "";
-    const { title, text, category, difficulty } = this.state;
+    var { title, text, category, difficulty } = this.state;
+    if (!["algebra", "geometry", "numberTheory", "combinatorics"].includes(category)) {
+      category = "miscellaneous";
+    }
     this.props.newProblem({ author: uid, title, text, category, difficulty, replies: [], votes: {} as Votes, tags: [] });
     //this.props.history.push(ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(":ind", `${project.problems.length}`));
   }
@@ -84,11 +87,7 @@ class NewProblem extends React.Component<NewProblemProps & WithStyles<typeof sty
           break;
         }
 
-        if (!["algebra", "geometry", "numberTheory", "combinatorics"].includes(value)) {
-          this.setState({ category: "miscellaneous" })
-        } else {
-          this.setState({ title: value });
-        }
+        this.setState({ category: value });
 
         break;
       case "difficulty":

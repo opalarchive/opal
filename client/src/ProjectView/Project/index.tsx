@@ -254,25 +254,15 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
     if (!this.state.editors.success) return "???"; // obviously impossible, but it shuts lint up
     return (
-     <>
-        <ProjectAppbar
-          notifs={this.props.notifs}
-          notifsLoading={this.props.notifsLoading}
-          markNotifications={this.props.markNotifications}
-          title={this.state.name.success ? this.state.name.value : ""}
-        />
-        <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
-          <View
-            project={this.state.project.value}
-            editors={this.state.editors.value}
-            uuid={this.props.match.params.uuid}
-            tryProblemAction={this.tryProblemAction}
-            fail={this.props.fail}
-            authUser={this.props.authUser}
-            newProblem={this.newProblem}
-          />
-        </div>
-      </>
+      <View
+        project={this.state.project.value}
+        editors={this.state.editors.value}
+        uuid={this.props.match.params.uuid}
+        tryProblemAction={this.tryProblemAction}
+        fail={this.props.fail}
+        authUser={this.props.authUser}
+        newProblem={this.newProblem}
+      />
     );
   }
 }
