@@ -64,7 +64,7 @@ class Problem extends React.PureComponent<
     editTitleValue: "",
     editTextValue: "",
     editCategoryValue: "",
-    editDifficultyValue: -1,
+    editDifficultyValue: 0,
   }
 
   constructor(props: ProblemProps & WithStyles<typeof styles>) {
@@ -200,7 +200,11 @@ class Problem extends React.PureComponent<
                     <TextField fullWidth value={this.state.editTitleValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onChange("title", e.target.value)} />
                     <IconButton
                       onClick={(_) => {
-                        tryProblemActionPrivileged(this.state.editTitleValue, "title");
+                        if (this.state.editTitleValue.length == 0) {
+                          tryProblemActionPrivileged("Untitled", "title");
+                        } else {
+                          tryProblemActionPrivileged(this.state.editTitleValue, "title");
+                        }                        
                         this.setState({ editTitle: false });
                       }}
                     >
@@ -225,10 +229,14 @@ class Problem extends React.PureComponent<
           <div className={classes.bodyText}>
             {this.state.editText ? (
               <>
-                <TextField fullWidth multiline value={this.state.editTextValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onChange("text", e.target.value)} />
+                <TextField variant="filled" fullWidth multiline value={this.state.editTextValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onChange("text", e.target.value)} />
                 <IconButton
                   onClick={(_) => {
-                    tryProblemActionPrivileged(this.state.editTextValue, "text");
+                    if (this.state.editTextValue.length == 0) {
+                      tryProblemActionPrivileged("Empty", "text");
+                    } else {
+                      tryProblemActionPrivileged(this.state.editTextValue, "text");
+                    }
                     this.setState({ editText: false });
                   }}
                 >
