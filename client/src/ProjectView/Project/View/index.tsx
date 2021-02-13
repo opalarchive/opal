@@ -30,8 +30,6 @@ import {
 } from "../../../Constants/types";
 import Overview from "./Pages/Overview";
 import Compile from "./Pages/Compile";
-import { Button } from "@material-ui/core";
-import { FiPlus } from "react-icons/fi";
 import NewProblem from "./Pages/NewProblem";
 
 interface ViewProps {
@@ -191,8 +189,15 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   }
 
   render() {
-    const { project, editors, uuid, tryProblemAction, authUser, match, newProblem } = this.props;
-    console.log(match.url);
+    const {
+      project,
+      editors,
+      uuid,
+      tryProblemAction,
+      authUser,
+      match,
+      newProblem,
+    } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -225,14 +230,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
           this.scrollSet > 1 ? undefined : this.state.defaultScroll
         }
       >
-        <br />
-        {match.url !== ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid) && (
-          <Button variant="contained" color="secondary" href={ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)}>
-            <FiPlus /> New Problem
-          </Button>
-        )}
-        
-        <br />
         <Switch>
           <Route
             exact

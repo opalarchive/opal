@@ -1,4 +1,4 @@
-import { withStyles, WithStyles } from "@material-ui/core";
+import { Button, withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { CategoryColors, ViewSectionProps } from "../..";
 
@@ -11,6 +11,8 @@ import SidebaredBase from "../../../../Template/SidebaredBase";
 import Filter from "./Filter";
 import styles from "./index.css";
 import ListViewer from "./ListViewer";
+import * as ROUTES from "../../../../../Constants/routes";
+import { FiPlus } from "react-icons/fi";
 
 interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
   fixedSidebar: boolean;
@@ -135,6 +137,16 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
         authUser={authUser}
       >
         <div className={classes.root}>
+          <div className={classes.buttonContainer}>
+            <Button
+              variant="contained"
+              color="secondary"
+              href={ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)}
+            >
+              <FiPlus />
+              &nbsp;New Problem
+            </Button>
+          </div>
           <ListViewer
             problemList={problemList}
             uuid={uuid}

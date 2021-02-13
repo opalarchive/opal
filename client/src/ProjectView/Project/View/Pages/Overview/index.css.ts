@@ -7,9 +7,9 @@ const styles = (theme: Theme) =>
       padding: `${spacingRem(theme, 3)} ${spacingRem(theme, 3)} 
                 ${spacingRem(theme, 1)} ${spacingRem(theme, 1.5)}`,
     },
-    navbarContainer: {
-      position: "relative",
-      margin: "0 auto",
+    buttonContainer: {
+      float: "right",
+      paddingBottom: spacingRem(theme, 2),
     },
     menuButton: {
       marginRight: theme.spacing(2),
