@@ -13,25 +13,29 @@ import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
 import { getProjectPrivate, tryProblemAction, newProblem } from "../../Firebase";
 import { getProjectName, post } from "../../Firebase";
+import { NotificationsProps } from "../Template/Notifications";
 
 import Loading from "../../Loading";
 import Unconfigured from "./unconfigured";
 import View from "./View";
+import ProjectAppbar from "./ProjectAppbar";
 
 interface ProjectMatch {
   uuid: string;
 }
 
-interface ProjectProps extends RouteComponentProps<ProjectMatch> {
+interface ProjectProps
+  extends RouteComponentProps<ProjectMatch>,
+    NotificationsProps {
   authUser: firebase.User;
   setNotifications: () => Promise<void>;
-  setTitle: (title: string) => void;
   fail: () => void;
 }
 
 interface ProjectState {
   project: Result<ProjectPrivate | string>;
   editors: Result<string[]>;
+  name: Result<string>;
   loading: boolean;
 }
 
@@ -45,6 +49,10 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       success: false,
       value: "",
     } as Result<string[]>,
+    name: {
+      success: false,
+      value: "",
+    },
     loading: true,
   };
   private interval: number = -1;
@@ -68,11 +76,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       );
       const name = await getProjectName(uuid, authUser);
 
-      if (name.success) {
-        this.props.setTitle(name.value);
-      }
-
-      this.setState({ project, editors, loading: false });
+      this.setState({ project, editors, name, loading: false });
     } catch (e) {
       return e;
     }
@@ -165,7 +169,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        for (let i=0; i<data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           if (data[i].length > 0 && !tags.includes(data[i])) {
             project.value.problems[ind].tags.push(data[i]);
           }
@@ -250,6 +254,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
     if (!this.state.editors.success) return "???"; // obviously impossible, but it shuts lint up
     return (
+<<<<<<< HEAD
       <View
         project={this.state.project.value}
         editors={this.state.editors.value}
@@ -259,6 +264,26 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         authUser={this.props.authUser}
         newProblem={this.newProblem}
       />
+=======
+      <>
+        <ProjectAppbar
+          notifs={this.props.notifs}
+          notifsLoading={this.props.notifsLoading}
+          markNotifications={this.props.markNotifications}
+          title={this.state.name.success ? this.state.name.value : ""}
+        />
+        <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
+          <View
+            project={this.state.project.value}
+            editors={this.state.editors.value}
+            uuid={this.props.match.params.uuid}
+            tryProblemAction={this.tryProblemAction}
+            fail={this.props.fail}
+            authUser={this.props.authUser}
+          />
+        </div>
+      </>
+>>>>>>> 14c17a8f3ec03ee4ed1b793eefa3fbe607d5aa22
     );
   }
 }

@@ -132,7 +132,6 @@ interface RoutedDetailsProps
   extends RouteComponentProps<DetailsMatch>,
     ViewSectionProps {
   fixedSidebar: boolean;
-  sidebarYOffset: number;
   problemProps: (
     uuid: string,
     prob: ProblemType,
@@ -144,9 +143,7 @@ interface RoutedDetailsProps
 }
 
 const RoutedDetails: React.FC<RoutedDetailsProps> = ({
-  height,
   fixedSidebar,
-  sidebarYOffset,
   project,
   uuid,
   problemProps,
@@ -174,8 +171,6 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
         allTags,
       }}
       fixedSidebar={fixedSidebar}
-      sidebarYOffset={sidebarYOffset}
-      height={height}
       authUser={authUser}
     >
       <StyledDetails
