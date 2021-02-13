@@ -1,4 +1,9 @@
+import React from "react";
 import {
+  AppBar,
+  IconButton,
+  Toolbar,
+  Typography,
   Paper,
   Tab,
   TabProps,
@@ -6,11 +11,14 @@ import {
   withStyles,
   WithStyles,
 } from "@material-ui/core";
-import React from "react";
+import Notifications, {
+  NotificationsProps,
+} from "../../Template/Notifications";
+import { FiUser } from "react-icons/fi";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import styles, { tabStyles } from "./index.css";
+import styles, { tabContainerStyles, tabStyles } from "./index.css";
 
-import * as ROUTES from "../../../../Constants/routes";
+import * as ROUTES from "../../../Constants/routes";
 import { compose } from "recompose";
 
 const sectionNames = ["Overview", "Compile", "Settings"];
@@ -48,6 +56,8 @@ const TabContainer: React.FC<any> = (props) => (
   <Tabs {...props} TabIndicatorProps={{ children: <span /> }} />
 );
 
+const StyledTabContainer = withStyles(tabContainerStyles)(TabContainer);
+
 interface LinkTabProps {
   url: string;
 }
@@ -68,6 +78,7 @@ const LinkTab: React.FC<
 );
 
 const StyledTab = withStyles(tabStyles)(LinkTab);
+
 class Navbar extends React.PureComponent<
   NavbarProps & RouteComponentProps & WithStyles<typeof styles>
 > {
@@ -78,28 +89,62 @@ class Navbar extends React.PureComponent<
 
     return (
       <div className={classes.root} ref={forwardedRef}>
-        <Paper elevation={3}>
-          <Tabs value={currentSection} aria-label="project navigation tabs">
-            {sectionNames.map((name, index) => {
-              return (
-                <StyledTab
-                  key={`${name}-tab`}
-                  url={sectionLinks[index].replace(":uuid", uuid)}
-                  label={name}
-                />
-              ); // mui passes weird props to this that jsx doesn't like on a tags, so we destroy them here (also to style)
-            })}
-          </Tabs>
-        </Paper>
+        <StyledTabContainer
+          value={currentSection}
+          aria-label="project navigation tabs"
+        >
+          {sectionNames.map((name, index) => {
+            return (
+              <StyledTab
+                key={`${name}-tab`}
+                url={sectionLinks[index].replace(":uuid", uuid)}
+                label={name}
+              />
+            ); // mui passes weird props to this that jsx doesn't like on a tags, so we destroy them here (also to style)
+          })}
+        </StyledTabContainer>
       </div>
     );
   }
 }
 
-export default compose<
+const StyledNavbar = compose<
   NavbarProps & RouteComponentProps & WithStyles<typeof styles>,
   NavbarProps
 >(
   withStyles(styles),
   withRouter
 )(Navbar);
+
+type ProjectAppbarProps = NotificationsProps & { title: string };
+
+class ProjectAppbar extends React.Component<ProjectAppbarProps> {
+  render() {
+    const { notifs, notifsLoading, markNotifications, title } = this.props;
+
+    return (
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+            {title}
+          </Typography>
+          <StyledNavbar uuid="e29edbeb-e10e-474d-9c5d-860d479ed198" />
+          <Notifications
+            notifsLoading={notifsLoading}
+            notifs={notifs}
+            markNotifications={markNotifications}
+          />
+          <IconButton
+            edge="end"
+            aria-label="account of current user"
+            color="inherit"
+          >
+            <FiUser />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+    );
+  }
+}
+
+export default ProjectAppbar;

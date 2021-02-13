@@ -25,7 +25,6 @@ interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
 class Compile extends React.Component<CompileProps> {
   render() {
     const {
-      // height,
       // project,
       // categoryColors,
       // editors,

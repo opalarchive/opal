@@ -18,6 +18,8 @@ import {
   ProjectViewFilter,
 } from "../../Constants/types";
 import SidebaredBase from "../Template/SidebaredBase";
+import { NotificationsProps } from "../Template/Notifications";
+import SelectionAppbar from "./SelectionAppbar";
 
 interface SelectionBaseProps {
   refreshProjects: () => Promise<void>;
@@ -93,23 +95,20 @@ class SelectionBase extends React.Component<SelectionBaseProps> {
   }
 }
 
-interface SelectionProps {
+interface SelectionProps extends NotificationsProps {
   authUser: firebase.User;
   setNotifications: () => Promise<void>;
-  setTitle: (title: string) => void;
   fail: () => void;
 }
 
 interface SelectionState {
   visibleProjects: Client.Publico;
-  bodyHeight: number;
   loading: boolean;
 }
 
 class Selection extends React.Component<SelectionProps, SelectionState> {
   state = {
     visibleProjects: {} as Client.Publico,
-    bodyHeight: 0,
     loading: true,
   };
 
@@ -119,7 +118,6 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
     super(props);
 
     this.setProjects = this.setProjects.bind(this);
-    this.onBodyHeightChange = this.onBodyHeightChange.bind(this);
   }
 
   async setProjects() {
@@ -136,13 +134,7 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
     }
   }
 
-  onBodyHeightChange(height: number) {
-    this.setState({ bodyHeight: height });
-  }
-
   async componentDidMount() {
-    this.props.setTitle("Project Selection");
-
     try {
       await poll(this.setProjects, () => !this.state.loading, 1500, 200);
 
@@ -165,92 +157,97 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
       return <Loading background="white" />;
     }
     return (
-      <ScrollBase
-        maxWidth={1320}
-        background="rgb(0, 0, 0, 0.025)"
-        onBodyHeightChange={this.onBodyHeightChange}
-      >
-        <SidebaredBase
-          sidebarWidth={15}
-          Sidebar={Sidebar}
-          fixedSidebar
-          height={this.state.bodyHeight}
-          authUser={this.props.authUser}
-        >
-          <Route
-            exact
-            path={ROUTES.PROJECT}
-            render={() => (
-              <SelectionBase
-                refreshProjects={this.setProjects}
-                type="priority"
-                visibleProjects={this.state.visibleProjects}
-                authUser={this.props.authUser}
+      <>
+        <SelectionAppbar
+          notifs={this.props.notifs}
+          notifsLoading={this.props.notifsLoading}
+          markNotifications={this.props.markNotifications}
+          title={"Project Selection"}
+        />
+        <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
+          <ScrollBase maxWidth={1320} background="rgb(0, 0, 0, 0.025)">
+            <SidebaredBase
+              sidebarWidth={15}
+              Sidebar={Sidebar}
+              fixedSidebar
+              authUser={this.props.authUser}
+            >
+              <Route
+                exact
+                path={ROUTES.PROJECT}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="priority"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            exact
-            path={ROUTES.SELECTION_PRIORITY}
-            render={() => (
-              <SelectionBase
-                refreshProjects={this.setProjects}
-                type="priority"
-                visibleProjects={this.state.visibleProjects}
-                authUser={this.props.authUser}
+              <Route
+                exact
+                path={ROUTES.SELECTION_PRIORITY}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="priority"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            exact
-            path={ROUTES.SELECTION_MY_PROJECTS}
-            render={() => (
-              <SelectionBase
-                refreshProjects={this.setProjects}
-                type="myProjects"
-                visibleProjects={this.state.visibleProjects}
-                authUser={this.props.authUser}
+              <Route
+                exact
+                path={ROUTES.SELECTION_MY_PROJECTS}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="myProjects"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            exact
-            path={ROUTES.SELECTION_SHARED_WITH_ME}
-            render={() => (
-              <SelectionBase
-                refreshProjects={this.setProjects}
-                type="sharedWithMe"
-                visibleProjects={this.state.visibleProjects}
-                authUser={this.props.authUser}
+              <Route
+                exact
+                path={ROUTES.SELECTION_SHARED_WITH_ME}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="sharedWithMe"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            exact
-            path={ROUTES.SELECTION_RECENT}
-            render={() => (
-              <SelectionBase
-                refreshProjects={this.setProjects}
-                type="recent"
-                visibleProjects={this.state.visibleProjects}
-                authUser={this.props.authUser}
+              <Route
+                exact
+                path={ROUTES.SELECTION_RECENT}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="recent"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            exact
-            path={ROUTES.SELECTION_TRASH}
-            render={() => (
-              <SelectionBase
-                refreshProjects={this.setProjects}
-                type="trash"
-                visibleProjects={this.state.visibleProjects}
-                authUser={this.props.authUser}
+              <Route
+                exact
+                path={ROUTES.SELECTION_TRASH}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="trash"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
               />
-            )}
-          />
-        </SidebaredBase>
-      </ScrollBase>
+            </SidebaredBase>
+          </ScrollBase>
+        </div>
+      </>
     );
   }
 }

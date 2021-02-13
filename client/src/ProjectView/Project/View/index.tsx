@@ -28,7 +28,6 @@ import {
   tryProblemAction,
 } from "../../../Constants/types";
 import Overview from "./Pages/Overview";
-import Navbar from "./Navbar";
 import Compile from "./Pages/Compile";
 
 interface ViewProps {
@@ -41,7 +40,6 @@ interface ViewProps {
 }
 
 export interface ViewSectionProps {
-  height: number;
   project: ProjectPrivate;
   uuid: string;
   authUser: firebase.User;
@@ -93,7 +91,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   };
 
   private scrollSet = 0;
-  private navbarRef = React.createRef<HTMLDivElement>();
 
   constructor(props: ViewProps & RouteComponentProps) {
     super(props);
@@ -102,9 +99,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
     this.problemProps = this.problemProps.bind(this);
     this.setDefaultScroll = this.setDefaultScroll.bind(this);
-    this.onBodyHeightChange = this.onBodyHeightChange.bind(this);
-    this.onScrollTopChange = this.onScrollTopChange.bind(this);
-    this.changeNavbarHeight = this.changeNavbarHeight.bind(this);
   }
 
   getCategoryColor(category: string) {
@@ -191,27 +185,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     }
   }
 
-  onScrollTopChange(scrollTop: number) {
-    this.setState({ scrollTop });
-  }
-
-  onBodyHeightChange(height: number) {
-    this.setState({ bodyHeight: height });
-  }
-
-  changeNavbarHeight() {
-    this.setState({ navbarHeight: this.navbarRef.current!.clientHeight! });
-  }
-
-  componentDidMount() {
-    this.changeNavbarHeight();
-    window.addEventListener("resize", this.changeNavbarHeight);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.changeNavbarHeight);
-  }
-
   render() {
     const { project, editors, uuid, tryProblemAction, authUser } = this.props;
 
@@ -231,21 +204,11 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     //   authUser: authUser,
     // };
 
-    const scrollPastHeader = this.state.scrollTop >= this.state.navbarHeight;
-    const viewableWindowHeight = scrollPastHeader
-      ? this.state.bodyHeight
-      : this.state.bodyHeight - this.state.navbarHeight + this.state.scrollTop;
-
     const viewSectionProps = {
-      height: viewableWindowHeight,
+      fixedSidebar: true,
       project,
       uuid,
       authUser,
-    };
-
-    const viewSectionWithSidebarProps = {
-      fixedSidebar: scrollPastHeader,
-      sidebarYOffset: -this.state.navbarHeight,
     };
 
     return (
@@ -255,11 +218,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
         customScrollTop={
           this.scrollSet > 1 ? undefined : this.state.defaultScroll
         }
-        onBodyHeightChange={this.onBodyHeightChange}
-        onScrollTopChange={this.onScrollTopChange}
       >
-        <Navbar uuid={uuid} forwardedRef={this.navbarRef} />
-
         <Switch>
           <Route
             exact
@@ -270,7 +229,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => (
               <Overview
                 {...viewSectionProps}
-                {...viewSectionWithSidebarProps}
                 categoryColors={this.state.categoryColors}
                 difficultyRange={this.state.difficultyRange}
                 editors={editors}
@@ -289,7 +247,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => (
               <Details
                 {...viewSectionProps}
-                {...viewSectionWithSidebarProps}
                 problemProps={this.problemProps}
                 tryProblemAction={tryProblemAction}
                 setDefaultScroll={this.setDefaultScroll}

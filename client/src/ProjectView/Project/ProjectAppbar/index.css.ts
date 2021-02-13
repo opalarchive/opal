@@ -1,11 +1,11 @@
 import { createStyles, Theme } from "@material-ui/core";
-import { spacingRem } from "../../../../Constants";
+import { spacingRem } from "../../../Constants";
 
 const styles = (theme: Theme) =>
   createStyles({
     root: {
-      padding: spacingRem(theme, 3),
-      paddingBottom: 0,
+      paddingLeft: spacingRem(theme, 3),
+      paddingRight: spacingRem(theme, 3),
     },
   });
 
@@ -16,9 +16,8 @@ export const tabContainerStyles = (theme: Theme) =>
       justifyContent: "center",
       backgroundColor: "transparent",
       "& > span": {
-        maxWidth: 40,
-        width: "100%",
-        backgroundColor: "#635ee7",
+        width: "30%",
+        backgroundColor: theme.palette.secondary.light,
       },
     },
   });
@@ -26,9 +25,15 @@ export const tabContainerStyles = (theme: Theme) =>
 export const tabStyles = (theme: Theme) =>
   createStyles({
     root: {
-      marginRight: theme.spacing(1),
+      textTransform: "none",
+      fontSize: "1.1rem",
+      font: "inherit",
+      minWidth: spacingRem(theme, 12),
+      "&:hover": {
+        opacity: 0.95,
+      },
       "&:focus": {
-        color: "rgba(0, 0, 0, 0.95)",
+        opacity: 0.95,
       },
     },
   });

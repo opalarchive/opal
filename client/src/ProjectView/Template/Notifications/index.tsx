@@ -1,7 +1,5 @@
 import {
-  AppBar,
   Typography,
-  Toolbar,
   withStyles,
   IconButton,
   Badge,
@@ -15,15 +13,15 @@ import {
   WithStyles,
 } from "@material-ui/core";
 import React from "react";
-import { FiBell, FiUser } from "react-icons/fi";
-import { Notification } from "../../../../.shared";
-import { Result } from "../../Constants/types";
-import Loading from "../../Loading";
+import { FiBell } from "react-icons/fi";
+import { Notification } from "../../../../../.shared";
+import { Result } from "../../../Constants/types";
+import Loading from "../../../Loading";
 import styles from "./index.css";
 
-interface NotificationsProps extends WithStyles<typeof styles> {
+export interface NotificationsProps {
   notifs: Result<Notification[]>;
-  loading: boolean;
+  notifsLoading: boolean;
   markNotifications: (number: number) => Promise<void>;
 }
 
@@ -32,7 +30,7 @@ interface NotificationsState {
 }
 
 class Notifications extends React.Component<
-  NotificationsProps,
+  NotificationsProps & WithStyles<typeof styles>,
   NotificationsState
 > {
   state = {
@@ -41,7 +39,7 @@ class Notifications extends React.Component<
 
   private notificationButton = React.createRef<HTMLButtonElement>();
 
-  constructor(props: NotificationsProps) {
+  constructor(props: NotificationsProps & WithStyles<typeof styles>) {
     super(props);
 
     this.setOpen = this.setOpen.bind(this);
@@ -55,7 +53,7 @@ class Notifications extends React.Component<
   }
 
   render() {
-    let { classes, notifs, loading } = this.props;
+    let { classes, notifs, notifsLoading: loading } = this.props;
     const { open } = this.state;
 
     const notificationBox = (
@@ -218,36 +216,4 @@ class Notifications extends React.Component<
   }
 }
 
-type TopBarProps = NotificationsProps & { title: string };
-
-class TopBar extends React.Component<TopBarProps> {
-  render() {
-    const { notifs, loading, markNotifications, title, classes } = this.props;
-
-    return (
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            {title}
-          </Typography>
-          <Notifications
-            classes={classes}
-            loading={loading}
-            notifs={notifs}
-            markNotifications={markNotifications}
-          />
-          <IconButton
-            edge="end"
-            aria-label="account of current user"
-            color="inherit"
-            className={classes.menuButton}
-          >
-            <FiUser />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-    );
-  }
-}
-
-export default withStyles(styles)(TopBar);
+export default withStyles(styles)(Notifications);

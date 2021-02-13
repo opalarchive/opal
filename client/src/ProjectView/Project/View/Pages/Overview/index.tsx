@@ -14,7 +14,6 @@ import ListViewer from "./ListViewer";
 
 interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
   fixedSidebar: boolean;
-  sidebarYOffset: number;
   categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
   editors: string[];
@@ -82,9 +81,7 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
 
   render() {
     const {
-      height,
       fixedSidebar,
-      sidebarYOffset,
       project,
       categoryColors,
       editors,
@@ -135,8 +132,6 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
           setCurrentList: this.setCurrentList,
         }}
         fixedSidebar={fixedSidebar}
-        sidebarYOffset={sidebarYOffset}
-        height={height}
         authUser={authUser}
       >
         <div className={classes.root}>
