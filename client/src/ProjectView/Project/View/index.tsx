@@ -22,6 +22,7 @@ import {
   problemActionPrivileged,
   ProjectPrivate,
   ReplyType,
+  Server,
 } from "../../../../../.shared/src/types";
 import {
   FrontendProblem,
@@ -36,7 +37,7 @@ import NewProblem from "./Pages/NewProblem";
 
 interface ViewProps {
   project: ProjectPrivate;
-  editors: string[];
+  editors: Server.Editors;
   uuid: string;
   tryProblemAction: tryProblemAction;
   tryProblemActionPrivileged: tryProblemActionPrivileged;
@@ -54,6 +55,7 @@ export interface ViewSectionProps {
   tryProblemActionPrivileged: tryProblemActionPrivileged;
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
+  editors: Server.Editors;
 }
 
 export interface CategoryColors {
@@ -236,6 +238,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       tryProblemActionPrivileged,
       getCategoryColor: this.getCategoryColor,
       getDifficultyColor: this.getDifficultyColor,
+      editors: editors,
     };
 
     return (
@@ -258,7 +261,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 {...viewSectionProps}
                 categoryColors={this.state.categoryColors}
                 difficultyRange={this.state.difficultyRange}
-                editors={editors}
                 problemProps={this.problemProps}
                 setDefaultScroll={this.setDefaultScroll}
               />
@@ -286,7 +288,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 {...viewSectionProps}
                 categoryColors={this.state.categoryColors}
                 difficultyRange={this.state.difficultyRange}
-                editors={editors}
                 problemProps={this.problemProps}
               />
             )}
@@ -299,7 +300,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 {...viewSectionProps}
                 categoryColors={this.state.categoryColors}
                 difficultyRange={this.state.difficultyRange}
-                editors={editors}
                 problemProps={this.problemProps}
                 newProblem={newProblem}
               />

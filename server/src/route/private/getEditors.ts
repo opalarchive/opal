@@ -21,5 +21,5 @@ export const execute = async (req, res) => {
 
   res
     .status(200)
-    .send(Object.keys(editors).map((authuid) => idToUsername(authuid)));
+    .send(editors);
 };

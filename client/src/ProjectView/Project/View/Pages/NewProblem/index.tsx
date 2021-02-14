@@ -2,7 +2,7 @@ import { withStyles, WithStyles, TextField, Slider, Button, Paper } from "@mater
 import React from "react";
 import { CategoryColors, ViewSectionProps } from "../..";
 
-import { Problem as ProblemType, Votes } from "../../../../../../../.shared";
+import { Problem as ProblemType, Server, Votes } from "../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
@@ -21,7 +21,7 @@ import Dot from "../../Embedded/Dot";
 interface NewProblemProps extends ViewSectionProps {
   categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
-  editors: string[];
+  editors: Server.Editors;
   problemProps: (
     uuid: string,
     prob: ProblemType,

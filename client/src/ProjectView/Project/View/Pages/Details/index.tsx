@@ -9,6 +9,7 @@ import Reply from "./Reply";
 import {
   reply as replyType,
   Problem as ProblemType,
+  Server,
 } from "../../../../../../../.shared";
 import styles from "./index.css";
 import {
@@ -27,6 +28,7 @@ interface DetailProps extends WithStyles<typeof styles>, FrontendProblem {
   allTags: Set<string>;
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
+  editors: Server.Editors;
 }
 
 class Details extends React.Component<DetailProps> {
@@ -72,9 +74,6 @@ class Details extends React.Component<DetailProps> {
       classes,
       replies,
       reply: replyNumber,
-      allTags,
-      getCategoryColor,
-      getDifficultyColor,
       ...otherProps
     } = this.props;
 
@@ -92,7 +91,7 @@ class Details extends React.Component<DetailProps> {
         </div>
 
         <div ref={this.prob}>
-          <Problem getCategoryColor={getCategoryColor} getDifficultyColor={getDifficultyColor} allTags={allTags} {...otherProps} repliable={false} />
+          <Problem {...otherProps} repliable={false} />
         </div>
 
         <div className={classes.replyOffset}>
@@ -164,6 +163,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   authUser,
   setDefaultScroll,
   match,
+  editors,
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
@@ -171,6 +171,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   project.problems.forEach((prob) => {
     prob.tags.forEach((tag) => allTags.add(tag));
   });
+  const problemDetails = problemProps(uuid, project.problems[ind], tryProblemAction, tryProblemActionPrivileged, authUser);
 
   return (
     <SidebaredBase
@@ -179,27 +180,22 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
       right
       sidebarProps={{
         project,
-        uuid,
-        ind,
         allTags,
+        editors,
+        ...problemDetails,
       }}
       fixedSidebar={fixedSidebar}
       authUser={authUser}
     >
       <StyledDetails
         replies={project.problems[ind].replies}
-        {...problemProps(
-          uuid,
-          project.problems[ind],
-          tryProblemAction,
-          tryProblemActionPrivileged,
-          authUser
-        )}
+        {...problemDetails}
         getCategoryColor={getCategoryColor}
         getDifficultyColor={getDifficultyColor}
         allTags={allTags}
         setDefaultScroll={setDefaultScroll}
         reply={reply}
+        editors={editors}
       />
     </SidebaredBase>
   );

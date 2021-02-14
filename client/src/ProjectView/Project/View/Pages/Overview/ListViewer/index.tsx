@@ -1,5 +1,5 @@
 import React from "react";
-import { Problem as ProblemType } from "../../../../../../../../.shared";
+import { Problem as ProblemType, Server } from "../../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
@@ -27,6 +27,7 @@ interface ListViewerProps {
     [tag: string]: boolean;
   };
   allTags: Set<string>;
+  editors: Server.Editors;
 }
 
 export default class ListViewer extends React.Component<ListViewerProps> {
@@ -45,6 +46,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       onClickTag,
       authUser,
       allTags,
+      editors,
     } = this.props;
 
     return problemList.map((prob) => (
@@ -57,6 +59,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
         clickedTags={clickedTags}
         onClickTag={onClickTag}
         allTags={allTags}
+        editors={editors}
       />
     ));
   }

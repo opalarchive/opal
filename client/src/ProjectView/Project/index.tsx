@@ -9,6 +9,7 @@ import {
   ReplyType,
   Client,
   problemActionPrivileged,
+  Server,
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
@@ -40,7 +41,7 @@ interface ProjectProps
 
 interface ProjectState {
   project: Result<ProjectPrivate | string>;
-  editors: Result<string[]>;
+  editors: Result<Server.Editors>;
   name: Result<string>;
   loading: boolean;
 }
@@ -53,8 +54,8 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     } as Result<ProjectPrivate | string>,
     editors: {
       success: false,
-      value: "",
-    } as Result<string[]>,
+      value: {},
+    } as Result<Server.Editors>,
     name: {
       success: false,
       value: "",
@@ -74,7 +75,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
   async setProject(uuid: string, authUser: firebase.User) {
     try {
       const project = await getProjectPrivate(uuid, authUser);
-      const editors = await post<string[]>(
+      const editors = await post<Server.Editors>(
         "private/getEditors",
         {
           uuid,

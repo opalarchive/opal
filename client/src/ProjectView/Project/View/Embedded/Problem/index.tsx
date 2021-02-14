@@ -30,6 +30,7 @@ import Dot from "../Dot";
 import Tag from "../Tag";
 import TagGroup from "../TagGroup";
 import { tupleToRGBString } from "../../../../../Constants";
+import { Server } from "../../../../../../../.shared";
 
 interface ProblemProps extends FrontendProblem {
   repliable: boolean;
@@ -40,6 +41,7 @@ interface ProblemProps extends FrontendProblem {
   allTags: Set<string>;
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
+  editors: Server.Editors;
 }
 
 interface ProblemState {
@@ -142,13 +144,14 @@ class Problem extends React.PureComponent<
       onClickTag,
       authUser,
       allTags,
+      editors,
     } = this.props;
 
-    const availableTags = [...allTags].filter((tag) => tags.indexOf(tag) < 0);
+    const availableTags: string[] = [...allTags].filter((tag) => tags.indexOf(tag) < 0);
+    const canEdit: boolean = editors[authUser.uid].role == "ADMIN" || editors[authUser.uid].role == "OWNER" || authUser.displayName == author;
 
     return (
       <Paper elevation={3} className={classes.root}>
-        {/* TODO: only show edit icons by role */}
         <div className={classes.left}>
           <div className={classes.leftIndex}>#{ind + 1}</div>
           <div className={classes.leftVote}>
@@ -214,12 +217,15 @@ class Problem extends React.PureComponent<
                 ) : (
                   <>
                     {title}
-                    <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                      e.preventDefault();
-                      this.setState({ editTitle: true });
-                    }}>
-                      <FiEdit2 />
-                    </IconButton>
+                    {canEdit ? (
+                      <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault();
+                        this.setState({ editTitle: true });
+                      }}>
+                        <FiEdit2 />
+                      </IconButton>
+                    ) : null}
+                    
                   </>
                 )}
               </>
@@ -246,12 +252,14 @@ class Problem extends React.PureComponent<
             ) : (
               <>
                 <Latex>{text}</Latex>
-                <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.preventDefault();
-                  this.setState({ editText: true });
-                }}>
-                  <FiEdit2 />
-                </IconButton>
+                {canEdit ? (
+                  <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.preventDefault();
+                    this.setState({ editText: true });
+                  }}>
+                    <FiEdit2 />
+                  </IconButton>
+                ) : null}
               </>
             )}
           </div>
@@ -305,12 +313,14 @@ class Problem extends React.PureComponent<
             ) : (
               <>
                 {category.name}
-                <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.preventDefault();
-                  this.setState({ editCategory: true });
-                }}>
-                  <FiEdit2 />
-                </IconButton>
+                {canEdit ? (
+                  <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.preventDefault();
+                    this.setState({ editCategory: true });
+                  }}>
+                    <FiEdit2 />
+                  </IconButton>
+                ) : null}
               </>
             )}
           </div>
@@ -350,12 +360,14 @@ class Problem extends React.PureComponent<
             ) : (
               <>
                 d-{difficulty.name}
-                <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.preventDefault();
-                  this.setState({ editDifficulty: true });
-                }}>
-                  <FiEdit2 />
-                </IconButton>
+                {canEdit ? (
+                  <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.preventDefault();
+                    this.setState({ editDifficulty: true });
+                  }}>
+                    <FiEdit2 />
+                  </IconButton>
+                ) : null}
               </>
             )}
           </div>

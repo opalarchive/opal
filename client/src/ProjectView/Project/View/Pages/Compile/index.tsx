@@ -2,7 +2,7 @@ import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { CategoryColors, ViewSectionProps } from "../..";
 
-import { Problem as ProblemType } from "../../../../../../../.shared";
+import { Problem as ProblemType, Server } from "../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
@@ -13,7 +13,7 @@ import styles from "./index.css";
 interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
   categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
-  editors: string[];
+  editors: Server.Editors;
   problemProps: (
     uuid: string,
     prob: ProblemType,
