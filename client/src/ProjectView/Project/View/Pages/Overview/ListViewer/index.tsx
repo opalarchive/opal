@@ -1,5 +1,8 @@
 import React from "react";
-import { Problem as ProblemType, Server } from "../../../../../../../../.shared";
+import {
+  Problem as ProblemType,
+  Server,
+} from "../../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
@@ -52,8 +55,14 @@ export default class ListViewer extends React.Component<ListViewerProps> {
     return problemList.map((prob) => (
       <Problem
         key={`problem-${prob.ind}`}
-        {...problemProps(uuid, prob, tryProblemAction, tryProblemActionPrivileged, authUser)}
-        repliable
+        {...problemProps(
+          uuid,
+          prob,
+          tryProblemAction,
+          tryProblemActionPrivileged,
+          authUser
+        )}
+        abriged
         getCategoryColor={getCategoryColor}
         getDifficultyColor={getDifficultyColor}
         clickedTags={clickedTags}
