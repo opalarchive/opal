@@ -91,7 +91,7 @@ const styles = (theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       fontSize: "1.2rem",
-      width: "11rem",
+      width: "11.5rem",
       flexShrink: 0,
     },
     rightCategory: {
@@ -113,6 +113,13 @@ const styles = (theme: Theme) =>
       padding: "0 0.5rem 0.5rem 0.5rem",
       display: "flex",
     },
+    editTextContainer: {
+      display: "flex",
+    },
+    editTextField: {
+      flexGrow: 1,
+    },
+    editTextIcon: {},
   });
 
 export default styles;

@@ -5,11 +5,9 @@ import {
   WithStyles,
   withStyles,
   TextField,
-  Button,
   IconButton,
   Slider,
 } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
 import {
   FiAlignLeft,
   FiArrowDown,
@@ -19,7 +17,6 @@ import {
   FiEdit2,
   FiMessageSquare,
 } from "react-icons/fi";
-import { FaCheck } from "react-icons/fa";
 import Latex from "../../../../../Constants/latex";
 import { Link } from "react-router-dom";
 
@@ -27,13 +24,12 @@ import * as ROUTES from "../../../../../Constants/routes";
 import styles from "./index.css";
 import { FrontendProblem, problemFunctionsObj } from "../../../../../Constants/types";
 import Dot from "../Dot";
-import Tag from "../Tag";
 import TagGroup from "../TagGroup";
 import { tupleToRGBString } from "../../../../../Constants";
 import { Server } from "../../../../../../../.shared";
 
 interface ProblemProps extends FrontendProblem, problemFunctionsObj {
-  repliable: boolean;
+  abridged: boolean;
   clickedTags?: {
     [tag: string]: boolean;
   };
@@ -56,7 +52,8 @@ interface ProblemState {
 }
 
 class Problem extends React.PureComponent<
-  ProblemProps & WithStyles<typeof styles>, ProblemState
+  ProblemProps & WithStyles<typeof styles>,
+  ProblemState
 > {
   state = {
     editCategory: false,
@@ -67,7 +64,7 @@ class Problem extends React.PureComponent<
     editTextValue: "",
     editCategoryValue: "",
     editDifficultyValue: 0,
-  }
+  };
 
   constructor(props: ProblemProps & WithStyles<typeof styles>) {
     super(props);
@@ -140,7 +137,7 @@ class Problem extends React.PureComponent<
       getCategoryColor,
       getDifficultyColor,
       replyTypes,
-      repliable,
+      abridged,
       clickedTags,
       onClickTag,
       authUser,
@@ -148,8 +145,15 @@ class Problem extends React.PureComponent<
       editors,
     } = this.props;
 
-    const availableTags: string[] = [...allTags].filter((tag) => tags.indexOf(tag) < 0);
-    const canEdit: boolean = editors[authUser.uid].role == "ADMIN" || editors[authUser.uid].role == "OWNER" || authUser.displayName == author;
+    const availableTags: string[] = [...allTags].filter(
+      (tag) => tags.indexOf(tag) < 0
+    );
+
+    const canEdit =
+      !abridged &&
+      (editors[authUser.uid].role === "ADMIN" ||
+        editors[authUser.uid].role === "OWNER" ||
+        authUser.displayName === author);
 
     return (
       <Paper elevation={3} className={classes.root}>
@@ -187,7 +191,7 @@ class Problem extends React.PureComponent<
         </div>
         <div className={classes.body}>
           <div className={classes.bodyTitle}>
-            {repliable ? (
+            {abridged ? (
               <Link
                 className={classes.link}
                 to={ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(
@@ -200,33 +204,50 @@ class Problem extends React.PureComponent<
             ) : (
               <>
                 {this.state.editTitle ? (
-                  <>
-                    <TextField fullWidth value={this.state.editTitleValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onChange("title", e.target.value)} />
+                  <div className={classes.editTextContainer}>
+                    <TextField
+                      className={classes.editTextField}
+                      fullWidth
+                      value={this.state.editTitleValue}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        this.onChange("title", e.target.value)
+                      }
+                    />
+                    &nbsp;
                     <IconButton
+                      size="small"
                       onClick={(_) => {
-                        if (this.state.editTitleValue.length == 0) {
+                        if (this.state.editTitleValue.length === 0) {
                           tryProblemActionPrivileged("Untitled", "title");
                         } else {
-                          tryProblemActionPrivileged(this.state.editTitleValue, "title");
-                        }                        
+                          tryProblemActionPrivileged(
+                            this.state.editTitleValue,
+                            "title"
+                          );
+                        }
                         this.setState({ editTitle: false });
                       }}
                     >
                       <FiCheck />
                     </IconButton>
-                  </>
+                  </div>
                 ) : (
                   <>
                     {title}
                     {canEdit ? (
-                      <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                        e.preventDefault();
-                        this.setState({ editTitle: true });
-                      }}>
-                        <FiEdit2 />
-                      </IconButton>
+                      <>
+                        &nbsp;
+                        <IconButton
+                          size="small"
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                            e.preventDefault();
+                            this.setState({ editTitle: true });
+                          }}
+                        >
+                          <FiEdit2 />
+                        </IconButton>
+                      </>
                     ) : null}
-                    
                   </>
                 )}
               </>
@@ -236,13 +257,26 @@ class Problem extends React.PureComponent<
           <div className={classes.bodyText}>
             {this.state.editText ? (
               <>
-                <TextField variant="filled" fullWidth multiline value={this.state.editTextValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onChange("text", e.target.value)} />
+                <TextField
+                  variant="filled"
+                  fullWidth
+                  multiline
+                  value={this.state.editTextValue}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    this.onChange("text", e.target.value)
+                  }
+                />
+                &nbsp;
                 <IconButton
+                  size="small"
                   onClick={(_) => {
-                    if (this.state.editTextValue.length == 0) {
+                    if (this.state.editTextValue.length === 0) {
                       tryProblemActionPrivileged("Empty", "text");
                     } else {
-                      tryProblemActionPrivileged(this.state.editTextValue, "text");
+                      tryProblemActionPrivileged(
+                        this.state.editTextValue,
+                        "text"
+                      );
                     }
                     this.setState({ editText: false });
                   }}
@@ -254,12 +288,18 @@ class Problem extends React.PureComponent<
               <>
                 <Latex>{text}</Latex>
                 {canEdit ? (
-                  <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    e.preventDefault();
-                    this.setState({ editText: true });
-                  }}>
-                    <FiEdit2 />
-                  </IconButton>
+                  <>
+                    &nbsp;
+                    <IconButton
+                      size="small"
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault();
+                        this.setState({ editText: true });
+                      }}
+                    >
+                      <FiEdit2 />
+                    </IconButton>
+                  </>
                 ) : null}
               </>
             )}
@@ -278,7 +318,7 @@ class Problem extends React.PureComponent<
               />
             )}
           </div>
-          {repliable ? (
+          {abridged ? (
             <div className={classes.bodyReply}>
               <Link
                 className={classes.link}
@@ -296,38 +336,76 @@ class Problem extends React.PureComponent<
         <div className={classes.right}>
           <div className={classes.rightCategory}>
             <Dot
-              color={this.state.editCategory ? tupleToRGBString(getCategoryColor(["algebra", "geometry", "combinatoris", "numberTheory"].includes(this.state.editCategoryValue) ? this.state.editCategoryValue : "miscellaneous")) : category.color}
+              color={
+                this.state.editCategory
+                  ? tupleToRGBString(
+                      getCategoryColor(
+                        [
+                          "algebra",
+                          "geometry",
+                          "combinatoris",
+                          "numberTheory",
+                        ].includes(this.state.editCategoryValue)
+                          ? this.state.editCategoryValue
+                          : "miscellaneous"
+                      )
+                    )
+                  : category.color
+              }
               style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
             />
             {this.state.editCategory ? (
-              <>
-                <TextField fullWidth value={this.state.editCategoryValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onChange("category", e.target.value)} />
+              <div className={classes.editTextContainer}>
+                <TextField
+                  className={classes.editTextField}
+                  value={this.state.editCategoryValue}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    this.onChange("category", e.target.value)
+                  }
+                />
+                &nbsp;
                 <IconButton
+                  size="small"
                   onClick={(_) => {
-                    tryProblemActionPrivileged(this.state.editCategoryValue, "category");
+                    tryProblemActionPrivileged(
+                      this.state.editCategoryValue,
+                      "category"
+                    );
                     this.setState({ editCategory: false });
                   }}
                 >
                   <FiCheck />
                 </IconButton>
-              </>
+              </div>
             ) : (
               <>
                 {category.name}
                 {canEdit ? (
-                  <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    e.preventDefault();
-                    this.setState({ editCategory: true });
-                  }}>
-                    <FiEdit2 />
-                  </IconButton>
+                  <>
+                    &nbsp;
+                    <IconButton
+                      size="small"
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault();
+                        this.setState({ editCategory: true });
+                      }}
+                    >
+                      <FiEdit2 />
+                    </IconButton>
+                  </>
                 ) : null}
               </>
             )}
           </div>
           <div className={classes.rightDifficulty}>
             <Dot
-              color={this.state.editDifficulty ? tupleToRGBString(getDifficultyColor(this.state.editDifficultyValue)) : difficulty.color}
+              color={
+                this.state.editDifficulty
+                  ? tupleToRGBString(
+                      getDifficultyColor(this.state.editDifficultyValue)
+                    )
+                  : difficulty.color
+              }
               style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
             />
             {this.state.editDifficulty ? (
@@ -345,13 +423,16 @@ class Problem extends React.PureComponent<
                   }}
                   valueLabelDisplay="auto"
                   aria-labelledby="difficulty-header"
-                  getAriaValueText={() =>
-                    `d-${this.state.editDifficultyValue}`
-                  }
+                  getAriaValueText={() => `d-${this.state.editDifficultyValue}`}
                 />
+                &nbsp;
                 <IconButton
+                  size="small"
                   onClick={(_) => {
-                    tryProblemActionPrivileged(this.state.editDifficultyValue, "difficulty");
+                    tryProblemActionPrivileged(
+                      this.state.editDifficultyValue,
+                      "difficulty"
+                    );
                     this.setState({ editDifficulty: false });
                   }}
                 >
@@ -362,12 +443,18 @@ class Problem extends React.PureComponent<
               <>
                 d-{difficulty.name}
                 {canEdit ? (
-                  <IconButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    e.preventDefault();
-                    this.setState({ editDifficulty: true });
-                  }}>
-                    <FiEdit2 />
-                  </IconButton>
+                  <>
+                    &nbsp;
+                    <IconButton
+                      size="small"
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault();
+                        this.setState({ editDifficulty: true });
+                      }}
+                    >
+                      <FiEdit2 />
+                    </IconButton>
+                  </>
                 ) : null}
               </>
             )}

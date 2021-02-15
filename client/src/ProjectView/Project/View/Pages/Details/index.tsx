@@ -99,7 +99,7 @@ class Details extends React.Component<DetailProps> {
         </div>
 
         <div ref={this.prob}>
-          <Problem {...problemPropsExtracted} {...problemFunctionsExtracted} {...otherProps} repliable={false} />
+          <Problem {...problemPropsExtracted} {...problemFunctionsExtracted} {...otherProps} abridged={false} />
         </div>
 
         <div className={classes.replyOffset}>

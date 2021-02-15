@@ -1,5 +1,8 @@
 import React from "react";
-import { Problem as ProblemType, Server } from "../../../../../../../../.shared";
+import {
+  Problem as ProblemType,
+  Server,
+} from "../../../../../../../../.shared";
 import {
   FrontendProblem,
   problemFunctions,
@@ -48,9 +51,9 @@ export default class ListViewer extends React.Component<ListViewerProps> {
         key={`problem-${prob.ind}`}
         {...problemProps(uuid, prob, authUser)}
         {...problemFunctions(uuid, prob, authUser)}
+        abridged
         getCategoryColor={getCategoryColor}
         getDifficultyColor={getDifficultyColor}
-        repliable
         clickedTags={clickedTags}
         onClickTag={onClickTag}
         allTags={allTags}
