@@ -5,6 +5,8 @@ import { CategoryColors, ViewSectionProps } from "../..";
 import { Problem as ProblemType, Server } from "../../../../../../../.shared";
 import {
   FrontendProblem,
+  problemFunctions,
+  problemProps,
   tryProblemAction,
   tryProblemActionPrivileged,
 } from "../../../../../Constants/types";
@@ -16,19 +18,12 @@ import * as ROUTES from "../../../../../Constants/routes";
 import { FiPlus } from "react-icons/fi";
 
 interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
-  fixedSidebar: boolean;
   categoryColors: CategoryColors;
+  fixedSidebar: boolean;
   difficultyRange: { start: number; end: number };
   editors: Server.Editors;
-  problemProps: (
-    uuid: string,
-    prob: ProblemType,
-    tryProblemAction: tryProblemAction,
-    tryProblemActionPrivileged: tryProblemActionPrivileged,
-    authUser: firebase.User
-  ) => FrontendProblem;
-  tryProblemAction: tryProblemAction;
-  tryProblemActionPrivileged: tryProblemActionPrivileged;
+  problemProps: problemProps;
+  problemFunctions: problemFunctions;
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
   setDefaultScroll: (scroll: number) => void;
@@ -94,8 +89,7 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
       editors,
       problemProps,
       uuid,
-      tryProblemAction,
-      tryProblemActionPrivileged,
+      problemFunctions,
       getCategoryColor,
       getDifficultyColor,
       authUser,
@@ -160,8 +154,7 @@ class Overview extends React.PureComponent<OverviewProps, OverviewState> {
             uuid={uuid}
             authUser={authUser}
             problemProps={problemProps}
-            tryProblemAction={tryProblemAction}
-            tryProblemActionPrivileged={tryProblemActionPrivileged}
+            problemFunctions={problemFunctions}
             getCategoryColor={getCategoryColor}
             getDifficultyColor={getDifficultyColor}
             onClickTag={this.onClickTag}

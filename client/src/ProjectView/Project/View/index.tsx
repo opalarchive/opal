@@ -21,6 +21,7 @@ import {
   problemAction,
   problemActionPrivileged,
   ProjectPrivate,
+  replyAction,
   ReplyType,
   Server,
 } from "../../../../../.shared/src/types";
@@ -30,6 +31,9 @@ import {
   tryProblemAction,
   newProblem,
   tryProblemActionPrivileged,
+  tryReplyAction,
+  problemProps,
+  problemFunctions,
 } from "../../../Constants/types";
 import Overview from "./Pages/Overview";
 import Compile from "./Pages/Compile";
@@ -41,6 +45,7 @@ interface ViewProps {
   uuid: string;
   tryProblemAction: tryProblemAction;
   tryProblemActionPrivileged: tryProblemActionPrivileged;
+  tryReplyAction: tryReplyAction;
   fail: () => void;
   authUser: firebase.User;
   newProblem: newProblem;
@@ -51,10 +56,8 @@ export interface ViewSectionProps {
   project: ProjectPrivate;
   uuid: string;
   authUser: firebase.User;
-  tryProblemAction: tryProblemAction;
-  tryProblemActionPrivileged: tryProblemActionPrivileged;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
+  problemProps: problemProps;
+  problemFunctions: problemFunctions;
   editors: Server.Editors;
 }
 
@@ -111,6 +114,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     this.getCategoryColor = this.getCategoryColor.bind(this);
     this.getDifficultyColor = this.getDifficultyColor.bind(this);
     this.problemProps = this.problemProps.bind(this);
+    this.problemFunctions = this.problemFunctions.bind(this);
     this.setDefaultScroll = this.setDefaultScroll.bind(this);
   }
 
@@ -140,13 +144,11 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     ) as number[];
   }
 
-  problemProps(
+  problemProps: problemProps = (
     uuid: string,
     prob: ProblemType,
-    tryProblemAction: tryProblemAction,
-    tryProblemActionPrivileged: tryProblemActionPrivileged,
     authUser: firebase.User
-  ): FrontendProblem {
+  ) => {
     const types = Object.fromEntries(
       Object.keys(ReplyType).map((replyType) => [replyType, 0])
     ) as replyTypes;
@@ -180,12 +182,23 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
         Object.values(prob.votes).length === 0
           ? 0
           : prob.votes[authUser.displayName!],
-      tryProblemAction: (problemActionData: data, type: problemAction) =>
-        tryProblemAction(prob.ind, problemActionData, type),
-      tryProblemActionPrivileged: (problemActionPrivilegedData: data, type: problemActionPrivileged) =>
-        tryProblemActionPrivileged(prob.ind, problemActionPrivilegedData, type),
       replyTypes: types,
       authUser: authUser,
+    };
+  }
+
+  problemFunctions: problemFunctions = (
+    uuid: string,
+    prob: ProblemType,
+    authUser: firebase.User
+  ) => {
+    return {
+      tryProblemAction: (problemActionData: data, type: problemAction) =>
+        this.props.tryProblemAction(prob.ind, problemActionData, type),
+      tryProblemActionPrivileged: (problemActionPrivilegedData: data, type: problemActionPrivileged) =>
+        this.props.tryProblemActionPrivileged(prob.ind, problemActionPrivilegedData, type),
+      tryReplyAction: (replyInd: number, replyActionData: data, type: replyAction) => 
+        this.props.tryReplyAction(prob.ind, replyInd, replyActionData, type),
     };
   }
 
@@ -206,11 +219,9 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       project,
       editors,
       uuid,
-      tryProblemAction,
-      tryProblemActionPrivileged,
       authUser,
-      match,
       newProblem,
+      match,
     } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
@@ -234,10 +245,8 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       project,
       uuid,
       authUser,
-      tryProblemAction,
-      tryProblemActionPrivileged,
-      getCategoryColor: this.getCategoryColor,
-      getDifficultyColor: this.getDifficultyColor,
+      problemProps: this.problemProps,
+      problemFunctions: this.problemFunctions,
       editors: editors,
     };
 
@@ -260,8 +269,10 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               <Overview
                 {...viewSectionProps}
                 categoryColors={this.state.categoryColors}
+                getCategoryColor={this.getCategoryColor}
+                getDifficultyColor={this.getDifficultyColor}
                 difficultyRange={this.state.difficultyRange}
-                problemProps={this.problemProps}
+                problemFunctions={this.problemFunctions}
                 setDefaultScroll={this.setDefaultScroll}
               />
             )}
@@ -275,8 +286,9 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => (
               <Details
                 {...viewSectionProps}
-                problemProps={this.problemProps}
                 setDefaultScroll={this.setDefaultScroll}
+                getCategoryColor={this.getCategoryColor}
+                getDifficultyColor={this.getDifficultyColor}
               />
             )}
           />
@@ -286,9 +298,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => (
               <Compile
                 {...viewSectionProps}
-                categoryColors={this.state.categoryColors}
                 difficultyRange={this.state.difficultyRange}
-                problemProps={this.problemProps}
               />
             )}
           />
@@ -298,10 +308,10 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => (
               <NewProblem
                 {...viewSectionProps}
-                categoryColors={this.state.categoryColors}
-                difficultyRange={this.state.difficultyRange}
-                problemProps={this.problemProps}
                 newProblem={newProblem}
+                getCategoryColor={this.getCategoryColor}
+                getDifficultyColor={this.getDifficultyColor}
+                difficultyRange={this.state.difficultyRange}
               />
             )}
           />

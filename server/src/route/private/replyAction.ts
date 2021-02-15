@@ -4,8 +4,10 @@ import {
   Problem,
   data,
   problemAction,
+  replyAction,
   vote,
   ReplyType,
+  reply,
 } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
@@ -13,71 +15,25 @@ const tryAction = async (
   cdb: firebase.database.Database,
   problem: Problem,
   problemInd: number,
+  replyInd: number,
   data: data,
-  type: problemAction,
+  type: replyAction,
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
-  let tags: string[] = problem.tags || [];
-  let newTags: string[] = [];
+  
   switch (type) {
-    case "vote":
-      if (data !== 1 && data !== -1) {
-        return { status: 400, value: "invalid-input" };
-      }
-
-      const newVote: vote =
-        !!problem.votes && problem.votes[authuid] === data ? 0 : data;
-      await cdb.ref(`problems/${problemInd}/votes/${authuid}`).set(newVote);
-
-      break;
-    case "comment":
+    case "edit":
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
       }
 
-      let index = 0;
-      if (!!problem.replies) {
-        index = problem.replies.length;
+      if (authuid !== problem.replies[replyInd].author) {
+        return { status: 400, value: "forbidden" }
       }
 
-      await cdb.ref(`problems/${problemInd}/replies/${index}`).set({
-        author: authuid,
-        text: data,
-        time: now,
-        type: ReplyType.COMMENT,
-        lastEdit: now,
-      });
-
-      break;
-    case "removeTag":
-      if (typeof data !== "string") {
-        return { status: 400, value: "invalid-input" };
-      }
-      
-      newTags = tags.filter((tag) => tag !== data);
-
-      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
-
-      break;
-    case "addTag":
-      if (typeof data !== "object") {
-        return { status: 400, value: "invalid-input" };
-      }
-
-      if (data.length == 0) {
-        break;
-      }
-
-      newTags = [...tags];
-
-      for (let i=0; i<data.length; i++) {
-        if (data[i].length > 0 && !tags.includes(data[i])) {
-          newTags.push(data[i]);
-        }
-      }
-
-      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
+      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/text`).set(data);
+      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`).set(now);
 
       break;
     default:
@@ -89,8 +45,9 @@ const tryAction = async (
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const problemInd: number = req.body.problemInd;
+  const replyInd: number = req.body.replyInd;
   let data: data = req.body.data;
-  const type: problemAction = req.body.type;
+  const type: replyAction = req.body.type;
   const authuid: string = req.body.authuid;
 
   if (!data) {
@@ -115,10 +72,21 @@ export const execute = async (req, res) => {
     return;
   }
 
+  const reply: reply | null = await trydb.value
+    .ref(`problems/${problemInd}/replies/${replyInd}`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
+
+  if (!reply) {
+    res.status(404).send("reply-not-found");
+    return;
+  }
+
   const result = await tryAction(
     trydb.value,
     problem,
     problemInd,
+    replyInd,
     data,
     type,
     authuid

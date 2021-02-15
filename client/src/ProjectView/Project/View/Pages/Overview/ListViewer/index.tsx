@@ -2,6 +2,8 @@ import React from "react";
 import { Problem as ProblemType, Server } from "../../../../../../../../.shared";
 import {
   FrontendProblem,
+  problemFunctions,
+  problemProps,
   tryProblemAction,
   tryProblemActionPrivileged,
 } from "../../../../../../Constants/types";
@@ -11,15 +13,8 @@ interface ListViewerProps {
   problemList: ProblemType[];
   uuid: string;
   authUser: firebase.User;
-  problemProps: (
-    uuid: string,
-    prob: ProblemType,
-    tryProblemAction: tryProblemAction,
-    tryProblemActionPrivileged: tryProblemActionPrivileged,
-    authUser: firebase.User
-  ) => FrontendProblem;
-  tryProblemAction: tryProblemAction;
-  tryProblemActionPrivileged: tryProblemActionPrivileged;
+  problemProps: problemProps;
+  problemFunctions: problemFunctions;
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
   onClickTag: (tagText: string) => void;
@@ -38,8 +33,7 @@ export default class ListViewer extends React.Component<ListViewerProps> {
       problemList,
       problemProps,
       uuid,
-      tryProblemAction,
-      tryProblemActionPrivileged,
+      problemFunctions,
       getCategoryColor,
       getDifficultyColor,
       clickedTags,
@@ -52,10 +46,11 @@ export default class ListViewer extends React.Component<ListViewerProps> {
     return problemList.map((prob) => (
       <Problem
         key={`problem-${prob.ind}`}
-        {...problemProps(uuid, prob, tryProblemAction, tryProblemActionPrivileged, authUser)}
-        repliable
+        {...problemProps(uuid, prob, authUser)}
+        {...problemFunctions(uuid, prob, authUser)}
         getCategoryColor={getCategoryColor}
         getDifficultyColor={getDifficultyColor}
+        repliable
         clickedTags={clickedTags}
         onClickTag={onClickTag}
         allTags={allTags}

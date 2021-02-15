@@ -216,6 +216,27 @@ export const tryProblemActionPrivileged = async (
   );
 };
 
+export const tryReplyAction = async (
+  uuid: string,
+  problemInd: number,
+  replyInd: number,
+  data: data,
+  type: string,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/replyAction",
+    {
+      uuid,
+      problemInd,
+      replyInd,
+      data,
+      type,
+    },
+    authUser
+  );
+};
+
 export const newProblem = async (
   uuid: string,
   problem: Omit<Problem, "ind">,

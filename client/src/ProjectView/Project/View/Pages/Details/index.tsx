@@ -10,10 +10,14 @@ import {
   reply as replyType,
   Problem as ProblemType,
   Server,
+  problemAction,
 } from "../../../../../../../.shared";
 import styles from "./index.css";
 import {
   FrontendProblem,
+  problemFunctions,
+  problemFunctionsObj,
+  problemProps,
   tryProblemAction,
   tryProblemActionPrivileged
 } from "../../../../../Constants/types";
@@ -21,7 +25,7 @@ import Action from "./Action";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import { ViewSectionProps } from "../..";
 
-interface DetailProps extends WithStyles<typeof styles>, FrontendProblem {
+interface DetailProps extends WithStyles<typeof styles> {
   replies: replyType[];
   setDefaultScroll: (scroll: number) => void;
   reply?: number;
@@ -29,6 +33,8 @@ interface DetailProps extends WithStyles<typeof styles>, FrontendProblem {
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
   editors: Server.Editors;
+  problemPropsExtracted: FrontendProblem;
+  problemFunctionsExtracted: problemFunctionsObj;
 }
 
 class Details extends React.Component<DetailProps> {
@@ -74,6 +80,8 @@ class Details extends React.Component<DetailProps> {
       classes,
       replies,
       reply: replyNumber,
+      problemPropsExtracted,
+      problemFunctionsExtracted,
       ...otherProps
     } = this.props;
 
@@ -82,7 +90,7 @@ class Details extends React.Component<DetailProps> {
         <div className={classes.top} ref={this.top}>
           <Link
             className={classes.topLink}
-            to={ROUTES.PROJECT_VIEW.replace(":uuid", otherProps.uuid)}
+            to={ROUTES.PROJECT_VIEW.replace(":uuid", problemPropsExtracted.uuid)}
           >
             <FiChevronLeft className={classes.topIcon} />
             Back
@@ -91,7 +99,7 @@ class Details extends React.Component<DetailProps> {
         </div>
 
         <div ref={this.prob}>
-          <Problem {...otherProps} repliable={false} />
+          <Problem {...problemPropsExtracted} {...problemFunctionsExtracted} {...otherProps} repliable={false} />
         </div>
 
         <div className={classes.replyOffset}>
@@ -101,24 +109,24 @@ class Details extends React.Component<DetailProps> {
               replies.map((reply, id) => (
                 <div key={id} ref={this.commentRefs[id]}>
                   <Reply
-                    uuid={otherProps.uuid}
-                    ind={otherProps.ind}
+                    uuid={problemPropsExtracted.uuid}
+                    ind={problemPropsExtracted.ind}
                     reply={id}
                     content={reply}
                     isHighlighted={replyNumber === id}
-                    tryProblemAction={otherProps.tryProblemAction}
-                    tryProblemActionPrivileged={otherProps.tryProblemActionPrivileged}
+                    problemFunctionsExtracted={problemFunctionsExtracted}
+                    authUser={problemPropsExtracted.authUser}
                   />
                 </div>
               ))}
           </div>
           <Reply
-            uuid={otherProps.uuid}
-            ind={otherProps.ind}
+            uuid={problemPropsExtracted.uuid}
+            ind={problemPropsExtracted.ind}
             reply={-1}
             isHighlighted={false}
-            tryProblemAction={otherProps.tryProblemAction}
-            tryProblemActionPrivileged={otherProps.tryProblemActionPrivileged}
+            problemFunctionsExtracted={problemFunctionsExtracted}
+            authUser={problemPropsExtracted.authUser}
           />
         </div>
       </div>
@@ -138,14 +146,8 @@ interface RoutedDetailsProps
   extends RouteComponentProps<DetailsMatch>,
     ViewSectionProps {
   fixedSidebar: boolean;
-  problemProps: (
-    uuid: string,
-    prob: ProblemType,
-    tryProblemAction: tryProblemAction,
-    tryProblemActionPrivileged: tryProblemActionPrivileged,
-    authUser: firebase.User
-  ) => FrontendProblem;
-  tryProblemAction: tryProblemAction;
+  problemProps: problemProps;
+  problemFunctions: problemFunctions;
   getCategoryColor: (category: string) => number[];
   getDifficultyColor: (difficulty: number) => number[];
   setDefaultScroll: (scroll: number) => void;
@@ -156,8 +158,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   project,
   uuid,
   problemProps,
-  tryProblemAction,
-  tryProblemActionPrivileged,
+  problemFunctions,
   getCategoryColor,
   getDifficultyColor,
   authUser,
@@ -171,7 +172,8 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   project.problems.forEach((prob) => {
     prob.tags.forEach((tag) => allTags.add(tag));
   });
-  const problemDetails = problemProps(uuid, project.problems[ind], tryProblemAction, tryProblemActionPrivileged, authUser);
+  const problemPropsExtracted = problemProps(uuid, project.problems[ind], authUser);
+  const problemFunctionsExtracted = problemFunctions(uuid, project.problems[ind], authUser);
 
   return (
     <SidebaredBase
@@ -182,14 +184,16 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
         project,
         allTags,
         editors,
-        ...problemDetails,
+        ...problemPropsExtracted,
+        ...problemFunctionsExtracted,
       }}
       fixedSidebar={fixedSidebar}
       authUser={authUser}
     >
       <StyledDetails
         replies={project.problems[ind].replies}
-        {...problemDetails}
+        problemPropsExtracted={problemPropsExtracted}
+        problemFunctionsExtracted={problemFunctionsExtracted}
         getCategoryColor={getCategoryColor}
         getDifficultyColor={getDifficultyColor}
         allTags={allTags}

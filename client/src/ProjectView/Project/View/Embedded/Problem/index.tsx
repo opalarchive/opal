@@ -25,14 +25,14 @@ import { Link } from "react-router-dom";
 
 import * as ROUTES from "../../../../../Constants/routes";
 import styles from "./index.css";
-import { FrontendProblem } from "../../../../../Constants/types";
+import { FrontendProblem, problemFunctionsObj } from "../../../../../Constants/types";
 import Dot from "../Dot";
 import Tag from "../Tag";
 import TagGroup from "../TagGroup";
 import { tupleToRGBString } from "../../../../../Constants";
 import { Server } from "../../../../../../../.shared";
 
-interface ProblemProps extends FrontendProblem {
+interface ProblemProps extends FrontendProblem, problemFunctionsObj {
   repliable: boolean;
   clickedTags?: {
     [tag: string]: boolean;
@@ -136,6 +136,7 @@ class Problem extends React.PureComponent<
       myVote,
       tryProblemAction,
       tryProblemActionPrivileged,
+      tryReplyAction,
       getCategoryColor,
       getDifficultyColor,
       replyTypes,

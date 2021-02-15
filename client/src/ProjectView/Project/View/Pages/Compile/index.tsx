@@ -5,23 +5,18 @@ import { CategoryColors, ViewSectionProps } from "../..";
 import { Problem as ProblemType, Server } from "../../../../../../../.shared";
 import {
   FrontendProblem,
+  problemFunctions,
+  problemProps,
   tryProblemAction,
   tryProblemActionPrivileged,
 } from "../../../../../Constants/types";
 import styles from "./index.css";
 
 interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
-  categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
   editors: Server.Editors;
-  problemProps: (
-    uuid: string,
-    prob: ProblemType,
-    tryProblemAction: tryProblemAction,
-    tryProblemActionPrivileged: tryProblemActionPrivileged,
-    authUser: firebase.User
-  ) => FrontendProblem;
-  tryProblemAction: tryProblemAction;
+  problemProps: problemProps;
+  problemFunctions: problemFunctions;
 }
 
 class Compile extends React.Component<CompileProps> {

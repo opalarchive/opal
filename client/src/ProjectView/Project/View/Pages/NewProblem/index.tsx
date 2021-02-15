@@ -1,25 +1,17 @@
-import {
-  withStyles,
-  WithStyles,
-  TextField,
-  Slider,
-  Button,
-  Paper,
-} from "@material-ui/core";
+import { withStyles, WithStyles, TextField, Slider, Button, Paper } from "@material-ui/core";
 import React from "react";
 import { CategoryColors, ViewSectionProps } from "../..";
 
-import {
-  Problem as ProblemType,
-  Server,
-  Votes,
-} from "../../../../../../../.shared";
+import { Problem as ProblemType, Server, Votes } from "../../../../../../../.shared";
 import {
   FrontendProblem,
   tryProblemAction,
   newProblem,
   tryProblemActionPrivileged,
+  problemProps,
+  problemFunctions,
 } from "../../../../../Constants/types";
+import TagGroup from "../../Embedded/TagGroup";
 import problemContainerStyles from "../../Embedded/Problem/index.css";
 import detailsStyles from "../../Pages/Details/index.css";
 import { FiChevronLeft, FiPlus } from "react-icons/fi";
@@ -30,17 +22,12 @@ import { tupleToRGBString } from "../../../../../Constants/index";
 import Dot from "../../Embedded/Dot";
 
 interface NewProblemProps extends ViewSectionProps {
-  categoryColors: CategoryColors;
   difficultyRange: { start: number; end: number };
   editors: Server.Editors;
-  problemProps: (
-    uuid: string,
-    prob: ProblemType,
-    tryProblemAction: tryProblemAction,
-    tryProblemActionPrivileged: tryProblemActionPrivileged,
-    authUser: firebase.User
-  ) => FrontendProblem;
-  tryProblemAction: tryProblemAction;
+  problemProps: problemProps;
+  problemFunctions: problemFunctions;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
   newProblem: newProblem;
 }
 
@@ -77,7 +64,9 @@ class NewProblem extends React.Component<
   }
 
   newProblem() {
-    const uid = !!this.props.authUser.uid ? this.props.authUser.uid : "";
+    const uid = !!this.props.authUser.uid
+      ? this.props.authUser.uid
+      : "";
     const { uuid, project } = this.props;
     var { title, text, category, difficulty } = this.state;
     if (title.length == 0) {

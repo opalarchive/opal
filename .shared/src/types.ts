@@ -184,7 +184,8 @@ export interface Problem {
 }
 
 export type problemAction = "vote" | "comment" | "addTag" | "removeTag";
-export type problemActionPrivileged = "title" | "text" | "category" | "difficulty";
+export type problemActionPrivileged = "title" | "text" | "category" | "difficulty" | "editComment";
+export type replyAction = "edit";
 
 /**
  * Reply related types
@@ -199,6 +200,7 @@ interface Post {
   author: string;
   text: string;
   time: number;
+  lastEdit: number;
 }
 
 export interface Comment extends Post {
