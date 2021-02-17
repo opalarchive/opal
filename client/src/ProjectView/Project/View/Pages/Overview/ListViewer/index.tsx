@@ -28,7 +28,7 @@ interface ListViewerProps {
   editors: Server.Editors;
 }
 
-export default class ListViewer extends React.Component<ListViewerProps> {
+export default class ListViewer extends React.PureComponent<ListViewerProps> {
   state = {};
 
   render() {

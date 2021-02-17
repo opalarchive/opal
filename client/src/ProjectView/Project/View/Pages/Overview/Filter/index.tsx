@@ -4,16 +4,10 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Checkbox,
   Divider,
-  FormControlLabel,
-  IconButton,
-  Menu,
-  MenuItem,
   Paper,
   Slider,
   TableSortLabel,
-  TextField,
   withStyles,
   WithStyles,
   withTheme,
@@ -23,26 +17,21 @@ import styles from "./index.css";
 import { compose } from "recompose";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
 import { List, Problem } from "../../../../../../../../.shared";
-import {
-  FiCheckCircle,
-  FiChevronDown,
-  FiArrowDown,
-  FiCircle,
-  FiFilter,
-  FiList,
-} from "react-icons/fi";
+import { FiChevronDown, FiArrowDown, FiFilter, FiList } from "react-icons/fi";
 import { HiOutlineSortDescending } from "react-icons/hi";
 import Dot from "../../../Embedded/Dot";
 import { CategoryColors } from "../../..";
-import {
-  camelToTitle,
-  spacingRem,
-  tupleToRGBString,
-} from "../../../../../../Constants";
+import { spacingRem } from "../../../../../../Constants";
 import Scrollbar from "react-scrollbars-custom";
-import Tag from "../../../Embedded/Tag";
 import { SortDirection } from "../../../../../../Constants/types";
-import TagGroup from "../../../Embedded/TagGroup";
+import ListSelect from "../../../Embedded/ListSelect";
+import {
+  KeywordAccordion,
+  AuthorAccordion,
+  CategoryAccordion,
+  TagAccordion,
+  DifficultyAccordion,
+} from "./accordions";
 
 interface FilterPropsBase {
   setFilter: (filter: (problem: Problem) => boolean) => void;
@@ -81,7 +70,7 @@ interface FilterState {
     dataPoint: "ind" | "difficulty" | "votes";
     direction: SortDirection;
   };
-  listMenuAnchorEl: EventTarget | null;
+  listMenuAnchorEl: HTMLElement | null;
 }
 
 class Filter extends React.Component<FilterProps, FilterState> {
@@ -178,7 +167,12 @@ class Filter extends React.Component<FilterProps, FilterState> {
         }
       }
       if (filterUsed("author")) {
-        if (!problem.author.startsWith(author)) return false;
+        if (
+          !problem.author
+            .toLocaleLowerCase()
+            .startsWith(author.toLocaleLowerCase())
+        )
+          return false;
       }
       if (filterUsed("category")) {
         if (!category[problem.category]) return false;
@@ -291,11 +285,11 @@ class Filter extends React.Component<FilterProps, FilterState> {
   }
 
   render() {
-    const { filter: resetFilter, filterUsed, onChange, onSortClick } = this;
+    const { filterUsed, onChange, onSortClick } = this;
     const {
       keyword,
       author,
-      category: categorySelected,
+      category,
       difficulty,
       sort,
       listMenuAnchorEl,
@@ -334,65 +328,14 @@ class Filter extends React.Component<FilterProps, FilterState> {
                 />
                 <Divider className={classes.divider} />
               </div>
-              {/* we just need to match the mui styles */}
-              <div className="MuiAccordionSummary-root">
-                <div style={{ margin: "12px 0" }}>
-                  <span className={classes.valueDescriptor}>Current:</span>
-                  {currentList < 0 ? "All Problems" : lists[currentList].name}
-                </div>
-                <IconButton
-                  color="inherit"
-                  onClick={this.openListMenu}
-                  aria-controls="list-select-menu"
-                  aria-haspopup="true"
-                  edge="end"
-                >
-                  <FiChevronDown />
-                </IconButton>
-              </div>
-              <Menu
-                id="list-select-menu"
-                anchorEl={listMenuAnchorEl}
-                keepMounted
-                open={!!listMenuAnchorEl}
-                onClose={this.closeListMenu}
-                elevation={3}
-                getContentAnchorEl={null}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                {lists.map((list, ind) => (
-                  <MenuItem
-                    key={`list-${ind}`}
-                    onClick={(_) => {
-                      setCurrentList(ind);
-                      this.setState({ listMenuAnchorEl: null });
-                    }}
-                    className={
-                      currentList === ind ? classes.currentList : undefined
-                    }
-                  >
-                    {list.name}
-                  </MenuItem>
-                ))}
-                <MenuItem
-                  onClick={(_) => {
-                    setCurrentList(-1);
-                    this.setState({ listMenuAnchorEl: null });
-                  }}
-                  className={
-                    currentList === -1 ? classes.currentList : undefined
-                  }
-                >
-                  All Problems
-                </MenuItem>
-              </Menu>
+              <ListSelect
+                listMenuAnchorEl={listMenuAnchorEl}
+                currentList={currentList}
+                listNames={lists.map((list) => list.name)}
+                setCurrentList={setCurrentList}
+                openListMenu={this.openListMenu}
+                closeListMenu={this.closeListMenu}
+              />
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
@@ -406,156 +349,46 @@ class Filter extends React.Component<FilterProps, FilterState> {
                 />
                 <Divider className={classes.divider} />
               </div>
-              <Accordion elevation={0} className={classes.accordion}>
-                <AccordionSummary
-                  expandIcon={<FiChevronDown />}
-                  aria-controls="keyword-filter-content"
-                  id="keyword-filter-header"
-                >
-                  Keyword
-                  {filterUsed("keyword") && filterUsedDot}
-                </AccordionSummary>
-                <AccordionDetails className={classes.accordionDetails}>
-                  <TextField
-                    name="keyword"
-                    id="keyword-filter"
-                    label="Keyword"
-                    value={keyword}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-
-                      onChange(e.target.name, e.target.value, "keyword");
-                    }}
-                  />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion elevation={0} className={classes.accordion}>
-                <AccordionSummary
-                  expandIcon={<FiChevronDown />}
-                  aria-controls="author-filter-content"
-                  id="author-filter-header"
-                >
-                  Author
-                  {filterUsed("author") && filterUsedDot}
-                </AccordionSummary>
-                <AccordionDetails className={classes.accordionDetails}>
-                  <TextField
-                    name="author"
-                    id="author-filter"
-                    label="Author"
-                    value={author}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-
-                      onChange(e.target.name, e.target.value, "author");
-                    }}
-                  />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion elevation={0} className={classes.accordion}>
-                <AccordionSummary
-                  expandIcon={<FiChevronDown />}
-                  aria-controls="category-filter-content"
-                  id="category-filter-header"
-                >
-                  Category {filterUsed("category") && filterUsedDot}
-                </AccordionSummary>
-                <AccordionDetails className={classes.accordionDetails}>
-                  {Object.entries(categoryColors).map(([category, color]) => {
-                    return (
-                      <FormControlLabel
-                        key={`category-filter-${category}`}
-                        control={
-                          <Checkbox
-                            icon={<FiCircle />}
-                            checkedIcon={<FiCheckCircle />}
-                            name={category}
-                          />
-                        }
-                        value={!!categorySelected[category]}
-                        onChange={(
-                          e: React.ChangeEvent<{}>,
-                          checked: boolean
-                        ) => {
-                          e.stopPropagation();
-
-                          onChange(category, checked, "category");
-                        }}
-                        label={
-                          <>
-                            {camelToTitle(category)}
-                            <Dot
-                              color={tupleToRGBString(color)}
-                              style={{ marginLeft: "0.55rem" }}
-                            />
-                          </>
-                        }
-                      />
-                    );
-                  })}
-                </AccordionDetails>
-              </Accordion>
-              <Accordion elevation={0} className={classes.accordion}>
-                <AccordionSummary
-                  expandIcon={<FiChevronDown />}
-                  aria-controls="tag-filter-content"
-                  id="tag-filter-header"
-                >
-                  Tag
-                  {filterUsed("tag") && filterUsedDot}
-                </AccordionSummary>
-                <AccordionDetails className={classes.accordionDetails}>
-                  <div>
-                    {!!allTags && (
-                      <TagGroup
-                        text={[...allTags]} // convert from set to array
-                        clickedTags={clickedTags}
-                        onClickTag={onClickTag}
-                        filterTag
-                      />
-                    )}
-                  </div>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion elevation={0} className={classes.accordion}>
-                <AccordionSummary
-                  expandIcon={<FiChevronDown />}
-                  aria-controls="difficulty-filter-content"
-                  id="difficulty-filter-header"
-                >
-                  Difficulty
-                  {filterUsed("difficulty") && filterUsedDot}
-                </AccordionSummary>
-                <AccordionDetails
-                  className={classes.accordionDetails}
-                  style={{
-                    paddingLeft: spacingRem(theme, 3),
-                    paddingRight: spacingRem(theme, 3),
-                  }}
-                >
-                  <Slider
-                    value={[difficulty.start, difficulty.end]}
-                    onChange={(
-                      e: React.ChangeEvent<{}>,
-                      value: number | number[]
-                    ) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-
-                      onChange("difficulty", value, "difficulty");
-                    }}
-                    min={difficultyRange.start}
-                    max={difficultyRange.end}
-                    valueLabelDisplay="auto"
-                    aria-labelledby="difficulty-filter-header"
-                    getAriaValueText={() =>
-                      `lower bound d-${difficulty.start}, upper bound d-${difficulty.end}`
-                    }
-                  />
-                </AccordionDetails>
-              </Accordion>
+              <KeywordAccordion
+                keyword={keyword}
+                filterUsedDot={filterUsedDot}
+                filterUsed={filterUsed}
+                onChange={onChange}
+                classes={classes}
+              />
+              <AuthorAccordion
+                author={author}
+                filterUsedDot={filterUsedDot}
+                filterUsed={filterUsed}
+                onChange={onChange}
+                classes={classes}
+              />
+              <CategoryAccordion
+                categorySelected={category}
+                categoryColors={categoryColors}
+                filterUsedDot={filterUsedDot}
+                filterUsed={filterUsed}
+                onChange={onChange}
+                classes={classes}
+              />
+              <TagAccordion
+                allTags={allTags}
+                clickedTags={clickedTags}
+                onClickTag={onClickTag}
+                filterUsedDot={filterUsedDot}
+                filterUsed={filterUsed}
+                onChange={onChange}
+                classes={classes}
+              />
+              <DifficultyAccordion
+                difficulty={difficulty}
+                difficultyRange={difficultyRange}
+                filterUsedDot={filterUsedDot}
+                filterUsed={filterUsed}
+                onChange={onChange}
+                classes={classes}
+                theme={theme}
+              />
             </Paper>
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>

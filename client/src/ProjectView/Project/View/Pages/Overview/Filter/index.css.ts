@@ -25,13 +25,6 @@ const styles = (theme: Theme) =>
       )}`,
     },
     divider: { marginTop: `${spacingRem(theme, 1)}` },
-    valueDescriptor: {
-      color: "rgba(0, 0, 0, 0.69)",
-      paddingRight: spacingRem(theme, 1),
-    },
-    currentList: {
-      backgroundColor: theme.palette.secondary.light,
-    },
     accordion: {
       "&:before": { opacity: 0 },
       margin: "0 !important",
@@ -40,6 +33,10 @@ const styles = (theme: Theme) =>
       paddingTop: 0,
       display: "flex",
       flexDirection: "column",
+    },
+    slider: {
+      paddingLeft: spacingRem(theme, 3),
+      paddingRight: spacingRem(theme, 3),
     },
     sort: {
       padding: `${spacingRem(theme, 1)} ${spacingRem(theme, 2)} ${spacingRem(
