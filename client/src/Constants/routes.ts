@@ -12,6 +12,9 @@ export const PROJECT_PROBLEM_REPLY = "/project/view/:uuid/p:ind/r:reply";
 export const PROJECT_NEW_PROBLEM = "/project/view/:uuid/new-problem";
 
 export const PROJECT_COMPILE = "/project/view/:uuid/compile";
+export const PROJECT_ALL_PROBLEMS = "/project/view/:uuid/compile/all";
+export const PROJECT_LIST = "/project/view/:uuid/compile/l:list";
+
 export const PROJECT_SETTINGS = "/project/view/:uuid/settings";
 
 export const SELECTION_PRIORITY = "/project/priority";

@@ -185,7 +185,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       replyTypes: types,
       authUser: authUser,
     };
-  }
+  };
 
   problemFunctions: problemFunctions = (
     uuid: string,
@@ -195,12 +195,22 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     return {
       tryProblemAction: (problemActionData: data, type: problemAction) =>
         this.props.tryProblemAction(prob.ind, problemActionData, type),
-      tryProblemActionPrivileged: (problemActionPrivilegedData: data, type: problemActionPrivileged) =>
-        this.props.tryProblemActionPrivileged(prob.ind, problemActionPrivilegedData, type),
-      tryReplyAction: (replyInd: number, replyActionData: data, type: replyAction) => 
-        this.props.tryReplyAction(prob.ind, replyInd, replyActionData, type),
+      tryProblemActionPrivileged: (
+        problemActionPrivilegedData: data,
+        type: problemActionPrivileged
+      ) =>
+        this.props.tryProblemActionPrivileged(
+          prob.ind,
+          problemActionPrivilegedData,
+          type
+        ),
+      tryReplyAction: (
+        replyInd: number,
+        replyActionData: data,
+        type: replyAction
+      ) => this.props.tryReplyAction(prob.ind, replyInd, replyActionData, type),
     };
-  }
+  };
 
   setDefaultScroll(defaultScroll: number) {
     if (this.scrollSet === 0) {
@@ -215,14 +225,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   }
 
   render() {
-    const {
-      project,
-      editors,
-      uuid,
-      authUser,
-      newProblem,
-      match,
-    } = this.props;
+    const { project, editors, uuid, authUser, newProblem, match } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 
@@ -294,13 +297,12 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
           />
           <Route
             exact
-            path={[ROUTES.PROJECT_COMPILE.replace(":uuid", uuid)]}
-            render={(_) => (
-              <Compile
-                {...viewSectionProps}
-                difficultyRange={this.state.difficultyRange}
-              />
-            )}
+            path={[
+              ROUTES.PROJECT_COMPILE.replace(":uuid", uuid),
+              ROUTES.PROJECT_LIST.replace(":uuid", uuid),
+              ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", uuid),
+            ]}
+            render={(_) => <Compile {...viewSectionProps} />}
           />
           <Route
             exact

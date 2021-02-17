@@ -10,25 +10,41 @@ import styles from "./index.css";
 import { FiChevronDown } from "react-icons/fi";
 
 interface ListSelectProps extends WithStyles<typeof styles> {
-  listMenuAnchorEl: HTMLElement | null;
   currentList: number;
   listNames: string[];
   setCurrentList: (ind: number) => void;
-  openListMenu: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  closeListMenu: () => void;
 }
 
-class ListSelect extends React.PureComponent<ListSelectProps> {
+interface ListSelectionState {
+  listMenuAnchorEl: HTMLElement | null;
+}
+
+class ListSelect extends React.PureComponent<
+  ListSelectProps,
+  ListSelectionState
+> {
+  state = {
+    listMenuAnchorEl: null,
+  };
+
+  constructor(props: ListSelectProps) {
+    super(props);
+
+    this.openListMenu = this.openListMenu.bind(this);
+    this.closeListMenu = this.closeListMenu.bind(this);
+  }
+
+  openListMenu(event: React.MouseEvent<HTMLButtonElement>) {
+    this.setState({ listMenuAnchorEl: event.currentTarget });
+  }
+
+  closeListMenu() {
+    this.setState({ listMenuAnchorEl: null });
+  }
+
   render() {
-    const {
-      listMenuAnchorEl,
-      currentList,
-      listNames,
-      setCurrentList,
-      openListMenu,
-      closeListMenu,
-      classes,
-    } = this.props;
+    const { currentList, listNames, setCurrentList, classes } = this.props;
+    const { listMenuAnchorEl } = this.state;
     // we just need to match the mui styles
     return (
       <>
@@ -45,7 +61,7 @@ class ListSelect extends React.PureComponent<ListSelectProps> {
           </div>
           <IconButton
             color="inherit"
-            onClick={openListMenu}
+            onClick={this.openListMenu}
             aria-controls="list-select-menu"
             aria-haspopup="true"
             edge="end"
@@ -58,7 +74,7 @@ class ListSelect extends React.PureComponent<ListSelectProps> {
           anchorEl={listMenuAnchorEl}
           keepMounted
           open={!!listMenuAnchorEl}
-          onClose={closeListMenu}
+          onClose={this.closeListMenu}
           elevation={3}
           getContentAnchorEl={null}
           anchorOrigin={{
@@ -73,7 +89,7 @@ class ListSelect extends React.PureComponent<ListSelectProps> {
           <MenuItem
             onClick={(_) => {
               setCurrentList(-1);
-              closeListMenu();
+              this.closeListMenu();
             }}
             className={currentList === -1 ? classes.currentList : undefined}
           >
@@ -84,7 +100,7 @@ class ListSelect extends React.PureComponent<ListSelectProps> {
               key={`list-${ind}`}
               onClick={(_) => {
                 setCurrentList(ind);
-                closeListMenu();
+                this.closeListMenu();
               }}
               className={currentList === ind ? classes.currentList : undefined}
             >

@@ -1,12 +1,8 @@
 import React from "react";
 
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Divider,
   Paper,
-  Slider,
   TableSortLabel,
   withStyles,
   WithStyles,
@@ -17,11 +13,10 @@ import styles from "./index.css";
 import { compose } from "recompose";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
 import { List, Problem } from "../../../../../../../../.shared";
-import { FiChevronDown, FiArrowDown, FiFilter, FiList } from "react-icons/fi";
+import { FiArrowDown, FiFilter, FiList } from "react-icons/fi";
 import { HiOutlineSortDescending } from "react-icons/hi";
 import Dot from "../../../Embedded/Dot";
 import { CategoryColors } from "../../..";
-import { spacingRem } from "../../../../../../Constants";
 import Scrollbar from "react-scrollbars-custom";
 import { SortDirection } from "../../../../../../Constants/types";
 import ListSelect from "../../../Embedded/ListSelect";
@@ -70,17 +65,13 @@ interface FilterState {
     dataPoint: "ind" | "difficulty" | "votes";
     direction: SortDirection;
   };
-  listMenuAnchorEl: HTMLElement | null;
 }
 
 class Filter extends React.Component<FilterProps, FilterState> {
   shouldComponentUpdate(nextProps: FilterProps, nextState: FilterState) {
-    const { listMenuAnchorEl: prevAnchor, ...prev } = this.state;
-    const { listMenuAnchorEl: nextAnchor, ...next } = nextState;
     return (
       JSON.stringify(this.props) !== JSON.stringify(nextProps) ||
-      JSON.stringify(prev) !== JSON.stringify(next) ||
-      !!prevAnchor !== !!nextAnchor
+      JSON.stringify(this.state) !== JSON.stringify(nextState)
     );
   }
 
@@ -98,7 +89,6 @@ class Filter extends React.Component<FilterProps, FilterState> {
       dataPoint: "ind" | "difficulty" | "votes";
       direction: SortDirection;
     },
-    listMenuAnchorEl: null,
   };
 
   constructor(props: FilterProps) {
@@ -108,18 +98,8 @@ class Filter extends React.Component<FilterProps, FilterState> {
     this.filter = this.filter.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSortClick = this.onSortClick.bind(this);
-    this.openListMenu = this.openListMenu.bind(this);
-    this.closeListMenu = this.closeListMenu.bind(this);
 
     this.state = { ...this.state, difficulty: this.props.difficultyRange };
-  }
-
-  openListMenu(event: React.MouseEvent<HTMLButtonElement>) {
-    this.setState({ listMenuAnchorEl: event.currentTarget });
-  }
-
-  closeListMenu() {
-    this.setState({ listMenuAnchorEl: null });
   }
 
   filterUsed(
@@ -286,14 +266,7 @@ class Filter extends React.Component<FilterProps, FilterState> {
 
   render() {
     const { filterUsed, onChange, onSortClick } = this;
-    const {
-      keyword,
-      author,
-      category,
-      difficulty,
-      sort,
-      listMenuAnchorEl,
-    } = this.state;
+    const { keyword, author, category, difficulty, sort } = this.state;
     const {
       difficultyRange,
       categoryColors,
@@ -329,12 +302,9 @@ class Filter extends React.Component<FilterProps, FilterState> {
                 <Divider className={classes.divider} />
               </div>
               <ListSelect
-                listMenuAnchorEl={listMenuAnchorEl}
                 currentList={currentList}
                 listNames={lists.map((list) => list.name)}
                 setCurrentList={setCurrentList}
-                openListMenu={this.openListMenu}
-                closeListMenu={this.closeListMenu}
               />
             </Paper>
             <Paper elevation={3} className={classes.paper}>

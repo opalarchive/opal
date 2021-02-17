@@ -1,43 +1,97 @@
 import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
-import { CategoryColors, ViewSectionProps } from "../..";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { compose } from "recompose";
+import { ViewSectionProps } from "../..";
 
-import { Problem as ProblemType, Server } from "../../../../../../../.shared";
-import {
-  FrontendProblem,
-  problemFunctions,
-  problemProps,
-  tryProblemAction,
-  tryProblemActionPrivileged,
-} from "../../../../../Constants/types";
+import { Server } from "../../../../../../../.shared";
+import { problemFunctions, problemProps } from "../../../../../Constants/types";
+import SidebaredBase from "../../../../Template/SidebaredBase";
 import styles from "./index.css";
+import Navigation from "./Navigation";
 
-interface CompileProps extends WithStyles<typeof styles>, ViewSectionProps {
-  difficultyRange: { start: number; end: number };
+import * as ROUTES from "../../../../../Constants/routes";
+
+interface CompileProps extends ViewSectionProps {
   editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
 }
 
-class Compile extends React.Component<CompileProps> {
+interface CompileState {
+  currentList: number;
+}
+
+interface CompileMatch {
+  list: string;
+}
+
+class Compile extends React.Component<
+  CompileProps & RouteComponentProps<CompileMatch> & WithStyles<typeof styles>,
+  CompileState
+> {
+  state = {
+    currentList: -1,
+  };
+
+  constructor(
+    props: CompileProps &
+      RouteComponentProps<CompileMatch> &
+      WithStyles<typeof styles>
+  ) {
+    super(props);
+
+    if (props.match.params.list !== undefined) {
+      this.state = {
+        ...this.state,
+        currentList: parseInt(props.match.params.list),
+      };
+    }
+
+    this.setCurrentList = this.setCurrentList.bind(this);
+  }
+
+  setCurrentList(list: number) {
+    if (list === -1) {
+      this.props.history.push(
+        ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", this.props.uuid)
+      );
+    } else {
+      this.props.history.push(
+        ROUTES.PROJECT_LIST.replace(":uuid", this.props.uuid).replace(
+          ":list",
+          "" + list
+        )
+      );
+    }
+    this.setState({ currentList: list });
+  }
+
   render() {
-    const {
-      // project,
-      // categoryColors,
-      // editors,
-      // problemProps,
-      // uuid,
-      // tryProblemAction,
-      // authUser,
-      classes,
-    } = this.props;
+    const { project, fixedSidebar, authUser, classes } = this.props;
 
     return (
-      <div className={classes.root}>
-        {/* TODO add problem compilation code. The above props are recommended */}
-      </div>
+      <SidebaredBase
+        sidebarWidth={18}
+        Sidebar={Navigation}
+        sidebarProps={{
+          lists: project.lists,
+          currentList: this.state.currentList,
+          setCurrentList: this.setCurrentList,
+        }}
+        fixedSidebar={fixedSidebar}
+        authUser={authUser}
+      >
+        <div className={classes.root}>sdf </div>
+      </SidebaredBase>
     );
   }
 }
 
-export default withStyles(styles)(Compile);
+export default compose<
+  CompileProps & RouteComponentProps<CompileMatch> & WithStyles<typeof styles>,
+  CompileProps
+>(
+  withStyles(styles),
+  withRouter
+)(Compile);
