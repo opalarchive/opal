@@ -60,17 +60,21 @@ const StyledTabContainer = withStyles(tabContainerStyles)(TabContainer);
 
 interface LinkTabProps {
   url: string;
+  pathname: string;
 }
 
 const LinkTab: React.FC<
   LinkTabProps & TabProps & WithStyles<typeof styles>
-> = ({ url, ...rest }) => (
+> = ({ url, pathname, ...rest }) => (
   <Link
     to={url}
     style={{
       textDecoration: "none",
       color: "inherit",
       outline: "none",
+    }}
+    onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (url === pathname) e.preventDefault();
     }}
   >
     <Tab disableRipple {...rest} />
@@ -98,6 +102,7 @@ class Navbar extends React.PureComponent<
               <StyledTab
                 key={`${name}-tab`}
                 url={sectionLinks[index].replace(":uuid", uuid)}
+                pathname={location.pathname}
                 label={name}
               />
             ); // mui passes weird props to this that jsx doesn't like on a tags, so we destroy them here (also to style)
