@@ -74,8 +74,6 @@ class MenuBase extends React.Component<
       this.scrollSet = this.scrollSet + 1;
     }
 
-    console.log(this.state.height);
-
     return (
       <div
         className={classes.container}
