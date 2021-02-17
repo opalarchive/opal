@@ -19,7 +19,7 @@ import {
   FiLink2,
   FiMessageSquare,
 } from "react-icons/fi";
-import Latex from "../../../../../Constants/latex";
+import Markup from "../../../../../Constants/parseMarkup";
 import { formatTime } from "../../../../../Constants";
 import * as ROUTES from "../../../../../Constants/routes";
 import { compose } from "recompose";
@@ -54,7 +54,7 @@ class ReplyBase<State> extends React.Component<ReplyProps, State> {
   getText(classes: WithStyles<typeof styles>["classes"], text: string) {
     return (
       <div className={classes.text}>
-        <Latex>{text}</Latex>
+        <Markup>{text}</Markup>
       </div>
     );
   }
@@ -161,7 +161,7 @@ class Solution extends ReplyBase<SolutionState> {
         </div>
         {this.state.revealed && (
           <div className={classes.text}>
-            <Latex>{text}</Latex>
+            <Markup>{text}</Markup>
           </div>
         )}
       </>

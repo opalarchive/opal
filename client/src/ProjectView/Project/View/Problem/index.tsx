@@ -8,7 +8,7 @@ import {
   FiCornerDownRight,
   FiMessageSquare,
 } from "react-icons/fi";
-import Latex from "../../../../Constants/latex";
+import Markup from "../../../../Constants/parseMarkup";
 import { Link } from "react-router-dom";
 
 import * as ROUTES from "../../../../Constants/routes";
@@ -87,7 +87,7 @@ class Problem extends React.Component<
           <div className={classes.bodyTitle}>{title}</div>
           <div className={classes.bodyAuthor}>Proposed by {author}</div>
           <div className={classes.bodyText}>
-            <Latex>{text}</Latex>
+            <Markup>{text}</Markup>
           </div>
           <div className={classes.bodyFiller} />
           <div className={classes.bodyTags}>

@@ -25,3 +25,36 @@ a.MuiButton-containedSecondary:hover {
 .ScrollbarsCustom-TrackX {
   height: 6px !important;
 }
+
+/* BBCode tags */
+a.bbcode-link {
+  text-decoration: none;
+}
+a.bbcode-link:hover {
+  text-decoration: underline;
+}
+
+blockquote,
+pre {
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0.25rem;
+  padding: 0.5rem;
+}
+
+blockquote {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+pre {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+blockquote > p {
+  margin: 0;
+}
+
+blockquote > .bbcode-quote-author {
+  border-bottom: solid 0.1rem rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.75);
+  font-size: 0.75rem;
+}
