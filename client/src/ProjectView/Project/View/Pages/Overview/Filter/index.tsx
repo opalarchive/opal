@@ -59,7 +59,7 @@ interface FilterPropsBase {
   clickedTags: {
     [tag: string]: boolean;
   };
-  onClickTag: (tagText: string, callBack?: () => void) => void;
+  onClickTag: (tagText: string) => void;
   lists: List[];
   currentList: number;
   setCurrentList: (list: number) => void;
@@ -116,11 +116,13 @@ class Filter extends React.Component<FilterProps, FilterState> {
     super(props);
 
     this.filterUsed = this.filterUsed.bind(this);
-    this.resetFilter = this.resetFilter.bind(this);
+    this.filter = this.filter.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSortClick = this.onSortClick.bind(this);
     this.openListMenu = this.openListMenu.bind(this);
     this.closeListMenu = this.closeListMenu.bind(this);
+
+    this.state = { ...this.state, difficulty: this.props.difficultyRange };
   }
 
   openListMenu(event: React.MouseEvent<HTMLButtonElement>) {
@@ -157,9 +159,9 @@ class Filter extends React.Component<FilterProps, FilterState> {
     }
   }
 
-  resetFilter() {
-    const { keyword, author, category } = this.state;
-    const { difficultyRange, clickedTags, setFilter } = this.props;
+  filter() {
+    const { keyword, author, category, difficulty } = this.state;
+    const { clickedTags, setFilter } = this.props;
     const { filterUsed } = this;
 
     setFilter((problem: Problem) => {
@@ -192,9 +194,10 @@ class Filter extends React.Component<FilterProps, FilterState> {
         if (!works) return false;
       }
       if (filterUsed("difficulty")) {
+        console.log(difficulty.start, problem.difficulty, difficulty.end);
         if (
-          difficultyRange.start >= problem.difficulty ||
-          problem.difficulty >= difficultyRange.end
+          difficulty.start > problem.difficulty ||
+          problem.difficulty > difficulty.end
         )
           return false;
       }
@@ -202,7 +205,7 @@ class Filter extends React.Component<FilterProps, FilterState> {
     });
   }
 
-  resetSort() {
+  sort() {
     const { dataPoint, direction } = this.state.sort;
     const { setSortWeight } = this.props;
     const sign = direction === "asc" ? 1 : -1;
@@ -236,35 +239,30 @@ class Filter extends React.Component<FilterProps, FilterState> {
   ) {
     switch (type) {
       case "keyword":
-        this.setState({ keyword: value as string }, this.resetFilter);
+        this.setState({ keyword: value as string });
         break;
       case "author":
-        this.setState({ author: value as string }, this.resetFilter);
+        this.setState({ author: value as string });
         break;
       case "category":
-        this.setState(
-          {
-            category: {
-              ...this.state.category,
-              [name]: !this.state.category[name],
-            },
+        console.log(this.state.category[name]);
+        this.setState({
+          category: {
+            ...this.state.category,
+            [name]: !this.state.category[name],
           },
-          this.resetFilter
-        );
+        });
         break;
       case "tag":
         break;
       case "difficulty":
         const difficultyArray = value as number[];
-        this.setState(
-          {
-            difficulty: {
-              start: difficultyArray[0],
-              end: difficultyArray[1],
-            },
+        this.setState({
+          difficulty: {
+            start: difficultyArray[0],
+            end: difficultyArray[1],
           },
-          this.resetFilter
-        );
+        });
         break;
     }
   }
@@ -280,16 +278,20 @@ class Filter extends React.Component<FilterProps, FilterState> {
         direction: this.state.sort.direction === "asc" ? "desc" : "asc",
       };
     }
-    this.setState({ sort }, this.resetSort);
+    this.setState({ sort });
   }
 
   componentDidMount() {
-    this.setState({ difficulty: this.props.difficultyRange });
-    this.resetSort(); // nothing should be filtered out at the beginning, but the problems will not be sorted
+    this.sort(); // nothing should be filtered out at the beginning, but the problems will not be sorted
+  }
+
+  componentDidUpdate() {
+    this.filter();
+    this.sort();
   }
 
   render() {
-    const { resetFilter, filterUsed, onChange, onSortClick } = this;
+    const { filter: resetFilter, filterUsed, onChange, onSortClick } = this;
     const {
       keyword,
       author,
@@ -322,7 +324,7 @@ class Filter extends React.Component<FilterProps, FilterState> {
           <div className={classes.wrapper}>
             <Paper elevation={3} className={classes.paper}>
               <div className={classes.title}>
-                Lists
+                List
                 <FiList
                   style={{
                     position: "relative",
@@ -477,7 +479,6 @@ class Filter extends React.Component<FilterProps, FilterState> {
                           e: React.ChangeEvent<{}>,
                           checked: boolean
                         ) => {
-                          e.preventDefault();
                           e.stopPropagation();
 
                           onChange(category, checked, "category");
@@ -511,9 +512,7 @@ class Filter extends React.Component<FilterProps, FilterState> {
                       <TagGroup
                         text={[...allTags]} // convert from set to array
                         clickedTags={clickedTags}
-                        onClickTag={(tagText: string) =>
-                          onClickTag(tagText, resetFilter)
-                        }
+                        onClickTag={onClickTag}
                         filterTag
                       />
                     )}

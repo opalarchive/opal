@@ -3,13 +3,7 @@ import React from "react";
 import { CategoryColors, ViewSectionProps } from "../..";
 
 import { Problem as ProblemType, Server } from "../../../../../../../.shared";
-import {
-  FrontendProblem,
-  problemFunctions,
-  problemProps,
-  tryProblemAction,
-  tryProblemActionPrivileged,
-} from "../../../../../Constants/types";
+import { problemFunctions, problemProps } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import Filter from "./Filter";
 import styles from "./index.css";
@@ -38,7 +32,7 @@ interface OverviewState {
   currentList: number;
 }
 
-class Overview extends React.PureComponent<OverviewProps, OverviewState> {
+class Overview extends React.Component<OverviewProps, OverviewState> {
   state = {
     filter: (problem: ProblemType) => true,
     sortWeight: (problem: ProblemType) => ({
