@@ -11,6 +11,7 @@ import styles from "./index.css";
 import Navigation from "./Navigation";
 
 import * as ROUTES from "../../../../../Constants/routes";
+import Export from "./Export";
 
 interface CompileProps extends ViewSectionProps {
   editors: Server.Editors;
@@ -82,7 +83,9 @@ class Compile extends React.Component<
         fixedSidebar={fixedSidebar}
         authUser={authUser}
       >
-        <div className={classes.root}>sdf </div>
+        <div className={classes.root}>
+          <Export project={project} />
+        </div>
       </SidebaredBase>
     );
   }
