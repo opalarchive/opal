@@ -84,7 +84,7 @@ class Compile extends React.Component<
         authUser={authUser}
       >
         <div className={classes.root}>
-          <Export project={project} />
+          <Export project={project} currentList={this.state.currentList} />
         </div>
       </SidebaredBase>
     );

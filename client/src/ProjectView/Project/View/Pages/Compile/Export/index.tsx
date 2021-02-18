@@ -14,6 +14,7 @@ import { ProjectPrivate } from "../../../../../../../../.shared";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import styles from "./index.css";
 import {
+  exportBody,
   JSONTemplate,
   Template,
 } from "../../../../../../Constants/exportTemplates";
@@ -21,6 +22,7 @@ import { camelToTitle } from "../../../../../../Constants";
 
 interface ExportProps extends WithStyles<typeof styles> {
   project: ProjectPrivate;
+  currentList: number;
 }
 
 interface ExportState {
@@ -45,6 +47,7 @@ class Export extends React.Component<ExportProps, ExportState> {
     this.onChangeTemplateType = this.onChangeTemplateType.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.getExport = this.getExport.bind(this);
   }
 
   onChangeTemplateType(event: React.ChangeEvent<HTMLInputElement>) {
@@ -91,12 +94,32 @@ class Export extends React.Component<ExportProps, ExportState> {
     }
   }
 
+  getExport() {
+    const {
+      project: { problems, lists },
+      currentList,
+    } = this.props;
+    const { templateType } = this.state;
+    const problemList =
+      currentList === -1
+        ? problems
+        : problems.filter((prob) =>
+            lists[currentList].problems.includes(prob.ind)
+          );
+    if (templateType === "JSON") return exportBody(JSONTemplate, problemList);
+    if (templateType === "YAML")
+      return exportBody(this.state.customTemplate, problemList);
+    return exportBody(this.state.customTemplate, problemList);
+  }
+
   render() {
     const { classes } = this.props;
     const { templateType } = this.state;
 
     const template: Template =
       templateType === "JSON" ? JSONTemplate : this.state.customTemplate; // replace with yaml later
+
+    console.log(this.getExport());
 
     return (
       <Paper elevation={3} className={classes.root}>
