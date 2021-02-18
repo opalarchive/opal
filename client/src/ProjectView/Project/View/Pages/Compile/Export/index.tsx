@@ -68,13 +68,26 @@ class Export extends React.Component<ExportProps, ExportState> {
   onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Tab") {
       event.preventDefault();
-      this.setState({
-        customTemplate: {
-          ...this.state.customTemplate,
-          [(event.target as HTMLInputElement).name]:
-            (event.target as HTMLInputElement).value + "\t",
+
+      const target = event.target as HTMLInputElement;
+
+      const st = target.selectionStart!,
+        en = target.selectionEnd!;
+
+      const value = target.value.substr(0, st) + "\t" + target.value.substr(en);
+
+      this.setState(
+        {
+          customTemplate: {
+            ...this.state.customTemplate,
+            [target.name]: value,
+          },
         },
-      });
+        () => {
+          target.selectionStart = st + 1;
+          target.selectionEnd = st + 1;
+        }
+      );
     }
   }
 
@@ -117,23 +130,24 @@ class Export extends React.Component<ExportProps, ExportState> {
             {Object.entries(template).map(([part, text], ind) => (
               <React.Fragment key={`${part}-template`}>
                 <div className={classes.subtitle}>{camelToTitle(part)}</div>
-                {templateType !== "Custom" ? (
-                  <div className={classes.templateBox}>{text}</div>
-                ) : (
-                  <TextField
-                    className={classes.templateEdit}
-                    hiddenLabel
-                    multiline
-                    fullWidth
-                    size="small"
-                    variant="filled"
-                    inputProps={{ spellCheck: "false" }}
-                    name={part}
-                    value={this.state.customTemplate[part as keyof Template]}
-                    onChange={this.onChange}
-                    onKeyDown={this.onKeyDown}
-                  />
-                )}
+                <TextField
+                  className={classes.templateEdit}
+                  hiddenLabel
+                  multiline
+                  fullWidth
+                  size="small"
+                  variant="filled"
+                  inputProps={{ spellCheck: "false" }}
+                  name={part}
+                  value={
+                    templateType !== "Custom"
+                      ? text
+                      : this.state.customTemplate[part as keyof Template]
+                  }
+                  onChange={this.onChange}
+                  onKeyDown={this.onKeyDown}
+                  disabled={templateType !== "Custom"}
+                />
                 {ind + 1 !== Object.keys(template).length && (
                   <div className={classes.filler} />
                 )}
