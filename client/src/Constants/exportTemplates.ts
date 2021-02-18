@@ -29,6 +29,16 @@ export const JSONTemplate: Template = {
   tag: `"_text_"`,
 };
 
+/*
+TODO: add this
+*/
+export const YAMLTemplate: Template = {
+  body: ``,
+  problem: ``,
+  reply: ``,
+  tag: ``,
+};
+
 const regex = /_[^_]*_/g;
 
 const exportTag = (template: Template, tag: string) => {
@@ -92,7 +102,10 @@ const exportProblem = (template: Template, problem: Problem) => {
     // normal replace variable name with variable
     problemVars.forEach((problemVar) => {
       if (`_${problemVar}_` === match[i]) {
-        const insertedVar = problem[problemVar];
+        let insertedVar = problem[problemVar];
+        if (problemVar === "ind") {
+          insertedVar = problem[problemVar] + 1;
+        }
 
         match[i] =
           typeof insertedVar === "string" ? insertedVar : "" + insertedVar;
@@ -101,13 +114,26 @@ const exportProblem = (template: Template, problem: Problem) => {
 
     // replace reply and tag lists with replies and tags
     // _replies(foo)_ uses "foo" as a separator between replies
-    if (!!match[i].match(/^_replies\([\s\S]*\)_$/g)) {
-      const separator = match[i].substring(9, match[i].length - 2);
+    // _replies_ would just be a list with no separator
+    if (
+      !!match[i].match(/^_replies\([\s\S]*\)_$/g) ||
+      match[i] === "_replies_"
+    ) {
+      const separator =
+        match[i] === "_replies_"
+          ? ""
+          : match[i].substring(9, match[i].length - 2);
+
       match[i] = problem.replies
         .map((reply) => exportReply(template, reply))
         .join(separator);
-    } else if (!!match[i].match(/^_tags\([\s\S]*\)_$/g)) {
-      const separator = match[i].substring(6, match[i].length - 2);
+    } else if (
+      !!match[i].match(/^_tags\([\s\S]*\)_$/g) ||
+      match[i] === "_tags_"
+    ) {
+      const separator =
+        match[i] === "_tags_" ? "" : match[i].substring(6, match[i].length - 2);
+
       match[i] = problem.tags
         .map((tag) => exportTag(template, tag))
         .join(separator);
@@ -129,10 +155,15 @@ export const exportBody = (template: Template, problems: Problem[]) => {
   let result = normalText[0];
 
   for (let i = 0; i < match?.length; i++) {
-    // _problems(foo)_ (see exportProblem for more details)
-    if (!!match[i].match(/^_problems\([\s\S]*\)_$/g)) {
-      const separator = match[i].substring(10, match[i].length - 2);
-      console.log(separator);
+    // _problems(foo)_ or _problems_ (see exportProblem for more details)
+    if (
+      !!match[i].match(/^_problems\([\s\S]*\)_$/g) ||
+      match[i] === "_problems_"
+    ) {
+      const separator =
+        match[i] === "_problems_"
+          ? ""
+          : match[i].substring(10, match[i].length - 2);
 
       match[i] = problems
         .map((prob) => exportProblem(template, prob))

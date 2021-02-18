@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Button,
   Divider,
   FormControlLabel,
   InputAdornment,
@@ -17,6 +18,7 @@ import {
   exportBody,
   JSONTemplate,
   Template,
+  YAMLTemplate,
 } from "../../../../../../Constants/exportTemplates";
 import { camelToTitle } from "../../../../../../Constants";
 
@@ -107,8 +109,7 @@ class Export extends React.Component<ExportProps, ExportState> {
             lists[currentList].problems.includes(prob.ind)
           );
     if (templateType === "JSON") return exportBody(JSONTemplate, problemList);
-    if (templateType === "YAML")
-      return exportBody(this.state.customTemplate, problemList);
+    if (templateType === "YAML") return exportBody(YAMLTemplate, problemList);
     return exportBody(this.state.customTemplate, problemList);
   }
 
@@ -117,9 +118,7 @@ class Export extends React.Component<ExportProps, ExportState> {
     const { templateType } = this.state;
 
     const template: Template =
-      templateType === "JSON" ? JSONTemplate : this.state.customTemplate; // replace with yaml later
-
-    console.log(this.getExport());
+      templateType === "JSON" ? JSONTemplate : YAMLTemplate; // replace with yaml later
 
     return (
       <Paper elevation={3} className={classes.root}>
@@ -176,6 +175,17 @@ class Export extends React.Component<ExportProps, ExportState> {
                 )}
               </React.Fragment>
             ))}
+            <div className={classes.buttonContainer}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(this.getExport());
+                }}
+              >
+                Copy Export &nbsp; <BsBoxArrowUpRight />
+              </Button>
+            </div>
           </div>
         </div>
       </Paper>

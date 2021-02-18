@@ -41,6 +41,10 @@ const styles = (theme: Theme) =>
     filler: {
       marginTop: spacingRem(theme, 2),
     },
+    buttonContainer: {
+      float: "right",
+      padding: `${spacingRem(theme, 2)} 0`,
+    },
   });
 
 export default styles;
