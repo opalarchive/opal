@@ -95,7 +95,7 @@ export type problemProps = (
   authUser: firebase.User
 ) => FrontendProblem;
 
-export interface problemFunctionsObj {
+export interface problemFunctionsExtracted {
   tryProblemAction: (data: data, type: problemAction) => Promise<void>;
   tryProblemActionPrivileged: (data: data, type: problemActionPrivileged) => Promise<void>;
   tryReplyAction: (replyInd: number, data: data, type: replyAction) => Promise<void>;
@@ -105,7 +105,7 @@ export type problemFunctions = (
   uuid: string,
   prob: Problem,
   authUser: firebase.User
-) => problemFunctionsObj;
+) => problemFunctionsExtracted;
 
 export interface FrontendProblem {
   uuid: string;

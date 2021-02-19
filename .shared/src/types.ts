@@ -165,7 +165,7 @@ export type projectAction =
  */
 
 export type vote = 0 | 1 | -1;
-export type data = string | number | string[];
+export type data = string | number | string[] | ReplyType;
 
 export interface Votes {
   [uid: string]: vote;
@@ -183,9 +183,9 @@ export interface Problem {
   votes: Votes;
 }
 
-export type problemAction = "vote" | "comment" | "addTag" | "removeTag";
-export type problemActionPrivileged = "title" | "text" | "category" | "difficulty" | "editComment";
-export type replyAction = "edit";
+export type problemAction = "vote" | "comment" | "solution" | "addTag" | "removeTag";
+export type problemActionPrivileged = "title" | "text" | "category" | "difficulty";
+export type replyAction = "editText" | "editType";
 
 /**
  * Reply related types

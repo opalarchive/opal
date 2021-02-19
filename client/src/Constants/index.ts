@@ -6,6 +6,13 @@ export const camelToTitle = (input: string): string => {
   return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
+//from SO but simple at heart
+export const anyToProper = (input: string): string => {
+  return input.split(' ')
+   .map(w => w[0].toUpperCase() + w.substr(1).toLowerCase())
+   .join(' ');
+}
+
 const preciseTime = (hours: number, minutes: number): string => {
   if (minutes === 0) {
     if (hours % 12 === 0) {

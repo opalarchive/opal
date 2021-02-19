@@ -127,7 +127,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       return project;
     }
 
+    const now = new Date();
     var tags = project.value.problems[ind].tags;
+    var index = 0;
 
     switch (type) {
       case "vote":
@@ -148,19 +150,39 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        let index = 0;
+        index = 0;
         if (!!project.value.problems[ind].replies) {
           index = project.value.problems[ind].replies.length;
         } else {
           project.value.problems[ind].replies = [];
         }
 
-        const now = new Date();
         project.value.problems[ind].replies[index] = {
           author: displayName,
           text: data,
           time: now.getTime(),
           type: ReplyType.COMMENT,
+          lastEdit: now.getTime(),
+        };
+
+        break;
+      case "solution":
+        if (typeof data !== "string") {
+          break;
+        }
+
+        index = 0;
+        if (!!project.value.problems[ind].replies) {
+          index = project.value.problems[ind].replies.length;
+        } else {
+          project.value.problems[ind].replies = [];
+        }
+
+        project.value.problems[ind].replies[index] = {
+          author: displayName,
+          text: data,
+          time: now.getTime(),
+          type: ReplyType.SOLUTION,
           lastEdit: now.getTime(),
         };
 
@@ -229,12 +251,16 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         }
 
         project.value.problems[ind].title = data;
+
+        break;
       case "text":
         if (typeof data !== "string") {
           break;
         }
 
         project.value.problems[ind].text = data;
+
+        break;
       case "category":
         if (typeof data !== "string") {
           break;
@@ -245,6 +271,8 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         }
 
         project.value.problems[ind].category = data;
+
+        break;
       case "difficulty":
         if (typeof data !== "number") {
           break;
@@ -261,6 +289,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         }
 
         project.value.problems[ind].difficulty = data;
+        
         break;
       default:
         break;
@@ -290,13 +319,14 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     const displayName = !!this.props.authUser.displayName
       ? this.props.authUser.displayName
       : "";
+    const now = new Date();
     
     if (!project.success || typeof project.value === "string") {
       return project;
     }
 
     switch (type) {
-      case "edit":
+      case "editText":
         if (typeof data !== "string") {
           break;
         }
@@ -306,7 +336,36 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         }
 
         project.value.problems[ind].replies[replyInd].text = data;
-        const now = new Date();
+        project.value.problems[ind].replies[replyInd].lastEdit = now.getTime();
+
+        break;
+      case "editType":
+        if (typeof data !== "string") {
+          break;
+        }
+
+        if (displayName !== project.value.problems[ind].replies[replyInd].author) {
+          break;
+        }
+
+        if (!(data in ReplyType)) {
+          break;
+        }
+
+        if (data == project.value.problems[ind].replies[replyInd].type) {
+          break;
+        }
+
+        switch(data) {
+          case ReplyType.COMMENT:
+            project.value.problems[ind].replies[replyInd].type = ReplyType.COMMENT;
+            break;
+          case ReplyType.SOLUTION:
+            project.value.problems[ind].replies[replyInd].type = ReplyType.SOLUTION;
+            break;
+          default:
+            break;
+        }
         project.value.problems[ind].replies[replyInd].lastEdit = now.getTime();
 
         break;

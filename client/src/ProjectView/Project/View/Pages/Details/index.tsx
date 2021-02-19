@@ -16,7 +16,7 @@ import styles from "./index.css";
 import {
   FrontendProblem,
   problemFunctions,
-  problemFunctionsObj,
+  problemFunctionsExtracted,
   problemProps,
   tryProblemAction,
   tryProblemActionPrivileged
@@ -34,7 +34,7 @@ interface DetailProps extends WithStyles<typeof styles> {
   getDifficultyColor: (difficulty: number) => number[];
   editors: Server.Editors;
   problemPropsExtracted: FrontendProblem;
-  problemFunctionsExtracted: problemFunctionsObj;
+  problemFunctionsExtracted: problemFunctionsExtracted;
 }
 
 class Details extends React.Component<DetailProps> {
