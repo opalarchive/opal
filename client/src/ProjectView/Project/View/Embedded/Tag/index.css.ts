@@ -1,5 +1,4 @@
 import { createStyles, Theme } from "@material-ui/core";
-import { transform } from "typescript";
 
 const styles = (theme: Theme) =>
   createStyles({

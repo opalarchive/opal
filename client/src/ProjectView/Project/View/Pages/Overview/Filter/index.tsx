@@ -6,11 +6,8 @@ import {
   TableSortLabel,
   withStyles,
   WithStyles,
-  withTheme,
-  WithTheme,
 } from "@material-ui/core";
 import styles from "./index.css";
-import { compose } from "recompose";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
 import {
   CategoryColors,
@@ -50,10 +47,7 @@ interface FilterPropsBase {
   setCurrentList: (list: number) => void;
 }
 
-type FilterProps = SidebarProps &
-  FilterPropsBase &
-  WithStyles<typeof styles> &
-  WithTheme;
+type FilterProps = SidebarProps & FilterPropsBase & WithStyles<typeof styles>;
 
 interface FilterState {
   keyword: string;
@@ -279,7 +273,6 @@ class Filter extends React.Component<FilterProps, FilterState> {
       setCurrentList,
       classes,
       width,
-      theme,
     } = this.props;
 
     const filterUsedDot = (
@@ -358,7 +351,6 @@ class Filter extends React.Component<FilterProps, FilterState> {
                 filterUsed={filterUsed}
                 onChange={onChange}
                 classes={classes}
-                theme={theme}
               />
             </Paper>
             <Paper elevation={3} className={classes.paper}>
@@ -414,7 +406,4 @@ class Filter extends React.Component<FilterProps, FilterState> {
   }
 }
 
-export default compose<FilterProps, SidebarProps & FilterPropsBase>(
-  withStyles(styles),
-  withTheme
-)(Filter);
+export default withStyles(styles)(Filter);

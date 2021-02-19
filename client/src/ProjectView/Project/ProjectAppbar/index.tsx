@@ -4,7 +4,6 @@ import {
   IconButton,
   Toolbar,
   Typography,
-  Paper,
   Tab,
   TabProps,
   Tabs,

@@ -29,10 +29,6 @@ interface ProblemProps {
 class Problem extends React.PureComponent<
   ProblemProps & WithStyles<typeof styles>
 > {
-  constructor(props: ProblemProps & WithStyles<typeof styles>) {
-    super(props);
-  }
-
   render() {
     const {
       refInner,
@@ -42,7 +38,6 @@ class Problem extends React.PureComponent<
       title,
       category,
       difficulty,
-      author,
       categoryColors,
       difficultyColors,
       style,

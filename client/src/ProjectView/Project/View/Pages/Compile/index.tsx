@@ -4,11 +4,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { ViewSectionProps } from "../..";
 
-import {
-  CategoryColors,
-  DifficultyColors,
-  Server,
-} from "../../../../../../../.shared";
+import { Server } from "../../../../../../../.shared";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import styles from "./index.css";

@@ -3,11 +3,10 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import {
   ProjectPrivate,
   Problem,
-  data,
+  actionData,
   vote,
   problemAction,
   ReplyType,
-  Client,
   problemActionPrivileged,
   Server,
   replyAction,
@@ -21,7 +20,7 @@ import {
   newProblem,
   tryReplyAction,
   getProjectName,
-  post
+  post,
 } from "../../Firebase";
 import { NotificationsProps } from "../Template/Notifications";
 
@@ -71,7 +70,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     super(props);
 
     this.tryProblemAction = this.tryProblemAction.bind(this);
-    this.tryProblemActionPrivileged = this.tryProblemActionPrivileged.bind(this);
+    this.tryProblemActionPrivileged = this.tryProblemActionPrivileged.bind(
+      this
+    );
     this.tryReplyAction = this.tryReplyAction.bind(this);
     this.newProblem = this.newProblem.bind(this);
   }
@@ -117,7 +118,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
   }
 
-  clientSideAction(ind: number, data: data, type: problemAction) {
+  clientSideAction(ind: number, data: actionData, type: problemAction) {
     let project = this.state.project;
     const displayName = !!this.props.authUser.displayName
       ? this.props.authUser.displayName
@@ -200,7 +201,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        if (data.length == 0) {
+        if (data.length === 0) {
           break;
         }
 
@@ -217,7 +218,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     return project;
   }
 
-  async tryProblemAction(ind: number, data: data, type: problemAction) {
+  async tryProblemAction(ind: number, data: actionData, type: problemAction) {
     const oldProject = this.state.project;
     this.setState({ project: this.clientSideAction(ind, data, type) });
 
@@ -234,12 +235,12 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
   }
 
-  clientSideActionPrivileged(ind: number, data: data, type: problemActionPrivileged) {
+  clientSideActionPrivileged(
+    ind: number,
+    data: actionData,
+    type: problemActionPrivileged
+  ) {
     let project = this.state.project;
-    const displayName = !!this.props.authUser.displayName
-      ? this.props.authUser.displayName
-      : "";
-
     if (!project.success || typeof project.value === "string") {
       return project;
     }
@@ -266,7 +267,11 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        if (!["algebra", "geometry", "numberTheory", "combinatorics"].includes(data)) {
+        if (
+          !["algebra", "geometry", "numberTheory", "combinatorics"].includes(
+            data
+          )
+        ) {
           data = "miscellaneous";
         }
 
@@ -289,7 +294,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         }
 
         project.value.problems[ind].difficulty = data;
-        
+
         break;
       default:
         break;
@@ -297,9 +302,15 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     return project;
   }
 
-  async tryProblemActionPrivileged(ind: number, data: data, type: problemActionPrivileged) {
+  async tryProblemActionPrivileged(
+    ind: number,
+    data: actionData,
+    type: problemActionPrivileged
+  ) {
     const oldProject = this.state.project;
-    this.setState({ project: this.clientSideActionPrivileged(ind, data, type) });
+    this.setState({
+      project: this.clientSideActionPrivileged(ind, data, type),
+    });
 
     const result = await tryProblemActionPrivileged(
       this.props.match.params.uuid,
@@ -314,13 +325,18 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
   }
 
-  clientSideReplyAction(ind: number, replyInd: number, data: data, type: replyAction) {
+  clientSideReplyAction(
+    ind: number,
+    replyInd: number,
+    data: actionData,
+    type: replyAction
+  ) {
     let project = this.state.project;
     const displayName = !!this.props.authUser.displayName
       ? this.props.authUser.displayName
       : "";
     const now = new Date();
-    
+
     if (!project.success || typeof project.value === "string") {
       return project;
     }
@@ -331,7 +347,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        if (displayName !== project.value.problems[ind].replies[replyInd].author) {
+        if (
+          displayName !== project.value.problems[ind].replies[replyInd].author
+        ) {
           break;
         }
 
@@ -344,7 +362,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        if (displayName !== project.value.problems[ind].replies[replyInd].author) {
+        if (
+          displayName !== project.value.problems[ind].replies[replyInd].author
+        ) {
           break;
         }
 
@@ -352,16 +372,18 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        if (data == project.value.problems[ind].replies[replyInd].type) {
+        if (data === project.value.problems[ind].replies[replyInd].type) {
           break;
         }
 
-        switch(data) {
+        switch (data) {
           case ReplyType.COMMENT:
-            project.value.problems[ind].replies[replyInd].type = ReplyType.COMMENT;
+            project.value.problems[ind].replies[replyInd].type =
+              ReplyType.COMMENT;
             break;
           case ReplyType.SOLUTION:
-            project.value.problems[ind].replies[replyInd].type = ReplyType.SOLUTION;
+            project.value.problems[ind].replies[replyInd].type =
+              ReplyType.SOLUTION;
             break;
           default:
             break;
@@ -370,7 +392,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
 
         break;
       case "delete":
-        if (displayName !== project.value.problems[ind].replies[replyInd].author) {
+        if (
+          displayName !== project.value.problems[ind].replies[replyInd].author
+        ) {
           break;
         }
 
@@ -383,9 +407,16 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     return project;
   }
 
-  async tryReplyAction(ind: number, replyInd: number, data: data, type: replyAction) {
+  async tryReplyAction(
+    ind: number,
+    replyInd: number,
+    data: actionData,
+    type: replyAction
+  ) {
     const oldProject = this.state.project;
-    this.setState({ project: this.clientSideReplyAction(ind, replyInd, data, type) });
+    this.setState({
+      project: this.clientSideReplyAction(ind, replyInd, data, type),
+    });
 
     const result = await tryReplyAction(
       this.props.match.params.uuid,

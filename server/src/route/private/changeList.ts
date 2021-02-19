@@ -1,13 +1,6 @@
 import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import {
-  Problem,
-  data,
-  problemAction,
-  vote,
-  ReplyType,
-  List
-} from "../../../../.shared/src/types";
+import { Problem, List } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
 const tryChangeList = async (
@@ -16,14 +9,16 @@ const tryChangeList = async (
   problemInd: number,
   authuid: string
 ): Promise<Result<string>> => {
-
-  let lists: List[] = await cdb.ref(`lists`).once("value").then((snapshot) => snapshot.val());
+  let lists: List[] = await cdb
+    .ref(`lists`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
 
   if (lists.length != listSelection.length) {
     return { status: 400, value: "invalid-input" };
   }
 
-  for (let i=0; i<listSelection.length; i++) {
+  for (let i = 0; i < listSelection.length; i++) {
     if (listSelection[i]) {
       if (!lists[i].problems.includes(problemInd)) {
         lists[i].problems.push(problemInd);
@@ -37,7 +32,6 @@ const tryChangeList = async (
   }
 
   await cdb.ref(`lists`).set(lists);
-
 
   return { status: 200, value: "success" };
 };

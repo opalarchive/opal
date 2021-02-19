@@ -7,7 +7,7 @@ import {
 import React from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 import { compose } from "recompose";
-import { data, problemAction } from "../../../../../../../.shared";
+import { actionData, problemAction } from "../../../../../../../.shared";
 import styles from "./index.css";
 
 interface TagProps {
@@ -16,7 +16,7 @@ interface TagProps {
   onClickTag?: (tagText: string) => void;
   onClickAddTag?: () => void;
   style?: React.CSSProperties;
-  tryProblemAction?: (data: data, type: problemAction) => Promise<void>;
+  tryProblemAction?: (data: actionData, type: problemAction) => Promise<void>;
   filterTag?: boolean;
   addTag?: boolean;
 }
@@ -24,10 +24,6 @@ interface TagProps {
 class Tag extends React.PureComponent<
   TagProps & WithStyles<typeof styles> & WithTheme
 > {
-  constructor(props: TagProps & WithStyles<typeof styles> & WithTheme) {
-    super(props);
-  }
-
   render() {
     const {
       text,

@@ -1,12 +1,6 @@
 import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import {
-  Problem,
-  data,
-  problemAction,
-  vote,
-  ReplyType,
-} from "../../../../.shared/src/types";
+import { Problem } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
 const tryAction = async (
@@ -14,9 +8,10 @@ const tryAction = async (
   problem: Omit<Problem, "ind">,
   authuid: string
 ): Promise<Result<string>> => {
-  
-
-  let problems = await cdb.ref(`problems`).once("value").then(snapshot => snapshot.val());
+  let problems = await cdb
+    .ref(`problems`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
   problems.push(problem);
   await cdb.ref(`problems`).set(problems);
 
@@ -40,10 +35,6 @@ export const execute = async (req, res) => {
     return;
   }
 
-  const result = await tryAction(
-    trydb.value,
-    problem,
-    authuid
-  );
+  const result = await tryAction(trydb.value, problem, authuid);
   res.status(result.status).send(result.value);
 };

@@ -14,15 +14,15 @@ import {
   FormControlLabel,
   Button,
 } from "@material-ui/core";
-import { FiList, FiChevronDown, FiTag } from "react-icons/fi";
+import { FiList, FiChevronDown } from "react-icons/fi";
 import styles from "./index.css";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
 import { ProjectPrivate, Server } from "../../../../../../../../.shared";
 import { changeList } from "../../../../../../Firebase";
 import Scrollbar from "react-scrollbars-custom";
-import { FrontendProblem } from "../../../../../../Constants/types";
+import { ClientProblem } from "../../../../../../Constants/types";
 
-interface SidebarListProps extends FrontendProblem {
+interface SidebarListProps extends ClientProblem {
   project: ProjectPrivate;
   allTags: Set<string>;
   editors: Server.Editors;
@@ -110,7 +110,10 @@ class Action extends React.Component<ActionProps, ActionState> {
 
   render() {
     const { classes, width, project, editors, authUser, author } = this.props;
-    const canEdit: boolean = editors[authUser.uid].role == "ADMIN" || editors[authUser.uid].role == "OWNER" || authUser.displayName == author;
+    const canEdit: boolean =
+      editors[authUser.uid].role === "ADMIN" ||
+      editors[authUser.uid].role === "OWNER" ||
+      authUser.displayName === author;
     return (
       <div className={classes.root} style={{ width: `${width}rem` }}>
         <Scrollbar>

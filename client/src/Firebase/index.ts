@@ -7,7 +7,7 @@ import {
   Notification,
   Client,
   projectActionAdmin,
-  data,
+  actionData,
   Problem,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
@@ -181,7 +181,7 @@ export const newProject = async (authUser: firebase.User) => {
 export const tryProblemAction = async (
   uuid: string,
   problemInd: number,
-  data: data,
+  data: actionData,
   type: string,
   authUser: firebase.User
 ) => {
@@ -200,7 +200,7 @@ export const tryProblemAction = async (
 export const tryProblemActionPrivileged = async (
   uuid: string,
   problemInd: number,
-  data: data,
+  data: actionData,
   type: string,
   authUser: firebase.User
 ) => {
@@ -220,7 +220,7 @@ export const tryReplyAction = async (
   uuid: string,
   problemInd: number,
   replyInd: number,
-  data: data,
+  data: actionData,
   type: string,
   authUser: firebase.User
 ) => {

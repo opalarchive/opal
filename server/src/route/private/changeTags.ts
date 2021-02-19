@@ -1,13 +1,6 @@
 import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import {
-  Problem,
-  data,
-  problemAction,
-  vote,
-  ReplyType,
-  List
-} from "../../../../.shared/src/types";
+import { Problem } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
 const tryChangeList = async (
@@ -16,7 +9,6 @@ const tryChangeList = async (
   problemInd: number,
   authuid: string
 ): Promise<Result<string>> => {
-
   let tags: string[] = [];
   for (const tag in clickedTags) {
     if (clickedTags[tag]) {

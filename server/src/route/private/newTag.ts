@@ -1,13 +1,6 @@
 import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import {
-  Problem,
-  data,
-  problemAction,
-  vote,
-  ReplyType,
-  List
-} from "../../../../.shared/src/types";
+import { Problem } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
 const tryChangeList = async (
@@ -16,8 +9,10 @@ const tryChangeList = async (
   problemInd: number,
   authuid: string
 ): Promise<Result<string>> => {
-
-  let tags = await cdb.ref(`problems/${problemInd}/tags`).once("value").then((snapshot) => snapshot.val());
+  let tags = await cdb
+    .ref(`problems/${problemInd}/tags`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
 
   tags.push(newTag);
 
@@ -49,11 +44,6 @@ export const execute = async (req, res) => {
     return;
   }
 
-  const result = await tryChangeList(
-    trydb.value,
-    newTag,
-    problemInd,
-    authuid
-  );
+  const result = await tryChangeList(trydb.value, newTag, problemInd, authuid);
   res.status(result.status).send(result.value);
 };

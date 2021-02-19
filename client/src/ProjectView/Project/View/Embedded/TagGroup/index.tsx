@@ -1,8 +1,8 @@
 import React from "react";
 import Tag from "../Tag";
-import { data, problemAction } from "../../../../../../../.shared";
+import { actionData, problemAction } from "../../../../../../../.shared";
 import { Autocomplete } from "@material-ui/lab";
-import { Button, IconButton, TextField } from "@material-ui/core";
+import { IconButton, TextField } from "@material-ui/core";
 import { FiCheck } from "react-icons/fi";
 
 interface TagGroupProps {
@@ -12,7 +12,7 @@ interface TagGroupProps {
   };
   onClickTag?: (tagText: string) => void;
   style?: React.CSSProperties[];
-  tryProblemAction?: (data: data, type: problemAction) => Promise<void>;
+  tryProblemAction?: (data: actionData, type: problemAction) => Promise<void>;
   filterTag?: boolean;
   canAddTag?: boolean;
   availableTags?: string[];

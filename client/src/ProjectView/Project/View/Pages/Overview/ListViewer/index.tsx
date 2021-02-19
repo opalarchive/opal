@@ -6,11 +6,8 @@ import {
   Server,
 } from "../../../../../../../../.shared";
 import {
-  FrontendProblem,
   problemFunctions,
   problemProps,
-  tryProblemAction,
-  tryProblemActionPrivileged,
 } from "../../../../../../Constants/types";
 import Problem from "../../../Embedded/Problem";
 

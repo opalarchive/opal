@@ -23,19 +23,19 @@ import { Link } from "react-router-dom";
 import * as ROUTES from "../../../../../Constants/routes";
 import styles from "./index.css";
 import {
-  FrontendProblem,
+  ClientProblem,
   problemFunctionsExtracted,
 } from "../../../../../Constants/types";
 import Dot from "../Dot";
 import TagGroup from "../TagGroup";
-import { getDifficultyColor, RGBToString } from "../../../../../Constants";
+import { getDifficultyColor } from "../../../../../Constants";
 import {
   CategoryColors,
   DifficultyColors,
   Server,
 } from "../../../../../../../.shared";
 
-interface ProblemProps extends FrontendProblem, problemFunctionsExtracted {
+interface ProblemProps extends ClientProblem, problemFunctionsExtracted {
   abridged?: boolean;
   clickedTags?: {
     [tag: string]: boolean;
@@ -141,7 +141,6 @@ class Problem extends React.PureComponent<
       myVote,
       tryProblemAction,
       tryProblemActionPrivileged,
-      tryReplyAction,
       categoryColors,
       difficultyColors,
       replyTypes,
@@ -156,7 +155,6 @@ class Problem extends React.PureComponent<
     const availableTags: string[] = [...allTags].filter(
       (tag) => tags.indexOf(tag) < 0
     );
-    console.log(categoryColors);
 
     const canEdit =
       !abridged &&

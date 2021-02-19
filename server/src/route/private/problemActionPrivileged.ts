@@ -2,11 +2,9 @@ import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
 import {
   Problem,
-  data,
-  problemAction,
-  vote,
-  ReplyType,
+  actionData,
   problemActionPrivileged,
+  ProjectSettings,
 } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 
@@ -14,13 +12,11 @@ const tryActionPrivileged = async (
   cdb: firebase.database.Database,
   problem: Problem,
   problemInd: number,
-  data: data,
+  data: actionData,
   type: problemActionPrivileged,
+  projectSettings: ProjectSettings,
   authuid: string
 ): Promise<Result<string>> => {
-  const now = Date.now();
-  let tags: string[] = problem.tags || [];
-  let newTags: string[] = [];
   switch (type) {
     case "title":
       if (typeof data !== "string") {
@@ -39,30 +35,23 @@ const tryActionPrivileged = async (
 
       break;
     case "category":
-      if (typeof data !== "string") {
+      if (
+        typeof data !== "string" ||
+        !Object.keys(projectSettings.categoryColors).includes(data)
+      ) {
         return { status: 400, value: "invalid-input" };
-      }
-
-      if (!["algebra", "geometry", "numberTheory", "combinatorics"].includes(data)) {
-        data = "miscellaneous";
       }
 
       await cdb.ref(`problems/${problemInd}/category`).set(data);
 
       break;
     case "difficulty":
-      if (typeof data !== "number") {
-        break;
-      }
-
-      //these two checks usually wont pass through since there's a slider, but its just in case
-
-      if (data < 0) {
-        data = 0;
-      }
-
-      if (data > 100) {
-        data = 100;
+      if (
+        typeof data !== "number" ||
+        data < projectSettings.difficultyRange.start ||
+        data > projectSettings.difficultyRange.end
+      ) {
+        return { status: 400, value: "invalid-input" };
       }
 
       await cdb.ref(`problems/${problemInd}/difficulty`).set(data);
@@ -77,7 +66,7 @@ const tryActionPrivileged = async (
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const problemInd: number = req.body.problemInd;
-  let data: data = req.body.data;
+  let data: actionData = req.body.data;
   const type: problemActionPrivileged = req.body.type;
   const authuid: string = req.body.authuid;
 
@@ -103,12 +92,18 @@ export const execute = async (req, res) => {
     return;
   }
 
+  const projectSettings: ProjectSettings = await trydb.value
+    .ref(`settings`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
+
   const result = await tryActionPrivileged(
     trydb.value,
     problem,
     problemInd,
     data,
     type,
+    projectSettings,
     authuid
   );
   res.status(result.status).send(result.value);

@@ -1,5 +1,5 @@
 import {
-  data,
+  actionData,
   problemAction,
   problemActionPrivileged,
   ReplyType,
@@ -75,20 +75,20 @@ export interface Difficulty {
 
 export type tryProblemAction = (
   ind: number,
-  data: data,
+  data: actionData,
   type: problemAction
 ) => Promise<void>;
 
 export type tryProblemActionPrivileged = (
   ind: number,
-  data: data,
+  data: actionData,
   type: problemActionPrivileged
 ) => Promise<void>;
 
 export type tryReplyAction = (
   ind: number,
   replyInd: number,
-  data: data,
+  data: actionData,
   type: replyAction
 ) => Promise<void>;
 
@@ -98,17 +98,17 @@ export type problemProps = (
   uuid: string,
   prob: Problem,
   authUser: firebase.User
-) => FrontendProblem;
+) => ClientProblem;
 
 export interface problemFunctionsExtracted {
-  tryProblemAction: (data: data, type: problemAction) => Promise<void>;
+  tryProblemAction: (data: actionData, type: problemAction) => Promise<void>;
   tryProblemActionPrivileged: (
-    data: data,
+    data: actionData,
     type: problemActionPrivileged
   ) => Promise<void>;
   tryReplyAction: (
     replyInd: number,
-    data: data,
+    data: actionData,
     type: replyAction
   ) => Promise<void>;
 }
@@ -119,7 +119,7 @@ export type problemFunctions = (
   authUser: firebase.User
 ) => problemFunctionsExtracted;
 
-export interface FrontendProblem {
+export interface ClientProblem {
   uuid: string;
   ind: number;
   title: string;

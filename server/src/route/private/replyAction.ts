@@ -2,10 +2,8 @@ import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
 import {
   Problem,
-  data,
-  problemAction,
+  actionData,
   replyAction,
-  vote,
   ReplyType,
   reply,
 } from "../../../../.shared/src/types";
@@ -16,13 +14,13 @@ const tryAction = async (
   problem: Problem,
   problemInd: number,
   replyInd: number,
-  data: data,
+  data: actionData,
   type: replyAction,
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
   const replies = problem.replies;
-  
+
   switch (type) {
     case "editText":
       if (typeof data !== "string") {
@@ -30,11 +28,15 @@ const tryAction = async (
       }
 
       if (authuid !== problem.replies[replyInd].author) {
-        return { status: 400, value: "forbidden" }
+        return { status: 400, value: "forbidden" };
       }
 
-      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/text`).set(data);
-      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`).set(now);
+      await cdb
+        .ref(`problems/${problemInd}/replies/${replyInd}/text`)
+        .set(data);
+      await cdb
+        .ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`)
+        .set(now);
 
       break;
     case "editType":
@@ -43,7 +45,7 @@ const tryAction = async (
       }
 
       if (authuid !== problem.replies[replyInd].author) {
-        return { status: 400, value: "forbidden" }
+        return { status: 400, value: "forbidden" };
       }
 
       if (data == problem.replies[replyInd].type) {
@@ -54,13 +56,17 @@ const tryAction = async (
         break;
       }
 
-      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/type`).set(data);
-      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`).set(now);
+      await cdb
+        .ref(`problems/${problemInd}/replies/${replyInd}/type`)
+        .set(data);
+      await cdb
+        .ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`)
+        .set(now);
 
       break;
     case "delete":
       if (authuid !== problem.replies[replyInd].author) {
-        return { status: 400, value: "forbidden" }
+        return { status: 400, value: "forbidden" };
       }
       let newReplies = replies;
       newReplies.splice(replyInd, 1);
@@ -77,7 +83,7 @@ export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const problemInd: number = req.body.problemInd;
   const replyInd: number = req.body.replyInd;
-  let data: data = req.body.data;
+  let data: actionData = req.body.data;
   const type: replyAction = req.body.type;
   const authuid: string = req.body.authuid;
 

@@ -18,10 +18,6 @@ type NavigationProps = SidebarProps &
   WithStyles<typeof styles>;
 
 class Navigation extends React.Component<NavigationProps> {
-  constructor(props: NavigationProps) {
-    super(props);
-  }
-
   render() {
     const { lists, currentList, setCurrentList, width, classes } = this.props;
     return (

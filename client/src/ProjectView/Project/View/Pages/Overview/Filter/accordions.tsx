@@ -9,7 +9,6 @@ import {
   FormControlLabel,
   Slider,
   TextField,
-  Theme,
   WithStyles,
 } from "@material-ui/core";
 import { FiCheckCircle, FiChevronDown, FiCircle } from "react-icons/fi";
@@ -212,7 +211,6 @@ export class DifficultyAccordion extends React.PureComponent<
   AccordionProps & {
     difficulty: DifficultyRange;
     difficultyRange: DifficultyRange;
-    theme: Theme;
   }
 > {
   render() {
@@ -223,7 +221,6 @@ export class DifficultyAccordion extends React.PureComponent<
       filterUsed,
       onChange,
       classes,
-      theme,
     } = this.props;
     return (
       <Accordion elevation={0} className={classes.accordion}>

@@ -14,7 +14,7 @@ import {
 } from "../../../../../../../.shared";
 import styles from "./index.css";
 import {
-  FrontendProblem,
+  ClientProblem,
   problemFunctions,
   problemFunctionsExtracted,
   problemProps,
@@ -29,7 +29,7 @@ interface DetailProps extends WithStyles<typeof styles> {
   reply?: number;
   allTags: Set<string>;
   editors: Server.Editors;
-  problemPropsExtracted: FrontendProblem;
+  problemPropsExtracted: ClientProblem;
   problemFunctionsExtracted: problemFunctionsExtracted;
   categoryColors: CategoryColors;
   difficultyColors: DifficultyColors;

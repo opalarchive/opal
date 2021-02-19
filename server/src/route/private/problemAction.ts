@@ -2,7 +2,7 @@ import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
 import {
   Problem,
-  data,
+  actionData,
   problemAction,
   vote,
   ReplyType,
@@ -13,7 +13,7 @@ const tryAction = async (
   cdb: firebase.database.Database,
   problem: Problem,
   problemInd: number,
-  data: data,
+  data: actionData,
   type: problemAction,
   authuid: string
 ): Promise<Result<string>> => {
@@ -74,7 +74,7 @@ const tryAction = async (
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
       }
-      
+
       newTags = tags.filter((tag) => tag !== data);
 
       await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
@@ -91,7 +91,7 @@ const tryAction = async (
 
       newTags = [...tags];
 
-      for (let i=0; i<data.length; i++) {
+      for (let i = 0; i < data.length; i++) {
         if (data[i].length > 0 && !tags.includes(data[i])) {
           newTags.push(data[i]);
         }
@@ -109,7 +109,7 @@ const tryAction = async (
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const problemInd: number = req.body.problemInd;
-  let data: data = req.body.data;
+  let data: actionData = req.body.data;
   const type: problemAction = req.body.type;
   const authuid: string = req.body.authuid;
 

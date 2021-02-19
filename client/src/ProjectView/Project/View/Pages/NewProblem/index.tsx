@@ -9,19 +9,12 @@ import {
 import React from "react";
 import { ViewSectionProps } from "../..";
 
-import {
-  CategoryColors,
-  DifficultyColors,
-  DifficultyRange,
-  Server,
-  Votes,
-} from "../../../../../../../.shared";
+import { DifficultyRange, Server, Votes } from "../../../../../../../.shared";
 import {
   newProblem,
   problemProps,
   problemFunctions,
 } from "../../../../../Constants/types";
-import TagGroup from "../../Embedded/TagGroup";
 import problemContainerStyles from "../../Embedded/Problem/index.css";
 import detailsStyles from "../../Pages/Details/index.css";
 import { FiChevronLeft, FiPlus } from "react-icons/fi";
@@ -75,10 +68,10 @@ class NewProblem extends React.Component<
     const uid = !!this.props.authUser.uid ? this.props.authUser.uid : "";
     const { uuid, project } = this.props;
     var { title, text, category, difficulty } = this.state;
-    if (title.length == 0) {
+    if (title.length === 0) {
       title = "Untitled";
     }
-    if (text.length == 0) {
+    if (text.length === 0) {
       text = "Empty";
     }
     if (
@@ -152,7 +145,7 @@ class NewProblem extends React.Component<
       // categoryColors,
       // editors,
       // problemProps,
-      uuid,
+      // uuid,
       // tryProblemAction,
       authUser,
       classes,

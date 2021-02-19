@@ -1,5 +1,5 @@
 import { clientdb } from "../../helpers/clientdb";
-import { db } from "../../helpers/firebaseSetup";
+
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const authuid: string = req.body.authuid;

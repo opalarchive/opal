@@ -11,7 +11,7 @@ import * as ROUTES from "../../../Constants/routes";
 import Details from "./Pages/Details";
 import {
   CategoryColors,
-  data,
+  actionData,
   DifficultyColors,
   Problem as ProblemType,
   problemAction,
@@ -98,9 +98,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       });
     }
 
-    const categoryColors = this.props.project.settings.categoryColors;
-    const difficultyColors = this.props.project.settings.difficultyColors;
-
     return {
       ind: prob.ind,
       uuid: uuid,
@@ -129,10 +126,10 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     authUser: firebase.User
   ) => {
     return {
-      tryProblemAction: (problemActionData: data, type: problemAction) =>
+      tryProblemAction: (problemActionData: actionData, type: problemAction) =>
         this.props.tryProblemAction(prob.ind, problemActionData, type),
       tryProblemActionPrivileged: (
-        problemActionPrivilegedData: data,
+        problemActionPrivilegedData: actionData,
         type: problemActionPrivileged
       ) =>
         this.props.tryProblemActionPrivileged(
@@ -142,7 +139,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
         ),
       tryReplyAction: (
         replyInd: number,
-        replyActionData: data,
+        replyActionData: actionData,
         type: replyAction
       ) => this.props.tryReplyAction(prob.ind, replyInd, replyActionData, type),
     };
@@ -161,7 +158,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   }
 
   render() {
-    const { project, editors, uuid, authUser, newProblem, match } = this.props;
+    const { project, editors, uuid, authUser, newProblem } = this.props;
 
     const loadBackground = "rgb(0, 0, 0, 0.025)";
 

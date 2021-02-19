@@ -16,7 +16,6 @@ import {
 } from "@material-ui/core";
 import {
   FiAlignLeft,
-  FiChevronDown,
   FiCornerRightUp,
   FiEdit2,
   FiLink2,
@@ -29,7 +28,6 @@ import * as ROUTES from "../../../../../../Constants/routes";
 import { compose } from "recompose";
 import {
   problemAction,
-  problemActionPrivileged,
   reply,
   ReplyType,
 } from "../../../../../../../../.shared";
@@ -55,11 +53,18 @@ interface ReplyBaseState {
   currentType: ReplyType;
 }
 
-class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyProps, State> {
-
+class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
+  ReplyProps,
+  State
+> {
   constructor(props: ReplyProps) {
     super(props);
-    this.state = { ...this.state, edit: false, editValue: "", typeMenuAnchorEl: null };
+    this.state = {
+      ...this.state,
+      edit: false,
+      editValue: "",
+      typeMenuAnchorEl: null,
+    };
 
     this.getText = this.getText.bind(this);
     this.handleEditChange = this.handleEditChange.bind(this);
@@ -72,7 +77,9 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
   }
 
   componentDidMount() {
-    this.setState({ editValue: (this.props.content ? this.props.content.text : "") });
+    this.setState({
+      editValue: this.props.content ? this.props.content.text : "",
+    });
   }
 
   isLinkable() {
@@ -119,7 +126,11 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
 
     if (this.state.editValue.length < 8) return;
 
-    this.props.problemFunctionsExtracted.tryReplyAction(this.props.reply, this.state.editValue, "editText");
+    this.props.problemFunctionsExtracted.tryReplyAction(
+      this.props.reply,
+      this.state.editValue,
+      "editText"
+    );
     this.setState({ edit: false });
   }
 
@@ -132,7 +143,11 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
   }
 
   setCurrentType(type: ReplyType) {
-    this.props.problemFunctionsExtracted.tryReplyAction(this.props.reply, type, "editType");
+    this.props.problemFunctionsExtracted.tryReplyAction(
+      this.props.reply,
+      type,
+      "editType"
+    );
     this.closeTypeMenu();
   }
 
@@ -178,7 +193,12 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
           {this.isLinkable() && !!content && (
             <div className={classes.top}>
               <div className={classes.author}>{content.author}</div>
-              <div className={classes.time}>{formatTime(content.time)+(content.lastEdit != content.time ? ` (Edited at ${formatTime(content.lastEdit)})` : ``)}</div>
+              <div className={classes.time}>
+                {formatTime(content.time) +
+                  (content.lastEdit !== content.time
+                    ? ` (Edited at ${formatTime(content.lastEdit)})`
+                    : ``)}
+              </div>
               <div className={classes.filler} />
               <div className={classes.actions}>
                 <Tooltip title="Get Link" aria-label="get link">
@@ -191,7 +211,7 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
                     <FiLink2 size="1.2rem" />
                   </IconButton>
                 </Tooltip>
-                {content.author == authUser.displayName && (
+                {content.author === authUser.displayName && (
                   <Tooltip title="Edit" aria-label="edit">
                     <IconButton
                       className={classes.linkIcon}
@@ -203,12 +223,16 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
                     </IconButton>
                   </Tooltip>
                 )}
-                {content.author == authUser.displayName && (
+                {content.author === authUser.displayName && (
                   <Tooltip title="Delete" aria-label="delete">
                     <IconButton
                       className={classes.linkIcon}
                       onClick={() => {
-                        this.props.problemFunctionsExtracted.tryReplyAction(reply, "_", "delete"); //needs a placeholder for data since empty data ends up not reaching backend
+                        this.props.problemFunctionsExtracted.tryReplyAction(
+                          reply,
+                          "_",
+                          "delete"
+                        ); //needs a placeholder for data since empty data ends up not reaching backend
                       }}
                     >
                       <FiTrash2 size="1.2rem" />
@@ -252,14 +276,12 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
               </div>
             </form>
           ) : (
-            <>
-              {this.getText(classes, !!content ? content.text : "")}
-            </>
+            <>{this.getText(classes, !!content ? content.text : "")}</>
           )}
         </Paper>
 
         <Paper elevation={3} className={`${classes.iconPaper}`}>
-          {(!content || content.author == authUser.displayName) ? (
+          {!content || content.author === authUser.displayName ? (
             <>
               <IconButton
                 size="small"
@@ -321,7 +343,6 @@ interface SolutionState extends ReplyBaseState {
 }
 
 class Solution extends ReplyBase<SolutionState> {
-
   constructor(props: ReplyProps) {
     super(props);
     this.state = { ...this.state, revealed: false };
@@ -366,7 +387,12 @@ interface WriteCommentState extends ReplyBaseState {
 export class WriteComment extends ReplyBase<WriteCommentState> {
   constructor(props: ReplyProps) {
     super(props);
-    this.state = { ...this.state, input: "", typeMenuAnchorEl: null, currentType: ReplyType.COMMENT };
+    this.state = {
+      ...this.state,
+      input: "",
+      typeMenuAnchorEl: null,
+      currentType: ReplyType.COMMENT,
+    };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitComment = this.handleSubmitComment.bind(this);
@@ -403,7 +429,10 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
       default:
         typeString = "comment";
     }
-    this.props.problemFunctionsExtracted.tryProblemAction(this.state.input, typeString);
+    this.props.problemFunctionsExtracted.tryProblemAction(
+      this.state.input,
+      typeString
+    );
     this.setState({ input: "" });
   }
 

@@ -1,4 +1,4 @@
-import { Client, Server, UserInfo } from "../../../../.shared/src/types";
+import { Client, Server } from "../../../../.shared/src/types";
 import { db } from "../../helpers/firebaseSetup";
 import { getIdToUsername } from "../../helpers/idToUsername";
 

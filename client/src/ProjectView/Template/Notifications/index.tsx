@@ -147,7 +147,7 @@ class Notifications extends React.Component<
                 <span
                   dangerouslySetInnerHTML={{
                     __html: notif.content.replace(
-                      /\<a href/g,
+                      /<a href/g,
                       `<a class=${classes.link} href`
                     ),
                   }}

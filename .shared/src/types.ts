@@ -191,7 +191,7 @@ export type projectAction =
  */
 
 export type vote = 0 | 1 | -1;
-export type data = string | number | string[] | ReplyType;
+export type actionData = string | number | string[];
 
 export interface Votes {
   [uid: string]: vote;
