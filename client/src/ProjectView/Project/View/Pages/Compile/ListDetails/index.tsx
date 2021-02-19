@@ -92,7 +92,7 @@ class ListDetails extends React.Component<ListDetailsProps> {
                   {Object.entries(difficultyData).map(
                     ([dataPoint, { value, dot }]) => (
                       <li key={dataPoint}>
-                        {camelToTitle(dataPoint)}&nbsp;
+                        {camelToTitle(dataPoint)}:&nbsp;
                         {Math.round(value * 10) / 10}
                         {dot && (
                           <>

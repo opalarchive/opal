@@ -13,6 +13,7 @@ import Navigation from "./Navigation";
 import * as ROUTES from "../../../../../Constants/routes";
 import Export from "./Export";
 import ListDetails from "./ListDetails";
+import Problems from "./Problems";
 
 interface CompileProps extends ViewSectionProps {
   editors: Server.Editors;
@@ -74,6 +75,7 @@ class Compile extends React.Component<
 
   render() {
     const {
+      uuid,
       project,
       fixedSidebar,
       categoryColors,
@@ -85,8 +87,8 @@ class Compile extends React.Component<
     const problemList =
       this.state.currentList === -1
         ? project.problems
-        : project.problems.filter((prob) =>
-            project.lists[this.state.currentList].problems.includes(prob.ind)
+        : project.lists[this.state.currentList].problems.map(
+            (probInd) => project.problems[probInd]
           );
 
     return (
@@ -108,7 +110,19 @@ class Compile extends React.Component<
             getCategoryColor={getCategoryColor}
             getDifficultyColor={getDifficultyColor}
           />
-          <Export problemList={problemList} />
+          {problemList.length !== 0 && (
+            <>
+              <Problems
+                uuid={uuid}
+                currentList={this.state.currentList}
+                problemList={problemList}
+                getCategoryColor={getCategoryColor}
+                getDifficultyColor={getDifficultyColor}
+                authUser={authUser}
+              />
+              <Export problemList={problemList} />
+            </>
+          )}
         </div>
       </SidebaredBase>
     );

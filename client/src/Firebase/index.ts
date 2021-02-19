@@ -246,7 +246,7 @@ export const newProblem = async (
     "private/newProblem",
     {
       uuid,
-      problem
+      problem,
     },
     authUser
   );
@@ -264,6 +264,25 @@ export const changeList = async (
       uuid,
       listSelection,
       problemInd,
+    },
+    authUser
+  );
+};
+
+export const reorderList = async (
+  uuid: string,
+  listInd: number,
+  sourceInd: number,
+  destInd: number,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/reorderList",
+    {
+      uuid,
+      listInd,
+      sourceInd,
+      destInd,
     },
     authUser
   );

@@ -22,7 +22,10 @@ import { Link } from "react-router-dom";
 
 import * as ROUTES from "../../../../../Constants/routes";
 import styles from "./index.css";
-import { FrontendProblem, problemFunctionsExtracted } from "../../../../../Constants/types";
+import {
+  FrontendProblem,
+  problemFunctionsExtracted,
+} from "../../../../../Constants/types";
 import Dot from "../Dot";
 import TagGroup from "../TagGroup";
 import { tupleToRGBString } from "../../../../../Constants";
@@ -69,14 +72,15 @@ class Problem extends React.PureComponent<
   constructor(props: ProblemProps & WithStyles<typeof styles>) {
     super(props);
 
-    this.onChange = this.onChange.bind(this);
-  }
+    this.state = {
+      ...this.state,
+      editTitleValue: this.props.title,
+      editTextValue: this.props.text,
+      editCategoryValue: this.props.category.name,
+      editDifficultyValue: this.props.difficulty.name,
+    };
 
-  componentDidMount() {
-    this.setState({ editTitleValue: this.props.title });
-    this.setState({ editTextValue: this.props.text });
-    this.setState({ editCategoryValue: this.props.category.name });
-    this.setState({ editDifficultyValue: this.props.difficulty.name });
+    this.onChange = this.onChange.bind(this);
   }
 
   onChange(field: string, value: string | number | number[]) {
