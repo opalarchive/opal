@@ -21,6 +21,7 @@ import {
   FiEdit2,
   FiLink2,
   FiMessageSquare,
+  FiTrash2,
 } from "react-icons/fi";
 import Latex from "../../../../../../Constants/latex";
 import { formatTime, anyToProper } from "../../../../../../Constants";
@@ -199,6 +200,18 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
                       }}
                     >
                       <FiEdit2 size="1.2rem" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {content.author == authUser.displayName && (
+                  <Tooltip title="Delete" aria-label="delete">
+                    <IconButton
+                      className={classes.linkIcon}
+                      onClick={() => {
+                        this.props.problemFunctionsExtracted.tryReplyAction(reply, "_", "delete"); //needs a placeholder for data since empty data ends up not reaching backend
+                      }}
+                    >
+                      <FiTrash2 size="1.2rem" />
                     </IconButton>
                   </Tooltip>
                 )}

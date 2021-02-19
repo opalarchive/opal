@@ -369,6 +369,14 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         project.value.problems[ind].replies[replyInd].lastEdit = now.getTime();
 
         break;
+      case "delete":
+        if (displayName !== project.value.problems[ind].replies[replyInd].author) {
+          break;
+        }
+
+        project.value.problems[ind].replies.splice(replyInd, 1);
+
+        break;
       default:
         break;
     }

@@ -51,8 +51,9 @@ const styles = (theme: Theme) =>
       alignItems: "center",
     },
     linkIcon: {
-      paddingTop: 0,
-      paddingBottom: 0,
+      marginLeft: "0.5rem",
+      marginRight: "0.5rem",
+      padding: 0,
       display: "inline-block",
     },
     text: {

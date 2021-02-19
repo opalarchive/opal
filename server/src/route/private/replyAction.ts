@@ -21,6 +21,7 @@ const tryAction = async (
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
+  const replies = problem.replies;
   
   switch (type) {
     case "editText":
@@ -55,6 +56,15 @@ const tryAction = async (
 
       await cdb.ref(`problems/${problemInd}/replies/${replyInd}/type`).set(data);
       await cdb.ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`).set(now);
+
+      break;
+    case "delete":
+      if (authuid !== problem.replies[replyInd].author) {
+        return { status: 400, value: "forbidden" }
+      }
+      let newReplies = replies;
+      newReplies.splice(replyInd, 1);
+      await cdb.ref(`problems/${problemInd}/replies`).set(newReplies);
 
       break;
     default:
