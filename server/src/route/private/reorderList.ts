@@ -26,7 +26,10 @@ export const execute = async (req, res) => {
   }
 
   // indices should be in bounds, i.e. return actual problems
-  if (!listProblems[sourceInd] || !listProblems[destInd]) {
+  if (
+    listProblems[sourceInd] === undefined ||
+    listProblems[destInd] === undefined
+  ) {
     res.status(400).send("index-out-of-bonds");
     return;
   }
