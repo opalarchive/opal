@@ -2,7 +2,7 @@ import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { ViewSectionProps } from "../..";
+import { CategoryColors, ViewSectionProps } from "../..";
 
 import { Server } from "../../../../../../../.shared";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
@@ -12,11 +12,15 @@ import Navigation from "./Navigation";
 
 import * as ROUTES from "../../../../../Constants/routes";
 import Export from "./Export";
+import ListDetails from "./ListDetails";
 
 interface CompileProps extends ViewSectionProps {
   editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
+  categoryColors: CategoryColors;
+  getCategoryColor: (category: string) => number[];
+  getDifficultyColor: (difficulty: number) => number[];
 }
 
 interface CompileState {
@@ -69,7 +73,21 @@ class Compile extends React.Component<
   }
 
   render() {
-    const { project, fixedSidebar, authUser, classes } = this.props;
+    const {
+      project,
+      fixedSidebar,
+      categoryColors,
+      getCategoryColor,
+      getDifficultyColor,
+      authUser,
+      classes,
+    } = this.props;
+    const problemList =
+      this.state.currentList === -1
+        ? project.problems
+        : project.problems.filter((prob) =>
+            project.lists[this.state.currentList].problems.includes(prob.ind)
+          );
 
     return (
       <SidebaredBase
@@ -84,7 +102,13 @@ class Compile extends React.Component<
         authUser={authUser}
       >
         <div className={classes.root}>
-          <Export project={project} currentList={this.state.currentList} />
+          <ListDetails
+            problemList={problemList}
+            categoryColors={categoryColors}
+            getCategoryColor={getCategoryColor}
+            getDifficultyColor={getDifficultyColor}
+          />
+          <Export problemList={problemList} />
         </div>
       </SidebaredBase>
     );

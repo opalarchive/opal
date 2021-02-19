@@ -3,7 +3,6 @@ import {
   Button,
   Divider,
   FormControlLabel,
-  InputAdornment,
   Paper,
   Radio,
   RadioGroup,
@@ -11,7 +10,7 @@ import {
   WithStyles,
   withStyles,
 } from "@material-ui/core";
-import { ProjectPrivate } from "../../../../../../../../.shared";
+import { Problem } from "../../../../../../../../.shared";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import styles from "./index.css";
 import {
@@ -23,8 +22,7 @@ import {
 import { camelToTitle } from "../../../../../../Constants";
 
 interface ExportProps extends WithStyles<typeof styles> {
-  project: ProjectPrivate;
-  currentList: number;
+  problemList: Problem[];
 }
 
 interface ExportState {
@@ -97,17 +95,9 @@ class Export extends React.Component<ExportProps, ExportState> {
   }
 
   getExport() {
-    const {
-      project: { problems, lists },
-      currentList,
-    } = this.props;
+    const { problemList } = this.props;
     const { templateType } = this.state;
-    const problemList =
-      currentList === -1
-        ? problems
-        : problems.filter((prob) =>
-            lists[currentList].problems.includes(prob.ind)
-          );
+
     if (templateType === "JSON") return exportBody(JSONTemplate, problemList);
     if (templateType === "YAML") return exportBody(YAMLTemplate, problemList);
     return exportBody(this.state.customTemplate, problemList);

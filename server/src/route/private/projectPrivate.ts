@@ -1,4 +1,5 @@
 import {
+  List,
   Problem,
   ProjectPrivate,
   reply,
@@ -18,8 +19,12 @@ export const execute = async (req, res) => {
     return;
   }
 
-  interface PseudoProjectPrivate extends Omit<ProjectPrivate, "problems"> {
+  interface PseudoProjectPrivate
+    extends Omit<ProjectPrivate, "lists" | "problems"> {
     // these can possibly be undefined because of how firebase stores empty arrays/objects
+    lists: (Omit<List, "problems"> & {
+      problems?: number[];
+    })[];
     problems: (Omit<Problem, "ind" | "replies" | "tags" | "votes"> & {
       replies?: reply[];
       tags?: string[];
@@ -33,11 +38,18 @@ export const execute = async (req, res) => {
     .then((snapshot) => snapshot.val());
   const { problems, ...rest } = pseudoProjectPrivate;
 
-  let projectPrivate: ProjectPrivate = { ...rest, problems: [] };
+  let projectPrivate: ProjectPrivate = { ...rest, lists: [], problems: [] };
 
   const idToUsername = await getIdToUsername();
 
   if (!!pseudoProjectPrivate.problems) {
+    pseudoProjectPrivate.lists.forEach(({ problems, ...rest }, ind) => {
+      projectPrivate.lists[ind] = {
+        problems: problems || [],
+        ...rest,
+      };
+    });
+
     pseudoProjectPrivate.problems.forEach(
       ({ replies, tags, votes, ...rest }, ind) => {
         projectPrivate.problems[ind] = {

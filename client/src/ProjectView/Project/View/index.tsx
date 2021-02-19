@@ -26,7 +26,6 @@ import {
   Server,
 } from "../../../../../.shared/src/types";
 import {
-  FrontendProblem,
   replyTypes,
   tryProblemAction,
   newProblem,
@@ -302,7 +301,14 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               ROUTES.PROJECT_LIST.replace(":uuid", uuid),
               ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", uuid),
             ]}
-            render={(_) => <Compile {...viewSectionProps} />}
+            render={(_) => (
+              <Compile
+                {...viewSectionProps}
+                categoryColors={this.state.categoryColors}
+                getCategoryColor={this.getCategoryColor}
+                getDifficultyColor={this.getDifficultyColor}
+              />
+            )}
           />
           <Route
             exact

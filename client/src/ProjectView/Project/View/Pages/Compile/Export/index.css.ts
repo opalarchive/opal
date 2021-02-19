@@ -4,7 +4,6 @@ import { spacingRem } from "../../../../../../Constants";
 const styles = (theme: Theme) =>
   createStyles({
     root: {
-      marginBottom: "1rem",
       padding: spacingRem(theme, 2),
     },
     body: {
