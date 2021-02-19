@@ -2,8 +2,8 @@ import React from "react";
 import Tag from "../Tag";
 import { data, problemAction } from "../../../../../../../.shared";
 import { Autocomplete } from "@material-ui/lab";
-import { Button, TextField } from "@material-ui/core";
-import { FaCheck } from "react-icons/fa";
+import { Button, IconButton, TextField } from "@material-ui/core";
+import { FiCheck } from "react-icons/fi";
 
 interface TagGroupProps {
   text: string[];
@@ -75,27 +75,28 @@ class TagGroup extends React.PureComponent<TagGroupProps, TagGroupState> {
         {!!canAddTag &&
           !!availableTags &&
           (this.state.editAddTag ? (
-            <>
+            <div style={{ display: "flex" }}>
               <Autocomplete
                 multiple
                 freeSolo
                 id="tags-autocomplete"
+                fullWidth
+                style={{ flexGrow: 1 }}
                 options={availableTags}
                 value={this.state.inputAddTag}
                 onChange={this.handleChangeAddTag}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Add Tags"
-                    margin="normal"
                     InputProps={{ ...params.InputProps }}
                   />
                 )}
               />
-              <Button variant="contained" color="primary" onClick={this.addTag}>
-                <FaCheck />
-              </Button>
-            </>
+              &nbsp;
+              <IconButton size="small" onClick={this.addTag}>
+                <FiCheck />
+              </IconButton>
+            </div>
           ) : (
             <Tag
               text={""}
