@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  CategoryColors,
+  DifficultyColors,
   Problem as ProblemType,
   Server,
 } from "../../../../../../../../.shared";
@@ -18,8 +20,8 @@ interface ListViewerProps {
   authUser: firebase.User;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
   onClickTag: (tagText: string) => void;
   clickedTags: {
     [tag: string]: boolean;
@@ -37,8 +39,8 @@ export default class ListViewer extends React.PureComponent<ListViewerProps> {
       problemProps,
       uuid,
       problemFunctions,
-      getCategoryColor,
-      getDifficultyColor,
+      categoryColors,
+      difficultyColors,
       clickedTags,
       onClickTag,
       authUser,
@@ -52,8 +54,8 @@ export default class ListViewer extends React.PureComponent<ListViewerProps> {
         {...problemProps(uuid, prob, authUser)}
         {...problemFunctions(uuid, prob, authUser)}
         abridged
-        getCategoryColor={getCategoryColor}
-        getDifficultyColor={getDifficultyColor}
+        categoryColors={categoryColors}
+        difficultyColors={difficultyColors}
         clickedTags={clickedTags}
         onClickTag={onClickTag}
         allTags={allTags}

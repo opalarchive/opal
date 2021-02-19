@@ -2,9 +2,13 @@ import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { CategoryColors, ViewSectionProps } from "../..";
+import { ViewSectionProps } from "../..";
 
-import { Server } from "../../../../../../../.shared";
+import {
+  CategoryColors,
+  DifficultyColors,
+  Server,
+} from "../../../../../../../.shared";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import styles from "./index.css";
@@ -19,9 +23,6 @@ interface CompileProps extends ViewSectionProps {
   editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
-  categoryColors: CategoryColors;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
 }
 
 interface CompileState {
@@ -79,8 +80,7 @@ class Compile extends React.Component<
       project,
       fixedSidebar,
       categoryColors,
-      getCategoryColor,
-      getDifficultyColor,
+      difficultyColors,
       authUser,
       classes,
     } = this.props;
@@ -107,8 +107,7 @@ class Compile extends React.Component<
           <ListDetails
             problemList={problemList}
             categoryColors={categoryColors}
-            getCategoryColor={getCategoryColor}
-            getDifficultyColor={getDifficultyColor}
+            difficultyColors={difficultyColors}
           />
           {problemList.length !== 0 && (
             <>
@@ -116,8 +115,8 @@ class Compile extends React.Component<
                 uuid={uuid}
                 currentList={this.state.currentList}
                 problemList={problemList}
-                getCategoryColor={getCategoryColor}
-                getDifficultyColor={getDifficultyColor}
+                categoryColors={categoryColors}
+                difficultyColors={difficultyColors}
                 authUser={authUser}
               />
               <Export problemList={problemList} />

@@ -1,4 +1,5 @@
 import { Theme } from "@material-ui/core";
+import { DifficultyColors, RGB } from "../../../.shared";
 import { ProjectView, ProjectViewType } from "./types";
 
 export const camelToTitle = (input: string): string => {
@@ -8,10 +9,11 @@ export const camelToTitle = (input: string): string => {
 
 //from SO but simple at heart
 export const anyToProper = (input: string): string => {
-  return input.split(' ')
-   .map(w => w[0].toUpperCase() + w.substr(1).toLowerCase())
-   .join(' ');
-}
+  return input
+    .split(" ")
+    .map((w) => w[0].toUpperCase() + w.substr(1).toLowerCase())
+    .join(" ");
+};
 
 const preciseTime = (hours: number, minutes: number): string => {
   if (minutes === 0) {
@@ -118,6 +120,33 @@ export function lowerBound<T>(arr: T[], x: T): number {
   return lo;
 }
 
+// linearlly interpolate the difficulty color using keyframesque colors
+export function getDifficultyColor(
+  colors: DifficultyColors,
+  difficulty: number
+) {
+  const keys = Object.keys(colors).map((key) => parseInt(key));
+
+  let top = lowerBound(keys, difficulty);
+  const difficultyColor = colors[keys[top]];
+
+  if (top === 0) {
+    return difficultyColor;
+  }
+  return (Object.fromEntries(
+    Object.entries(difficultyColor).map(([primaryColor, value]) => [
+      primaryColor,
+      lerp(
+        keys[top - 1],
+        keys[top],
+        colors[keys[top - 1]][primaryColor as keyof RGB],
+        colors[keys[top]][primaryColor as keyof RGB],
+        difficulty
+      ),
+    ])
+  ) as unknown) as RGB;
+}
+
 export function getMean(arr: number[]) {
   if (arr.length === 0) return 0;
   let sum = 0;
@@ -149,8 +178,8 @@ export function getStDev(arr: number[]) {
 }
 
 // tuples seem to be broken rn
-export const tupleToRGBString = (arr: number[]) => {
-  return `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})`;
+export const RGBToString = (rgb: RGB) => {
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 };
 
 export const spacingRem = (theme: Theme, size: number) => {

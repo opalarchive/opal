@@ -6,8 +6,11 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
-import { Problem } from "../../../../../../../../.shared";
-import { camelToTitle, tupleToRGBString } from "../../../../../../Constants";
+import {
+  CategoryColors,
+  DifficultyColors,
+  Problem,
+} from "../../../../../../../../.shared";
 import ProblemDraggable from "../../../Embedded/ProblemDraggable";
 import { AiOutlineEdit } from "react-icons/ai";
 import styles from "./index.css";
@@ -17,8 +20,8 @@ interface ProblemsProps extends WithStyles<typeof styles> {
   uuid: string;
   currentList: number;
   problemList: Problem[];
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
   authUser: firebase.User;
 }
 
@@ -82,8 +85,8 @@ class Problems extends React.Component<ProblemsProps, ProblemState> {
 
   render() {
     const {
-      getCategoryColor,
-      getDifficultyColor,
+      categoryColors,
+      difficultyColors,
       currentList,
       classes,
     } = this.props;
@@ -111,18 +114,10 @@ class Problems extends React.Component<ProblemsProps, ProblemState> {
               ind={probInd}
               title={problemObject[probInd].title}
               author={problemObject[probInd].author}
-              category={{
-                name: camelToTitle(problemObject[probInd].category),
-                color: tupleToRGBString(
-                  getCategoryColor(problemObject[probInd].category)
-                ),
-              }}
-              difficulty={{
-                name: problemObject[probInd].difficulty,
-                color: tupleToRGBString(
-                  getDifficultyColor(problemObject[probInd].difficulty)
-                ),
-              }}
+              category={problemObject[probInd].category}
+              difficulty={problemObject[probInd].difficulty}
+              categoryColors={categoryColors}
+              difficultyColors={difficultyColors}
             />
           ))
         ) : (
@@ -146,24 +141,10 @@ class Problems extends React.Component<ProblemsProps, ProblemState> {
                               ind={probInd}
                               title={problemObject[probInd].title}
                               author={problemObject[probInd].author}
-                              category={{
-                                name: camelToTitle(
-                                  problemObject[probInd].category
-                                ),
-                                color: tupleToRGBString(
-                                  getCategoryColor(
-                                    problemObject[probInd].category
-                                  )
-                                ),
-                              }}
-                              difficulty={{
-                                name: problemObject[probInd].difficulty,
-                                color: tupleToRGBString(
-                                  getDifficultyColor(
-                                    problemObject[probInd].difficulty
-                                  )
-                                ),
-                              }}
+                              category={problemObject[probInd].category}
+                              difficulty={problemObject[probInd].difficulty}
+                              categoryColors={categoryColors}
+                              difficultyColors={difficultyColors}
                               style={{ ...provided.draggableProps.style }}
                             />
                           )}

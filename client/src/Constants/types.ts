@@ -124,14 +124,8 @@ export interface FrontendProblem {
   ind: number;
   title: string;
   text: string;
-  category: {
-    name: string;
-    color: string;
-  };
-  difficulty: {
-    name: number;
-    color: string;
-  };
+  category: string;
+  difficulty: number;
   author: string;
   tags: string[];
   votes: number;

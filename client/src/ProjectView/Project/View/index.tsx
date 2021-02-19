@@ -10,13 +10,9 @@ import ScrollBase from "../../Template/ScrollBase";
 import * as ROUTES from "../../../Constants/routes";
 import Details from "./Pages/Details";
 import {
-  tupleToRGBString,
-  camelToTitle,
-  lerp,
-  lowerBound,
-} from "../../../Constants";
-import {
+  CategoryColors,
   data,
+  DifficultyColors,
   Problem as ProblemType,
   problemAction,
   problemActionPrivileged,
@@ -58,23 +54,11 @@ export interface ViewSectionProps {
   problemProps: problemProps;
   problemFunctions: problemFunctions;
   editors: Server.Editors;
-}
-
-export interface CategoryColors {
-  [category: string]: number[];
-}
-
-interface DifficultyColors {
-  [difficultyKey: number]: number[]; // basically keyframes but with colors
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
 }
 
 interface ViewState {
-  categoryColors: CategoryColors;
-  difficultyColors: DifficultyColors;
-  difficultyRange: {
-    start: number;
-    end: number;
-  };
   defaultScroll: number;
   scrollTop: number;
   bodyHeight: number;
@@ -83,22 +67,6 @@ interface ViewState {
 
 class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   state = {
-    categoryColors: {
-      algebra: [241, 37, 30],
-      geometry: [35, 141, 25],
-      combinatorics: [21, 52, 224],
-      numberTheory: [173, 19, 179],
-      miscellaneous: [100, 100, 110],
-    } as CategoryColors,
-    difficultyColors: {
-      0: [0, 200, 100],
-      25: [0, 200, 255],
-      50: [150, 50, 255],
-      51: [255, 150, 0],
-      75: [255, 0, 0],
-      100: [0, 0, 0],
-    } as DifficultyColors,
-    difficultyRange: { start: 0, end: 100 },
     defaultScroll: 0,
     scrollTop: 0,
     bodyHeight: 0,
@@ -110,37 +78,9 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   constructor(props: ViewProps & RouteComponentProps) {
     super(props);
 
-    this.getCategoryColor = this.getCategoryColor.bind(this);
-    this.getDifficultyColor = this.getDifficultyColor.bind(this);
     this.problemProps = this.problemProps.bind(this);
     this.problemFunctions = this.problemFunctions.bind(this);
     this.setDefaultScroll = this.setDefaultScroll.bind(this);
-  }
-
-  getCategoryColor(category: string) {
-    return this.state.categoryColors[category];
-  }
-
-  // linearlly interpolate the difficulty color using keyframesque colors
-  getDifficultyColor(difficulty: number) {
-    const colors = this.state.difficultyColors;
-    const keys = Object.keys(colors).map((key) => parseInt(key));
-
-    let top = lowerBound(keys, difficulty);
-    const difficultyColor = colors[keys[top]];
-
-    if (top === 0) {
-      return difficultyColor;
-    }
-    return difficultyColor.map((value, ind) =>
-      lerp(
-        keys[top - 1],
-        keys[top],
-        colors[keys[top - 1]][ind],
-        colors[keys[top]][ind],
-        difficulty
-      )
-    ) as number[];
   }
 
   problemProps: problemProps = (
@@ -158,19 +98,16 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       });
     }
 
+    const categoryColors = this.props.project.settings.categoryColors;
+    const difficultyColors = this.props.project.settings.difficultyColors;
+
     return {
       ind: prob.ind,
       uuid: uuid,
       title: prob.title,
       text: prob.text,
-      category: {
-        name: camelToTitle(prob.category),
-        color: tupleToRGBString(this.getCategoryColor(prob.category)),
-      },
-      difficulty: {
-        name: prob.difficulty,
-        color: tupleToRGBString(this.getDifficultyColor(prob.difficulty)),
-      },
+      category: prob.category,
+      difficulty: prob.difficulty,
       author: prob.author,
       tags: prob.tags,
       votes:
@@ -250,6 +187,8 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       problemProps: this.problemProps,
       problemFunctions: this.problemFunctions,
       editors: editors,
+      categoryColors: project.settings.categoryColors,
+      difficultyColors: project.settings.difficultyColors,
     };
 
     return (
@@ -270,10 +209,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => (
               <Overview
                 {...viewSectionProps}
-                categoryColors={this.state.categoryColors}
-                getCategoryColor={this.getCategoryColor}
-                getDifficultyColor={this.getDifficultyColor}
-                difficultyRange={this.state.difficultyRange}
                 problemFunctions={this.problemFunctions}
                 setDefaultScroll={this.setDefaultScroll}
               />
@@ -289,8 +224,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               <Details
                 {...viewSectionProps}
                 setDefaultScroll={this.setDefaultScroll}
-                getCategoryColor={this.getCategoryColor}
-                getDifficultyColor={this.getDifficultyColor}
               />
             )}
           />
@@ -301,14 +234,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               ROUTES.PROJECT_LIST.replace(":uuid", uuid),
               ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", uuid),
             ]}
-            render={(_) => (
-              <Compile
-                {...viewSectionProps}
-                categoryColors={this.state.categoryColors}
-                getCategoryColor={this.getCategoryColor}
-                getDifficultyColor={this.getDifficultyColor}
-              />
-            )}
+            render={(_) => <Compile {...viewSectionProps} />}
           />
           <Route
             exact
@@ -317,9 +243,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               <NewProblem
                 {...viewSectionProps}
                 newProblem={newProblem}
-                getCategoryColor={this.getCategoryColor}
-                getDifficultyColor={this.getDifficultyColor}
-                difficultyRange={this.state.difficultyRange}
+                difficultyRange={project.settings.difficultyRange}
               />
             )}
           />

@@ -1,23 +1,24 @@
 import React from "react";
 import { Divider, Paper, WithStyles, withStyles } from "@material-ui/core";
-import { Problem } from "../../../../../../../../.shared";
+import {
+  CategoryColors,
+  DifficultyColors,
+  Problem,
+} from "../../../../../../../../.shared";
 import { HiOutlineViewList } from "react-icons/hi";
 import styles from "./index.css";
-import { CategoryColors } from "../../..";
 import {
-  camelToTitle,
+  getDifficultyColor,
   getMean,
   getMedianSlow,
   getStDev,
-  tupleToRGBString,
 } from "../../../../../../Constants";
 import Dot from "../../../Embedded/Dot";
 
 interface ListDetailsProps extends WithStyles<typeof styles> {
   problemList: Problem[];
   categoryColors: CategoryColors;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
+  difficultyColors: DifficultyColors;
 }
 
 class ListDetails extends React.Component<ListDetailsProps> {
@@ -25,8 +26,7 @@ class ListDetails extends React.Component<ListDetailsProps> {
     const {
       problemList,
       categoryColors,
-      getCategoryColor,
-      getDifficultyColor,
+      difficultyColors,
       classes,
     } = this.props;
 
@@ -39,9 +39,9 @@ class ListDetails extends React.Component<ListDetailsProps> {
 
     const difficultyList = problemList.map((prob) => prob.difficulty);
     let difficultyData = {
-      average: { value: getMean(difficultyList), dot: true },
-      median: { value: getMedianSlow(difficultyList), dot: true },
-      standardDeviation: { value: getStDev(difficultyList), dot: false },
+      Average: { value: getMean(difficultyList), dot: true },
+      Median: { value: getMedianSlow(difficultyList), dot: true },
+      "Standard Deviation": { value: getStDev(difficultyList), dot: false },
     };
 
     return (
@@ -67,11 +67,9 @@ class ListDetails extends React.Component<ListDetailsProps> {
                     (category) =>
                       !!categoryList[category] && (
                         <li key={category}>
-                          {categoryList[category]}&nbsp;{camelToTitle(category)}
+                          {categoryList[category]}&nbsp;{category}
                           &nbsp;
-                          <Dot
-                            color={tupleToRGBString(categoryColors[category])}
-                          />
+                          <Dot color={categoryColors[category]} />
                         </li>
                       )
                   )}
@@ -92,14 +90,15 @@ class ListDetails extends React.Component<ListDetailsProps> {
                   {Object.entries(difficultyData).map(
                     ([dataPoint, { value, dot }]) => (
                       <li key={dataPoint}>
-                        {camelToTitle(dataPoint)}:&nbsp;
+                        {dataPoint}:&nbsp;
                         {Math.round(value * 10) / 10}
                         {dot && (
                           <>
                             &nbsp;
                             <Dot
-                              color={tupleToRGBString(
-                                getDifficultyColor(value)
+                              color={getDifficultyColor(
+                                difficultyColors,
+                                value
                               )}
                             />
                           </>

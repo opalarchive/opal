@@ -92,12 +92,38 @@ export namespace Client {
  * Project related types
  */
 
+export interface RGB {
+  r: number;
+  g: number;
+  b: number;
+}
+
+export interface CategoryColors {
+  [category: string]: RGB;
+}
+
+export interface DifficultyColors {
+  [difficultyKey: number]: RGB; // basically keyframes but with colors
+}
+
+export interface DifficultyRange {
+  start: number;
+  end: number;
+}
+
+export interface ProjectSettings {
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
+  difficultyRange: DifficultyRange;
+}
+
 export interface List {
   name: string;
   problems: number[];
 }
 
 export interface ProjectPrivate {
+  settings: ProjectSettings;
   lists: List[];
   problems: Problem[];
 }
@@ -183,8 +209,17 @@ export interface Problem {
   votes: Votes;
 }
 
-export type problemAction = "vote" | "comment" | "solution" | "addTag" | "removeTag";
-export type problemActionPrivileged = "title" | "text" | "category" | "difficulty";
+export type problemAction =
+  | "vote"
+  | "comment"
+  | "solution"
+  | "addTag"
+  | "removeTag";
+export type problemActionPrivileged =
+  | "title"
+  | "text"
+  | "category"
+  | "difficulty";
 export type replyAction = "editText" | "editType" | "delete";
 
 /**

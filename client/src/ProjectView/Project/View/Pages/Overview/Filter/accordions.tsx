@@ -1,7 +1,6 @@
 /*  */
 import React from "react";
 import styles from "./index.css";
-import { CategoryColors } from "../../..";
 import {
   Accordion,
   AccordionDetails,
@@ -14,13 +13,12 @@ import {
   WithStyles,
 } from "@material-ui/core";
 import { FiCheckCircle, FiChevronDown, FiCircle } from "react-icons/fi";
-import {
-  camelToTitle,
-  spacingRem,
-  tupleToRGBString,
-} from "../../../../../../Constants";
 import Dot from "../../../Embedded/Dot";
 import TagGroup from "../../../Embedded/TagGroup";
+import {
+  CategoryColors,
+  DifficultyRange,
+} from "../../../../../../../../.shared";
 
 interface AccordionProps extends WithStyles<typeof styles> {
   filterUsedDot: JSX.Element;
@@ -152,11 +150,8 @@ export class CategoryAccordion extends React.PureComponent<
                 }}
                 label={
                   <>
-                    {camelToTitle(category)}
-                    <Dot
-                      color={tupleToRGBString(color)}
-                      style={{ marginLeft: "0.55rem" }}
-                    />
+                    {category}
+                    <Dot color={color} style={{ marginLeft: "0.55rem" }} />
                   </>
                 }
               />
@@ -215,14 +210,8 @@ export class TagAccordion extends React.PureComponent<
 
 export class DifficultyAccordion extends React.PureComponent<
   AccordionProps & {
-    difficulty: {
-      start: number;
-      end: number;
-    };
-    difficultyRange: {
-      start: number;
-      end: number;
-    };
+    difficulty: DifficultyRange;
+    difficultyRange: DifficultyRange;
     theme: Theme;
   }
 > {

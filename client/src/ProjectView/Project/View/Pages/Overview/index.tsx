@@ -1,6 +1,6 @@
 import { Button, withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
-import { CategoryColors, ViewSectionProps } from "../..";
+import { ViewSectionProps } from "../..";
 
 import { Problem as ProblemType, Server } from "../../../../../../../.shared";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
@@ -12,14 +12,10 @@ import * as ROUTES from "../../../../../Constants/routes";
 import { FiPlus } from "react-icons/fi";
 
 interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
-  categoryColors: CategoryColors;
   fixedSidebar: boolean;
-  difficultyRange: { start: number; end: number };
   editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
   setDefaultScroll: (scroll: number) => void;
 }
 
@@ -79,13 +75,10 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
     const {
       fixedSidebar,
       project,
-      categoryColors,
       editors,
       problemProps,
       uuid,
       problemFunctions,
-      getCategoryColor,
-      getDifficultyColor,
       authUser,
       classes,
     } = this.props;
@@ -119,8 +112,8 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
         sidebarProps={{
           setFilter: this.setFilter,
           setSortWeight: this.setSortWeight,
-          difficultyRange: this.props.difficultyRange,
-          categoryColors,
+          difficultyRange: project.settings.difficultyRange,
+          categoryColors: project.settings.categoryColors,
           editors,
           allTags,
           clickedTags: this.state.clickedTags,
@@ -149,8 +142,8 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
             authUser={authUser}
             problemProps={problemProps}
             problemFunctions={problemFunctions}
-            getCategoryColor={getCategoryColor}
-            getDifficultyColor={getDifficultyColor}
+            categoryColors={project.settings.categoryColors}
+            difficultyColors={project.settings.difficultyColors}
             onClickTag={this.onClickTag}
             clickedTags={this.state.clickedTags}
             allTags={allTags}

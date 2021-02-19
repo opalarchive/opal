@@ -12,11 +12,15 @@ import {
 import styles from "./index.css";
 import { compose } from "recompose";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
-import { List, Problem } from "../../../../../../../../.shared";
+import {
+  CategoryColors,
+  DifficultyRange,
+  List,
+  Problem,
+} from "../../../../../../../../.shared";
 import { FiArrowDown, FiFilter, FiList } from "react-icons/fi";
 import { HiOutlineSortDescending } from "react-icons/hi";
 import Dot from "../../../Embedded/Dot";
-import { CategoryColors } from "../../..";
 import Scrollbar from "react-scrollbars-custom";
 import { SortDirection } from "../../../../../../Constants/types";
 import ListSelect from "../../../Embedded/ListSelect";
@@ -33,11 +37,8 @@ interface FilterPropsBase {
   setSortWeight: (
     sortWeight: (problem: Problem) => { p: number; s: number }
   ) => void;
-  difficultyRange: {
-    start: number;
-    end: number;
-  };
   categoryColors: CategoryColors;
+  difficultyRange: DifficultyRange;
   editors: string[];
   allTags: Set<string>;
   clickedTags: {
@@ -57,7 +58,7 @@ type FilterProps = SidebarProps &
 interface FilterState {
   keyword: string;
   author: string;
-  difficulty: { start: number; end: number };
+  difficulty: DifficultyRange;
   category: {
     [category: string]: boolean;
   };

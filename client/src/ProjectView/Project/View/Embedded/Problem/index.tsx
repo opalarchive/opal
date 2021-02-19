@@ -28,18 +28,22 @@ import {
 } from "../../../../../Constants/types";
 import Dot from "../Dot";
 import TagGroup from "../TagGroup";
-import { tupleToRGBString } from "../../../../../Constants";
-import { Server } from "../../../../../../../.shared";
+import { getDifficultyColor, RGBToString } from "../../../../../Constants";
+import {
+  CategoryColors,
+  DifficultyColors,
+  Server,
+} from "../../../../../../../.shared";
 
 interface ProblemProps extends FrontendProblem, problemFunctionsExtracted {
-  abridged: boolean;
+  abridged?: boolean;
   clickedTags?: {
     [tag: string]: boolean;
   };
   onClickTag?: (tagText: string) => void;
   allTags: Set<string>;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
   editors: Server.Editors;
 }
 
@@ -76,8 +80,8 @@ class Problem extends React.PureComponent<
       ...this.state,
       editTitleValue: this.props.title,
       editTextValue: this.props.text,
-      editCategoryValue: this.props.category.name,
-      editDifficultyValue: this.props.difficulty.name,
+      editCategoryValue: this.props.category,
+      editDifficultyValue: this.props.difficulty,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -138,8 +142,8 @@ class Problem extends React.PureComponent<
       tryProblemAction,
       tryProblemActionPrivileged,
       tryReplyAction,
-      getCategoryColor,
-      getDifficultyColor,
+      categoryColors,
+      difficultyColors,
       replyTypes,
       abridged,
       clickedTags,
@@ -152,6 +156,7 @@ class Problem extends React.PureComponent<
     const availableTags: string[] = [...allTags].filter(
       (tag) => tags.indexOf(tag) < 0
     );
+    console.log(categoryColors);
 
     const canEdit =
       !abridged &&
@@ -195,7 +200,7 @@ class Problem extends React.PureComponent<
         </div>
         <div className={classes.body}>
           <div className={classes.bodyTitle}>
-            {abridged ? (
+            {!!abridged ? (
               <Link
                 className={classes.link}
                 to={ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(
@@ -322,7 +327,7 @@ class Problem extends React.PureComponent<
               />
             )}
           </div>
-          {abridged ? (
+          {!!abridged ? (
             <div className={classes.bodyReply}>
               <Link
                 className={classes.link}
@@ -341,20 +346,11 @@ class Problem extends React.PureComponent<
           <div className={classes.rightCategory}>
             <Dot
               color={
-                this.state.editCategory
-                  ? tupleToRGBString(
-                      getCategoryColor(
-                        [
-                          "algebra",
-                          "geometry",
-                          "combinatoris",
-                          "numberTheory",
-                        ].includes(this.state.editCategoryValue)
-                          ? this.state.editCategoryValue
-                          : "miscellaneous"
-                      )
-                    )
-                  : category.color
+                categoryColors[
+                  this.state.editCategory
+                    ? this.state.editCategoryValue
+                    : category
+                ]
               }
               style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
             />
@@ -383,7 +379,7 @@ class Problem extends React.PureComponent<
               </div>
             ) : (
               <>
-                {category.name}
+                {category}
                 {canEdit ? (
                   <>
                     &nbsp;
@@ -403,13 +399,12 @@ class Problem extends React.PureComponent<
           </div>
           <div className={classes.rightDifficulty}>
             <Dot
-              color={
+              color={getDifficultyColor(
+                difficultyColors,
                 this.state.editDifficulty
-                  ? tupleToRGBString(
-                      getDifficultyColor(this.state.editDifficultyValue)
-                    )
-                  : difficulty.color
-              }
+                  ? this.state.editDifficultyValue
+                  : difficulty
+              )}
               style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
             />
             {this.state.editDifficulty ? (
@@ -445,7 +440,7 @@ class Problem extends React.PureComponent<
               </>
             ) : (
               <>
-                d-{difficulty.name}
+                d-{difficulty}
                 {canEdit ? (
                   <>
                     &nbsp;

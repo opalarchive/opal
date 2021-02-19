@@ -1,13 +1,23 @@
-import { withStyles, WithStyles, TextField, Slider, Button, Paper } from "@material-ui/core";
-import React from "react";
-import { CategoryColors, ViewSectionProps } from "../..";
-
-import { Problem as ProblemType, Server, Votes } from "../../../../../../../.shared";
 import {
-  FrontendProblem,
-  tryProblemAction,
+  withStyles,
+  WithStyles,
+  TextField,
+  Slider,
+  Button,
+  Paper,
+} from "@material-ui/core";
+import React from "react";
+import { ViewSectionProps } from "../..";
+
+import {
+  CategoryColors,
+  DifficultyColors,
+  DifficultyRange,
+  Server,
+  Votes,
+} from "../../../../../../../.shared";
+import {
   newProblem,
-  tryProblemActionPrivileged,
   problemProps,
   problemFunctions,
 } from "../../../../../Constants/types";
@@ -18,16 +28,14 @@ import { FiChevronLeft, FiPlus } from "react-icons/fi";
 import { compose } from "recompose";
 import { withRouter, RouteComponentProps, Link } from "react-router-dom";
 import * as ROUTES from "../../../../../Constants/routes";
-import { tupleToRGBString } from "../../../../../Constants/index";
+import { getDifficultyColor } from "../../../../../Constants/index";
 import Dot from "../../Embedded/Dot";
 
 interface NewProblemProps extends ViewSectionProps {
-  difficultyRange: { start: number; end: number };
+  difficultyRange: DifficultyRange;
   editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
-  getCategoryColor: (category: string) => number[];
-  getDifficultyColor: (difficulty: number) => number[];
   newProblem: newProblem;
 }
 
@@ -64,9 +72,7 @@ class NewProblem extends React.Component<
   }
 
   newProblem() {
-    const uid = !!this.props.authUser.uid
-      ? this.props.authUser.uid
-      : "";
+    const uid = !!this.props.authUser.uid ? this.props.authUser.uid : "";
     const { uuid, project } = this.props;
     var { title, text, category, difficulty } = this.state;
     if (title.length == 0) {
@@ -150,8 +156,8 @@ class NewProblem extends React.Component<
       // tryProblemAction,
       authUser,
       classes,
-      getCategoryColor,
-      getDifficultyColor,
+      categoryColors,
+      difficultyColors,
     } = this.props;
 
     return (
@@ -196,18 +202,7 @@ class NewProblem extends React.Component<
             <div className={classes.right}>
               <div className={classes.rightCategory}>
                 <Dot
-                  color={tupleToRGBString(
-                    getCategoryColor(
-                      [
-                        "algebra",
-                        "geometry",
-                        "combinatorics",
-                        "numberTheory",
-                      ].includes(this.state.category)
-                        ? this.state.category
-                        : "miscellaneous"
-                    )
-                  )}
+                  color={categoryColors[this.state.category]}
                   style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
                 />
                 <TextField
@@ -221,8 +216,9 @@ class NewProblem extends React.Component<
               </div>
               <div className={classes.rightDifficulty}>
                 <Dot
-                  color={tupleToRGBString(
-                    getDifficultyColor(this.state.difficulty)
+                  color={getDifficultyColor(
+                    difficultyColors,
+                    this.state.difficulty
                   )}
                   style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
                 />

@@ -9,6 +9,8 @@ import { GrDrag } from "react-icons/gr";
 import styles from "./index.css";
 import Dot from "../Dot";
 import { FiLock } from "react-icons/fi";
+import { CategoryColors, DifficultyColors } from "../../../../../../../.shared";
+import { getDifficultyColor } from "../../../../../Constants";
 
 interface ProblemProps {
   refInner?: React.Ref<HTMLElement>;
@@ -16,15 +18,11 @@ interface ProblemProps {
   handleProps?: DraggableProvidedDragHandleProps;
   ind: number;
   title: string;
-  category: {
-    name: string;
-    color: string;
-  };
-  difficulty: {
-    name: number;
-    color: string;
-  };
+  category: string;
+  difficulty: number;
   author: string;
+  categoryColors: CategoryColors;
+  difficultyColors: DifficultyColors;
   style?: React.CSSProperties;
 }
 
@@ -45,6 +43,8 @@ class Problem extends React.PureComponent<
       category,
       difficulty,
       author,
+      categoryColors,
+      difficultyColors,
       style,
       classes,
     } = this.props;
@@ -72,17 +72,17 @@ class Problem extends React.PureComponent<
           <div className={classes.filler} />
           <div className={classes.rightCategory}>
             <Dot
-              color={category.color}
+              color={categoryColors[category]}
               style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
             />
-            {category.name}
+            {category}
           </div>
           <div className={classes.rightDifficulty}>
             <Dot
-              color={difficulty.color}
+              color={getDifficultyColor(difficultyColors, difficulty)}
               style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
             />
-            d-{difficulty.name}
+            d-{difficulty}
           </div>
         </div>
       </Paper>
