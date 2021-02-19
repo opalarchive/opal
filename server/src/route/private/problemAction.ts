@@ -20,6 +20,7 @@ const tryAction = async (
   const now = Date.now();
   let tags: string[] = problem.tags || [];
   let newTags: string[] = [];
+  let index = 0;
   switch (type) {
     case "vote":
       if (data !== 1 && data !== -1) {
@@ -36,7 +37,7 @@ const tryAction = async (
         return { status: 400, value: "invalid-input" };
       }
 
-      let index = 0;
+      index = 0;
       if (!!problem.replies) {
         index = problem.replies.length;
       }
@@ -46,6 +47,25 @@ const tryAction = async (
         text: data,
         time: now,
         type: ReplyType.COMMENT,
+        lastEdit: now,
+      });
+
+      break;
+    case "solution":
+      if (typeof data !== "string") {
+        return { status: 400, value: "invalid-input" };
+      }
+
+      index = 0;
+      if (!!problem.replies) {
+        index = problem.replies.length;
+      }
+
+      await cdb.ref(`problems/${problemInd}/replies/${index}`).set({
+        author: authuid,
+        text: data,
+        time: now,
+        type: ReplyType.SOLUTION,
         lastEdit: now,
       });
 

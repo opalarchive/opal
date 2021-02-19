@@ -23,7 +23,7 @@ const tryAction = async (
   const now = Date.now();
   
   switch (type) {
-    case "edit":
+    case "editText":
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
       }
@@ -33,6 +33,27 @@ const tryAction = async (
       }
 
       await cdb.ref(`problems/${problemInd}/replies/${replyInd}/text`).set(data);
+      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`).set(now);
+
+      break;
+    case "editType":
+      if (typeof data !== "string") {
+        return { status: 400, value: "invalid-input" };
+      }
+
+      if (authuid !== problem.replies[replyInd].author) {
+        return { status: 400, value: "forbidden" }
+      }
+
+      if (data == problem.replies[replyInd].type) {
+        break;
+      }
+
+      if (!(data in ReplyType)) {
+        break;
+      }
+
+      await cdb.ref(`problems/${problemInd}/replies/${replyInd}/type`).set(data);
       await cdb.ref(`problems/${problemInd}/replies/${replyInd}/lastEdit`).set(now);
 
       break;

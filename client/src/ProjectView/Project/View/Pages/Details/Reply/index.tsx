@@ -4,6 +4,8 @@ import {
   Button,
   darken,
   IconButton,
+  Menu,
+  MenuItem,
   Paper,
   TextField,
   Tooltip,
@@ -14,13 +16,14 @@ import {
 } from "@material-ui/core";
 import {
   FiAlignLeft,
+  FiChevronDown,
   FiCornerRightUp,
   FiEdit2,
   FiLink2,
   FiMessageSquare,
 } from "react-icons/fi";
 import Latex from "../../../../../../Constants/latex";
-import { formatTime } from "../../../../../../Constants";
+import { formatTime, anyToProper } from "../../../../../../Constants";
 import * as ROUTES from "../../../../../../Constants/routes";
 import { compose } from "recompose";
 import {
@@ -30,7 +33,8 @@ import {
   ReplyType,
 } from "../../../../../../../../.shared";
 import styles from "./index.css";
-import { problemFunctionsObj } from "../../../../../../Constants/types";
+import { problemFunctionsExtracted } from "../../../../../../Constants/types";
+import { IconType } from "react-icons";
 
 interface ReplyPropsBase {
   uuid: string;
@@ -38,7 +42,7 @@ interface ReplyPropsBase {
   reply: number;
   content?: reply;
   isHighlighted: boolean;
-  problemFunctionsExtracted: problemFunctionsObj;
+  problemFunctionsExtracted: problemFunctionsExtracted;
   authUser: firebase.User;
 }
 
@@ -46,17 +50,24 @@ type ReplyProps = WithStyles<typeof styles> & WithTheme & ReplyPropsBase;
 interface ReplyBaseState {
   edit: boolean;
   editValue: string;
+  typeMenuAnchorEl: HTMLElement | null;
+  currentType: ReplyType;
 }
 
 class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyProps, State> {
 
   constructor(props: ReplyProps) {
     super(props);
-    this.state = { ...this.state, edit: false, editValue: "" };
+    this.state = { ...this.state, edit: false, editValue: "", typeMenuAnchorEl: null };
 
     this.getText = this.getText.bind(this);
     this.handleEditChange = this.handleEditChange.bind(this);
     this.handleSubmitEdit = this.handleSubmitEdit.bind(this);
+    this.handleEditChange = this.handleEditChange.bind(this);
+    this.openTypeMenu = this.openTypeMenu.bind(this);
+    this.closeTypeMenu = this.closeTypeMenu.bind(this);
+    this.setCurrentType = this.setCurrentType.bind(this);
+    this.getIcon = this.getIcon.bind(this);
   }
 
   componentDidMount() {
@@ -76,7 +87,19 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
   }
 
   getIcon() {
-    return FiMessageSquare;
+    let Icon: IconType;
+    switch (this.state.currentType) {
+      case ReplyType.COMMENT:
+        Icon = FiMessageSquare;
+        break;
+      case ReplyType.SOLUTION:
+        Icon = FiAlignLeft;
+        break;
+      default:
+        Icon = FiMessageSquare;
+        break;
+    }
+    return Icon;
   }
 
   handleEditChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -95,8 +118,21 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
 
     if (this.state.editValue.length < 8) return;
 
-    this.props.problemFunctionsExtracted.tryReplyAction(this.props.reply, this.state.editValue, "edit");
+    this.props.problemFunctionsExtracted.tryReplyAction(this.props.reply, this.state.editValue, "editText");
     this.setState({ edit: false });
+  }
+
+  openTypeMenu(e: React.MouseEvent<HTMLButtonElement>) {
+    this.setState({ typeMenuAnchorEl: e.currentTarget });
+  }
+
+  closeTypeMenu() {
+    this.setState({ typeMenuAnchorEl: null });
+  }
+
+  setCurrentType(type: ReplyType) {
+    this.props.problemFunctionsExtracted.tryReplyAction(this.props.reply, type, "editType");
+    this.closeTypeMenu();
   }
 
   render() {
@@ -110,8 +146,20 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
       isHighlighted,
       authUser,
     } = this.props;
-
     const Icon = this.getIcon();
+    const IconInDom = () => (
+      <Icon
+        className={classes.icon}
+        stroke={
+          isHighlighted
+            ? darken(theme.palette.secondary.main, 0.1)
+            : "currentColor"
+        }
+        fill={
+          isHighlighted ? darken(theme.palette.secondary.main, 0.1) : "none"
+        }
+      />
+    );
     const linkPrefix = window.location.href.substr(
       0,
       window.location.href.indexOf(window.location.pathname)
@@ -167,7 +215,6 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
                 autoFocus
                 margin="dense"
                 id="comment"
-                label="Comment"
                 type="text"
                 value={this.state.editValue}
                 onChange={this.handleEditChange}
@@ -199,17 +246,56 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<ReplyP
         </Paper>
 
         <Paper elevation={3} className={`${classes.iconPaper}`}>
-          <Icon
-            className={classes.icon}
-            stroke={
-              isHighlighted
-                ? darken(theme.palette.secondary.main, 0.1)
-                : "currentColor"
-            }
-            fill={
-              isHighlighted ? darken(theme.palette.secondary.main, 0.1) : "none"
-            }
-          />
+          {(!content || content.author == authUser.displayName) ? (
+            <>
+              <IconButton
+                size="small"
+                color="inherit"
+                onClick={this.openTypeMenu}
+                aria-controls="list-select-menu"
+                aria-haspopup="true"
+                edge="end"
+              >
+                <IconInDom />
+              </IconButton>
+              <Menu
+                id="list-select-menu"
+                anchorEl={this.state.typeMenuAnchorEl}
+                keepMounted
+                open={!!this.state.typeMenuAnchorEl}
+                onClose={this.closeTypeMenu}
+                elevation={3}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <MenuItem
+                  onClick={(_) => {
+                    this.setCurrentType(ReplyType.COMMENT);
+                  }}
+                >
+                  <FiMessageSquare />
+                  &nbsp;Comment
+                </MenuItem>
+                <MenuItem
+                  onClick={(_) => {
+                    this.setCurrentType(ReplyType.SOLUTION);
+                  }}
+                >
+                  <FiAlignLeft />
+                  &nbsp;Solution
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <IconInDom />
+          )}
           <div className={classes.iconBodge} />
         </Paper>
       </div>
@@ -260,15 +346,21 @@ class Solution extends ReplyBase<SolutionState> {
 
 interface WriteCommentState extends ReplyBaseState {
   input: string;
+  typeMenuAnchorEl: HTMLElement | null;
+  currentType: ReplyType;
 }
 
 export class WriteComment extends ReplyBase<WriteCommentState> {
   constructor(props: ReplyProps) {
     super(props);
-    this.state = { ...this.state, input: "" };
+    this.state = { ...this.state, input: "", typeMenuAnchorEl: null, currentType: ReplyType.COMMENT };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitComment = this.handleSubmitComment.bind(this);
+    this.openTypeMenu = this.openTypeMenu.bind(this);
+    this.closeTypeMenu = this.closeTypeMenu.bind(this);
+    this.setCurrentType = this.setCurrentType.bind(this);
+    this.getIcon = this.getIcon.bind(this);
   }
 
   handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -287,8 +379,32 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
 
     if (this.state.input.length < 8) return;
 
-    this.props.problemFunctionsExtracted.tryProblemAction(this.state.input, "comment");
+    let typeString: problemAction;
+    switch (this.state.currentType) {
+      case ReplyType.COMMENT:
+        typeString = "comment";
+        break;
+      case ReplyType.SOLUTION:
+        typeString = "solution";
+        break;
+      default:
+        typeString = "comment";
+    }
+    this.props.problemFunctionsExtracted.tryProblemAction(this.state.input, typeString);
     this.setState({ input: "" });
+  }
+
+  openTypeMenu(e: React.MouseEvent<HTMLButtonElement>) {
+    this.setState({ typeMenuAnchorEl: e.currentTarget });
+  }
+
+  closeTypeMenu() {
+    this.setState({ typeMenuAnchorEl: null });
+  }
+
+  setCurrentType(type: ReplyType) {
+    this.setState({ currentType: type });
+    this.closeTypeMenu();
   }
 
   isLinkable() {
@@ -306,7 +422,7 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
           autoFocus
           margin="dense"
           id="comment"
-          label="Comment"
+          label={anyToProper(this.state.currentType)}
           type="text"
           value={this.state.input}
           onChange={this.handleInputChange}
@@ -336,88 +452,6 @@ export class WriteComment extends ReplyBase<WriteCommentState> {
     return FiEdit2;
   }
 }
-
-// interface EditState {
-//   edit: boolean;
-//   input: string;
-// }
-
-// export class EditComment extends ReplyBase<EditState> {
-//   state = {
-//     edit: false,
-//     input: "",
-//   }
-
-//   constructor(props: ReplyProps) {
-//     super(props);
-//   }
-
-//   componentDidMount() {
-//     this.setState({ input: (!!this.props.content ? this.props.content.text : "") });
-//   }
-
-//   handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-//     e.preventDefault();
-
-//     let input = e.target.value;
-//     if (input.length > 4000) {
-//       input = input.slice(0, 4000);
-//     }
-
-//     this.setState({ input });
-//   }
-
-//   handleSubmitComment(e: React.FormEvent<HTMLFormElement>) {
-//     e.preventDefault();
-
-//     if (this.state.input.length < 8) return;
-
-//     this.props.tryProblemActionPrivileged(this.state.input, "editComment");
-//     this.setState({ edit: false });
-//   }
-
-//   getText(classes: WithStyles<typeof styles>["classes"], text: string) {
-//     return (
-//       <form
-//         onSubmit={this.handleSubmitComment}
-//         autoComplete="off"
-//         className={classes.input}
-//       >
-//         <TextField
-//           autoFocus
-//           margin="dense"
-//           id="comment"
-//           label="Comment"
-//           type="text"
-//           value={this.state.input}
-//           onChange={this.handleInputChange}
-//           fullWidth
-//           multiline
-//         />
-//         <div className={classes.inputRight}>
-//           <div className={classes.inputRightFiller} />
-//           <Button
-//             variant="contained"
-//             color="primary"
-//             type="submit"
-//             endIcon={
-//               <FiCornerRightUp
-//                 className={`${classes.icon} ${classes.submitIcon}`}
-//               />
-//             }
-//             disabled={this.state.input.length < 8}
-//           >
-//             Submit
-//           </Button>
-//         </div>
-//       </form>
-//     );
-//   }
-
-//   getIcon() {
-//     return FiEdit2;
-//   }
-// }
 
 const Reply: React.FC<ReplyProps> = (props) => {
   if (!props.content) {
