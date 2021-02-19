@@ -185,7 +185,7 @@ export interface Problem {
 
 export type problemAction = "vote" | "comment" | "solution" | "addTag" | "removeTag";
 export type problemActionPrivileged = "title" | "text" | "category" | "difficulty";
-export type replyAction = "editText" | "editType";
+export type replyAction = "editText" | "editType" | "delete";
 
 /**
  * Reply related types
