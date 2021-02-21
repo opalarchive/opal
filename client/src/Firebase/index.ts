@@ -9,6 +9,7 @@ import {
   projectActionAdmin,
   actionData,
   Problem,
+  Config,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
 
@@ -87,6 +88,18 @@ export async function post<Output>(
 
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
+
+export const configureProject = async (
+  uuid: string,
+  config: Config,
+  authUser: firebase.User
+): Promise<Result<string>> => {
+  return await post<string>(
+    "private/configureProject",
+    { uuid, config },
+    authUser
+  );
+};
 
 export const getUsernames = async (): Promise<Result<string[]>> => {
   const usernamesObject = await post<UsernameInfo[]>(

@@ -35,6 +35,7 @@ import Compile from "./Pages/Compile";
 import NewProblem from "./Pages/NewProblem";
 
 interface ViewProps {
+  background: string;
   project: ProjectPrivate;
   editors: Server.Editors;
   uuid: string;
@@ -158,9 +159,14 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   }
 
   render() {
-    const { project, editors, uuid, authUser, newProblem } = this.props;
-
-    const loadBackground = "rgb(0, 0, 0, 0.025)";
+    const {
+      background,
+      project,
+      editors,
+      uuid,
+      authUser,
+      newProblem,
+    } = this.props;
 
     // don't set the scroll again if you've already done it once
     if (!!this.state.defaultScroll || this.state.defaultScroll === 0) {
@@ -191,7 +197,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     return (
       <ScrollBase
         maxWidth={1320}
-        background={loadBackground}
+        background={background}
         customScrollTop={
           this.scrollSet > 1 ? undefined : this.state.defaultScroll
         }

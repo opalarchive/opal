@@ -16,6 +16,28 @@ export interface Config {
   databaseURL: string;
 }
 
+export const configKeys = [
+  "type",
+  "project_id",
+  "private_key_id",
+  "private_key",
+  "client_email",
+  "client_id",
+  "auth_uri",
+  "token_uri",
+  "auth_provider_x509_cert_url",
+  "client_x509_cert_url",
+  "databaseURL",
+];
+
+export const isConfig = (config: any): config is Config => {
+  if (typeof config !== "object") return false;
+  for (let i = 0; i < configKeys.length; i++) {
+    if (typeof config[configKeys[i]] !== "string") return false;
+  }
+  return true;
+};
+
 export interface Notification {
   content: string;
   link: string;

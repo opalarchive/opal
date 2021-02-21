@@ -120,11 +120,22 @@ const StyledNavbar = compose<
   withRouter
 )(Navbar);
 
-type ProjectAppbarProps = NotificationsProps & { title: string };
+type ProjectAppbarProps = NotificationsProps & {
+  uuid: string;
+  disabled?: boolean;
+  title: string;
+};
 
 class ProjectAppbar extends React.Component<ProjectAppbarProps> {
   render() {
-    const { notifs, notifsLoading, markNotifications, title } = this.props;
+    const {
+      notifs,
+      notifsLoading,
+      markNotifications,
+      uuid,
+      disabled,
+      title,
+    } = this.props;
 
     return (
       <AppBar position="static">
@@ -132,7 +143,7 @@ class ProjectAppbar extends React.Component<ProjectAppbarProps> {
           <Typography variant="h6" style={{ flexGrow: 1 }}>
             {title}
           </Typography>
-          <StyledNavbar uuid="e29edbeb-e10e-474d-9c5d-860d479ed198" />
+          {!disabled && <StyledNavbar uuid={uuid} />}
           <Notifications
             notifsLoading={notifsLoading}
             notifs={notifs}

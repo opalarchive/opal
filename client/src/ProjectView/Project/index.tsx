@@ -25,7 +25,7 @@ import {
 import { NotificationsProps } from "../Template/Notifications";
 
 import Loading from "../../Loading";
-import Unconfigured from "./unconfigured";
+import Configure from "./Configure";
 import View from "./View";
 import ProjectAppbar from "./ProjectAppbar";
 
@@ -69,6 +69,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
   constructor(props: ProjectProps) {
     super(props);
 
+    this.setProject = this.setProject.bind(this);
     this.tryProblemAction = this.tryProblemAction.bind(this);
     this.tryProblemActionPrivileged = this.tryProblemActionPrivileged.bind(
       this
@@ -90,9 +91,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       const name = await getProjectName(uuid, authUser);
 
       this.setState({ project, editors, name, loading: false });
-    } catch (e) {
-      return e;
-    }
+    } catch (e) {}
   }
 
   async componentDidMount() {
@@ -105,6 +104,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         200
       );
       this.interval = window.setInterval(() => {
+        console.log("poll");
         this.setProject(this.props.match.params.uuid, this.props.authUser);
       }, 30000);
     } catch (e) {
@@ -458,6 +458,10 @@ class Project extends React.Component<ProjectProps, ProjectState> {
   }
 
   render() {
+    const background = "rgb(0, 0, 0, 0.025)";
+
+    const uuid = this.props.match.params.uuid;
+    console.log("rr");
     if (this.state.loading) {
       return <Loading background="white" />;
     }
@@ -482,7 +486,28 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       }
     } else {
       if (this.state.project.value === "unconfigured") {
-        return <Unconfigured />;
+        return (
+          <>
+            <ProjectAppbar
+              notifs={this.props.notifs}
+              notifsLoading={this.props.notifsLoading}
+              markNotifications={this.props.markNotifications}
+              title={this.state.name.success ? this.state.name.value : ""}
+              uuid={uuid}
+              disabled
+            />
+            <div
+              style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}
+            >
+              <Configure
+                uuid={uuid}
+                background={background}
+                authUser={this.props.authUser}
+                refresh={this.setProject}
+              />
+            </div>
+          </>
+        );
       }
     }
     if (typeof this.state.project.value === "string") {
@@ -496,12 +521,14 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           notifsLoading={this.props.notifsLoading}
           markNotifications={this.props.markNotifications}
           title={this.state.name.success ? this.state.name.value : ""}
+          uuid={uuid}
         />
         <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
           <View
+            background={background}
             project={this.state.project.value}
             editors={this.state.editors.value}
-            uuid={this.props.match.params.uuid}
+            uuid={uuid}
             tryProblemAction={this.tryProblemAction}
             tryProblemActionPrivileged={this.tryProblemActionPrivileged}
             tryReplyAction={this.tryReplyAction}
