@@ -8,11 +8,14 @@ const tryAction = async (
   problem: Omit<Problem, "ind">,
   authuid: string
 ): Promise<Result<string>> => {
-  let problems = await cdb
+  let problems: Omit<Problem, "ind">[] | undefined = await cdb
     .ref(`problems`)
     .once("value")
     .then((snapshot) => snapshot.val());
+
+  problems = problems || [];
   problems.push(problem);
+
   await cdb.ref(`problems`).set(problems);
 
   return { status: 200, value: "success" };
