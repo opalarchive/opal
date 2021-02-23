@@ -17,7 +17,7 @@ import {
 import { FiList, FiChevronDown } from "react-icons/fi";
 import styles from "./index.css";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
-import { ProjectPrivate, Server } from "../../../../../../../../.shared";
+import { ProjectPrivate, projectRole, ProjectRole, Server } from "../../../../../../../../.shared";
 import { changeList } from "../../../../../../Firebase";
 import Scrollbar from "react-scrollbars-custom";
 import { ClientProblem } from "../../../../../../Constants/types";
@@ -25,7 +25,7 @@ import { ClientProblem } from "../../../../../../Constants/types";
 interface SidebarListProps extends ClientProblem {
   project: ProjectPrivate;
   allTags: Set<string>;
-  editors: Server.Editors;
+  myRole: projectRole;
   authUser: firebase.User;
 }
 
@@ -109,10 +109,10 @@ class Action extends React.Component<ActionProps, ActionState> {
   }
 
   render() {
-    const { classes, width, project, editors, authUser, author } = this.props;
+    const { classes, width, project, myRole, authUser, author } = this.props;
     const canEdit: boolean =
-      editors[authUser.uid].role === "ADMIN" ||
-      editors[authUser.uid].role === "OWNER" ||
+      ProjectRole[myRole] == 0 ||
+      ProjectRole[myRole] == 1 ||
       authUser.displayName === author;
     return (
       <div className={classes.root} style={{ width: `${width}rem` }}>

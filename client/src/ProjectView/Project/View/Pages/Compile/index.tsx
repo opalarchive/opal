@@ -16,7 +16,6 @@ import ListDetails from "./ListDetails";
 import Problems from "./Problems";
 
 interface CompileProps extends ViewSectionProps {
-  editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
 }

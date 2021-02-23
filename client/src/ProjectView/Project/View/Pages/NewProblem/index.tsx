@@ -26,7 +26,6 @@ import Dot from "../../Embedded/Dot";
 
 interface NewProblemProps extends ViewSectionProps {
   difficultyRange: DifficultyRange;
-  editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
   newProblem: newProblem;

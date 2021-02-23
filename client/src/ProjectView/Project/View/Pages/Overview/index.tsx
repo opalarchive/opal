@@ -13,7 +13,6 @@ import { FiPlus } from "react-icons/fi";
 
 interface OverviewProps extends WithStyles<typeof styles>, ViewSectionProps {
   fixedSidebar: boolean;
-  editors: Server.Editors;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
   setDefaultScroll: (scroll: number) => void;
@@ -75,7 +74,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
     const {
       fixedSidebar,
       project,
-      editors,
+      myRole,
       problemProps,
       uuid,
       problemFunctions,
@@ -114,7 +113,6 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
           setSortWeight: this.setSortWeight,
           difficultyRange: project.settings.difficultyRange,
           categoryColors: project.settings.categoryColors,
-          editors,
           allTags,
           clickedTags: this.state.clickedTags,
           onClickTag: this.onClickTag,
@@ -147,7 +145,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
             onClickTag={this.onClickTag}
             clickedTags={this.state.clickedTags}
             allTags={allTags}
-            editors={editors}
+            myRole={myRole}
           />
         </div>
       </SidebaredBase>

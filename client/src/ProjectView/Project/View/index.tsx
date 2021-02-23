@@ -20,6 +20,8 @@ import {
   replyAction,
   ReplyType,
   Server,
+  projectRole,
+  Client,
 } from "../../../../../.shared/src/types";
 import {
   replyTypes,
@@ -33,17 +35,19 @@ import {
 import Overview from "./Pages/Overview";
 import Compile from "./Pages/Compile";
 import NewProblem from "./Pages/NewProblem";
+import Settings from "./Pages/Settings";
 
 interface ViewProps {
   background: string;
   project: ProjectPrivate;
-  editors: Server.Editors;
+  editors: Client.Editors;
   uuid: string;
   tryProblemAction: tryProblemAction;
   tryProblemActionPrivileged: tryProblemActionPrivileged;
   tryReplyAction: tryReplyAction;
   fail: () => void;
   authUser: firebase.User;
+  myRole: projectRole;
   newProblem: newProblem;
 }
 
@@ -54,7 +58,7 @@ export interface ViewSectionProps {
   authUser: firebase.User;
   problemProps: problemProps;
   problemFunctions: problemFunctions;
-  editors: Server.Editors;
+  myRole: projectRole;
   categoryColors: CategoryColors;
   difficultyColors: DifficultyColors;
 }
@@ -162,6 +166,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
     const {
       background,
       project,
+      myRole,
       editors,
       uuid,
       authUser,
@@ -189,7 +194,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       authUser,
       problemProps: this.problemProps,
       problemFunctions: this.problemFunctions,
-      editors: editors,
+      myRole,
       categoryColors: project.settings.categoryColors,
       difficultyColors: project.settings.difficultyColors,
     };
@@ -238,6 +243,16 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
               ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", uuid),
             ]}
             render={(_) => <Compile {...viewSectionProps} />}
+          />
+          <Route
+            exact
+            path={[ROUTES.PROJECT_SETTINGS.replace(":uuid", uuid)]}
+            render={(_) => (
+              <Settings
+                {...viewSectionProps}
+                editors={editors}
+              />
+            )}
           />
           <Route
             exact

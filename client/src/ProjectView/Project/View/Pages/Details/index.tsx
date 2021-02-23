@@ -9,6 +9,7 @@ import Reply from "./Reply";
 import {
   CategoryColors,
   DifficultyColors,
+  projectRole,
   reply as replyType,
   Server,
 } from "../../../../../../../.shared";
@@ -28,7 +29,7 @@ interface DetailProps extends WithStyles<typeof styles> {
   setDefaultScroll: (scroll: number) => void;
   reply?: number;
   allTags: Set<string>;
-  editors: Server.Editors;
+  myRole: projectRole;
   problemPropsExtracted: ClientProblem;
   problemFunctionsExtracted: problemFunctionsExtracted;
   categoryColors: CategoryColors;
@@ -80,6 +81,7 @@ class Details extends React.Component<DetailProps> {
       reply: replyNumber,
       problemPropsExtracted,
       problemFunctionsExtracted,
+      myRole,
       ...otherProps
     } = this.props;
 
@@ -103,6 +105,7 @@ class Details extends React.Component<DetailProps> {
           <Problem
             {...problemPropsExtracted}
             {...problemFunctionsExtracted}
+            myRole={myRole}
             {...otherProps}
           />
         </div>
@@ -121,6 +124,7 @@ class Details extends React.Component<DetailProps> {
                     isHighlighted={replyNumber === id}
                     problemFunctionsExtracted={problemFunctionsExtracted}
                     authUser={problemPropsExtracted.authUser}
+                    myRole={myRole}
                   />
                 </div>
               ))}
@@ -132,6 +136,7 @@ class Details extends React.Component<DetailProps> {
             isHighlighted={false}
             problemFunctionsExtracted={problemFunctionsExtracted}
             authUser={problemPropsExtracted.authUser}
+            myRole={myRole}
           />
         </div>
       </div>
@@ -167,7 +172,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   authUser,
   setDefaultScroll,
   match,
-  editors,
+  myRole,
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
@@ -194,7 +199,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
       sidebarProps={{
         project,
         allTags,
-        editors,
+        myRole,
         ...problemPropsExtracted,
         ...problemFunctionsExtracted,
       }}
@@ -210,7 +215,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
         allTags={allTags}
         setDefaultScroll={setDefaultScroll}
         reply={reply}
-        editors={editors}
+        myRole={myRole}
       />
     </SidebaredBase>
   );

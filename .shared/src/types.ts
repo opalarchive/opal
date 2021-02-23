@@ -89,10 +89,12 @@ export namespace Server {
 export namespace Client {
   export interface EditStatus {
     lastEdit: number;
+    shareDate: number;
+    role: projectRole;
   }
 
   export interface Editors {
-    [uid: string]: EditStatus;
+    [username: string]: EditStatus;
   }
 
   export interface ProjectPublic {
@@ -238,10 +240,10 @@ export type problemAction =
   | "addTag"
   | "removeTag";
 export type problemActionPrivileged =
-  | "title"
-  | "text"
-  | "category"
-  | "difficulty";
+  | "editTitle"
+  | "editText"
+  | "editCategory"
+  | "editDifficulty";
 export type replyAction = "editText" | "editType" | "delete";
 
 /**

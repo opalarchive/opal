@@ -10,6 +10,8 @@ import {
   problemActionPrivileged,
   Server,
   replyAction,
+  projectRole,
+  Client,
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
@@ -43,9 +45,10 @@ interface ProjectProps
 
 interface ProjectState {
   project: Result<ProjectPrivate | string>;
-  editors: Result<Server.Editors>;
+  editors: Result<Client.Editors>;
   name: Result<string>;
   loading: boolean;
+  myRole: projectRole;
 }
 
 class Project extends React.Component<ProjectProps, ProjectState> {
@@ -63,6 +66,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       value: "",
     },
     loading: true,
+    myRole: "EDITOR" as projectRole,
   };
   private interval: number = -1;
 
@@ -81,7 +85,8 @@ class Project extends React.Component<ProjectProps, ProjectState> {
   async setProject(uuid: string, authUser: firebase.User) {
     try {
       const project = await getProjectPrivate(uuid, authUser);
-      const editors = await post<Server.Editors>(
+      //note that the editors we receive from server has uids converted to usernames
+      const editors = await post<Client.Editors>(
         "private/getEditors",
         {
           uuid,
@@ -89,8 +94,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         authUser
       );
       const name = await getProjectName(uuid, authUser);
+      const myRole: projectRole = editors.success && !!authUser.displayName ? editors.value[authUser.displayName].role : "EDITOR";
 
-      this.setState({ project, editors, name, loading: false });
+      this.setState({ project, editors, name, myRole, loading: false });
     } catch (e) {}
   }
 
@@ -104,7 +110,6 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         200
       );
       this.interval = window.setInterval(() => {
-        console.log("poll");
         this.setProject(this.props.match.params.uuid, this.props.authUser);
       }, 30000);
     } catch (e) {
@@ -246,7 +251,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
 
     switch (type) {
-      case "title":
+      case "editTitle":
         if (typeof data !== "string") {
           break;
         }
@@ -254,7 +259,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         project.value.problems[ind].title = data;
 
         break;
-      case "text":
+      case "editText":
         if (typeof data !== "string") {
           break;
         }
@@ -262,7 +267,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         project.value.problems[ind].text = data;
 
         break;
-      case "category":
+      case "editCategory":
         if (typeof data !== "string") {
           break;
         }
@@ -278,7 +283,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         project.value.problems[ind].category = data;
 
         break;
-      case "difficulty":
+      case "editDifficulty":
         if (typeof data !== "number") {
           break;
         }
@@ -461,7 +466,6 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     const background = "rgb(0, 0, 0, 0.025)";
 
     const uuid = this.props.match.params.uuid;
-    console.log("rr");
     if (this.state.loading) {
       return <Loading background="white" />;
     }
@@ -534,6 +538,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
             tryReplyAction={this.tryReplyAction}
             fail={this.props.fail}
             authUser={this.props.authUser}
+            myRole={this.state.myRole}
             newProblem={this.newProblem}
           />
         </div>

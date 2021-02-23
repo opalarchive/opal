@@ -3,6 +3,11 @@ import React from "react";
 import {
   Button,
   darken,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   Menu,
   MenuItem,
@@ -28,6 +33,8 @@ import * as ROUTES from "../../../../../../Constants/routes";
 import { compose } from "recompose";
 import {
   problemAction,
+  ProjectRole,
+  projectRole,
   reply,
   ReplyType,
 } from "../../../../../../../../.shared";
@@ -43,14 +50,17 @@ interface ReplyPropsBase {
   isHighlighted: boolean;
   problemFunctionsExtracted: problemFunctionsExtracted;
   authUser: firebase.User;
+  myRole: projectRole;
 }
 
 type ReplyProps = WithStyles<typeof styles> & WithTheme & ReplyPropsBase;
+
 interface ReplyBaseState {
   edit: boolean;
   editValue: string;
   typeMenuAnchorEl: HTMLElement | null;
   currentType: ReplyType;
+  deleteModalOpen: boolean;
 }
 
 class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
@@ -64,6 +74,7 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
       edit: false,
       editValue: "",
       typeMenuAnchorEl: null,
+      deleteModalOpen: false,
     };
 
     this.getText = this.getText.bind(this);
@@ -74,6 +85,8 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
     this.closeTypeMenu = this.closeTypeMenu.bind(this);
     this.setCurrentType = this.setCurrentType.bind(this);
     this.getIcon = this.getIcon.bind(this);
+    this.handleOpenDeleteModal = this.handleOpenDeleteModal.bind(this);
+    this.handleCloseDeleteModal = this.handleCloseDeleteModal.bind(this);
   }
 
   componentDidMount() {
@@ -124,7 +137,7 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
   handleSubmitEdit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (this.state.editValue.length < 8) return;
+    if (this.state.editValue.length < 8 || (!!this.props.content && this.state.editValue === this.props.content.text)) return;
 
     this.props.problemFunctionsExtracted.tryReplyAction(
       this.props.reply,
@@ -140,6 +153,14 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
 
   closeTypeMenu() {
     this.setState({ typeMenuAnchorEl: null });
+  }
+
+  handleOpenDeleteModal() {
+    this.setState({ deleteModalOpen: true });
+  }
+
+  handleCloseDeleteModal() {
+    this.setState({ deleteModalOpen: false });
   }
 
   setCurrentType(type: ReplyType) {
@@ -161,6 +182,7 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
       reply,
       isHighlighted,
       authUser,
+      myRole,
     } = this.props;
     const Icon = this.getIcon();
     const IconInDom = () => (
@@ -187,6 +209,9 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
         .replace(":ind", "" + ind)
         .replace(":reply", "" + reply);
 
+    const canEdit: boolean = !!content ? content.author === authUser.displayName : false;
+    const canDelete: boolean = !!content ? (ProjectRole[myRole] == 0 || ProjectRole[myRole] == 1 || content.author === authUser.displayName) : false;
+
     return (
       <div className={classes.root}>
         <Paper elevation={3} className={`${classes.reply}`}>
@@ -211,7 +236,7 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
                     <FiLink2 size="1.2rem" />
                   </IconButton>
                 </Tooltip>
-                {content.author === authUser.displayName && (
+                {canEdit && (
                   <Tooltip title="Edit" aria-label="edit">
                     <IconButton
                       className={classes.linkIcon}
@@ -223,21 +248,46 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
                     </IconButton>
                   </Tooltip>
                 )}
-                {content.author === authUser.displayName && (
-                  <Tooltip title="Delete" aria-label="delete">
-                    <IconButton
-                      className={classes.linkIcon}
-                      onClick={() => {
-                        this.props.problemFunctionsExtracted.tryReplyAction(
-                          reply,
-                          "_",
-                          "delete"
-                        ); //needs a placeholder for data since empty data ends up not reaching backend
-                      }}
+                {canDelete && (
+                  <>
+                    <Tooltip title="Delete" aria-label="delete">
+                      <IconButton
+                        className={classes.linkIcon}
+                        onClick={this.handleOpenDeleteModal}
+                      >
+                        <FiTrash2 size="1.2rem" />
+                      </IconButton>
+                    </Tooltip>
+                    <Dialog
+                      open={this.state.deleteModalOpen}
+                      onClose={this.handleCloseDeleteModal}
+                      aria-describedby="delete-reply-description"
                     >
-                      <FiTrash2 size="1.2rem" />
-                    </IconButton>
-                  </Tooltip>
+                      <DialogContent>
+                        <DialogContentText id="delete-reply-description">
+                          Are you sure you want to delete this reply? This is an
+                          irreversible action.
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={this.handleCloseDeleteModal} color="primary" autoFocus>
+                          No
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            this.props.problemFunctionsExtracted.tryReplyAction(
+                              reply,
+                              "_",
+                              "delete"
+                            ); //needs a placeholder for data since empty data ends up not reaching backend
+                          }}
+                          color="primary"
+                        >
+                          Yes
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </>
                 )}
               </div>
             </div>
@@ -281,7 +331,7 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
         </Paper>
 
         <Paper elevation={3} className={`${classes.iconPaper}`}>
-          {!content || content.author === authUser.displayName ? (
+          {!content || canEdit ? (
             <>
               <IconButton
                 size="small"

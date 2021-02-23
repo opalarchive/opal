@@ -32,6 +32,8 @@ import { getDifficultyColor } from "../../../../../Constants";
 import {
   CategoryColors,
   DifficultyColors,
+  ProjectRole,
+  projectRole,
   Server,
 } from "../../../../../../../.shared";
 
@@ -44,7 +46,7 @@ interface ProblemProps extends ClientProblem, problemFunctionsExtracted {
   allTags: Set<string>;
   categoryColors: CategoryColors;
   difficultyColors: DifficultyColors;
-  editors: Server.Editors;
+  myRole: projectRole;
 }
 
 interface ProblemState {
@@ -149,7 +151,7 @@ class Problem extends React.PureComponent<
       onClickTag,
       authUser,
       allTags,
-      editors,
+      myRole,
     } = this.props;
 
     const availableTags: string[] = [...allTags].filter(
@@ -158,8 +160,8 @@ class Problem extends React.PureComponent<
 
     const canEdit =
       !abridged &&
-      (editors[authUser.uid].role === "ADMIN" ||
-        editors[authUser.uid].role === "OWNER" ||
+      (ProjectRole[myRole] == 0 ||
+        ProjectRole[myRole] == 1 ||
         authUser.displayName === author);
 
     return (
@@ -225,11 +227,11 @@ class Problem extends React.PureComponent<
                       size="small"
                       onClick={(_) => {
                         if (this.state.editTitleValue.length === 0) {
-                          tryProblemActionPrivileged("Untitled", "title");
+                          tryProblemActionPrivileged("Untitled", "editTitle");
                         } else {
                           tryProblemActionPrivileged(
                             this.state.editTitleValue,
-                            "title"
+                            "editTitle"
                           );
                         }
                         this.setState({ editTitle: false });
@@ -278,11 +280,11 @@ class Problem extends React.PureComponent<
                   size="small"
                   onClick={(_) => {
                     if (this.state.editTextValue.length === 0) {
-                      tryProblemActionPrivileged("Empty", "text");
+                      tryProblemActionPrivileged("Empty", "editText");
                     } else {
                       tryProblemActionPrivileged(
                         this.state.editTextValue,
-                        "text"
+                        "editText"
                       );
                     }
                     this.setState({ editText: false });
@@ -367,7 +369,7 @@ class Problem extends React.PureComponent<
                   onClick={(_) => {
                     tryProblemActionPrivileged(
                       this.state.editCategoryValue,
-                      "category"
+                      "editCategory"
                     );
                     this.setState({ editCategory: false });
                   }}
@@ -428,7 +430,7 @@ class Problem extends React.PureComponent<
                   onClick={(_) => {
                     tryProblemActionPrivileged(
                       this.state.editDifficultyValue,
-                      "difficulty"
+                      "editDifficulty"
                     );
                     this.setState({ editDifficulty: false });
                   }}

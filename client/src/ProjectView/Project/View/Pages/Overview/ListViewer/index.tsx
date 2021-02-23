@@ -3,6 +3,7 @@ import {
   CategoryColors,
   DifficultyColors,
   Problem as ProblemType,
+  projectRole,
   Server,
 } from "../../../../../../../../.shared";
 import {
@@ -24,7 +25,7 @@ interface ListViewerProps {
     [tag: string]: boolean;
   };
   allTags: Set<string>;
-  editors: Server.Editors;
+  myRole: projectRole;
 }
 
 export default class ListViewer extends React.PureComponent<ListViewerProps> {
@@ -42,7 +43,7 @@ export default class ListViewer extends React.PureComponent<ListViewerProps> {
       onClickTag,
       authUser,
       allTags,
-      editors,
+      myRole
     } = this.props;
 
     return problemList.map((prob) => (
@@ -56,7 +57,7 @@ export default class ListViewer extends React.PureComponent<ListViewerProps> {
         clickedTags={clickedTags}
         onClickTag={onClickTag}
         allTags={allTags}
-        editors={editors}
+        myRole={myRole}
       />
     ));
   }

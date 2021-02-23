@@ -21,5 +21,8 @@ export const execute = async (req, res) => {
 
   res
     .status(200)
-    .send(editors);
+    .send(Object.fromEntries(Object.entries(editors).map(([uid, editStatus]) => {
+      const { starred, ...editStatusWithoutStarred } = editStatus;
+      return [idToUsername(uid), editStatusWithoutStarred];
+    })));
 };
