@@ -10,34 +10,43 @@ import {
 } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
 import { db } from "../../helpers/firebaseSetup";
+import {
+  problemTextMaxLength,
+  problemTitleMaxLength,
+} from "../../../../.shared/src/constants";
 
-const permission = (editors: Server.Editors, problem: Problem, authuid: string, type: problemActionPrivileged): boolean => {
+const permission = (
+  editors: Server.Editors,
+  problem: Problem,
+  authuid: string,
+  type: problemActionPrivileged
+): boolean => {
   switch (type) {
     case "editTitle":
       return (
-        ProjectRole[editors[authuid].role] == 0 ||
-        ProjectRole[editors[authuid].role] == 1 ||
+        ProjectRole[editors[authuid].role] === ProjectRole.OWNER ||
+        ProjectRole[editors[authuid].role] == ProjectRole.ADMIN ||
         authuid === problem.author
       );
       break;
     case "editText":
       return (
-        ProjectRole[editors[authuid].role] == 0 ||
-        ProjectRole[editors[authuid].role] == 1 ||
+        ProjectRole[editors[authuid].role] === ProjectRole.OWNER ||
+        ProjectRole[editors[authuid].role] == ProjectRole.ADMIN ||
         authuid === problem.author
       );
       break;
     case "editCategory":
       return (
-        ProjectRole[editors[authuid].role] == 0 ||
-        ProjectRole[editors[authuid].role] == 1 ||
+        ProjectRole[editors[authuid].role] === ProjectRole.OWNER ||
+        ProjectRole[editors[authuid].role] == ProjectRole.ADMIN ||
         authuid === problem.author
       );
       break;
     case "editDifficulty":
       return (
-        ProjectRole[editors[authuid].role] == 0 ||
-        ProjectRole[editors[authuid].role] == 1 ||
+        ProjectRole[editors[authuid].role] === ProjectRole.OWNER ||
+        ProjectRole[editors[authuid].role] == ProjectRole.ADMIN ||
         authuid === problem.author
       );
       break;
@@ -45,7 +54,7 @@ const permission = (editors: Server.Editors, problem: Problem, authuid: string, 
       break;
   }
   return false;
-}
+};
 
 const tryActionPrivileged = async (
   cdb: firebase.database.Database,
@@ -57,10 +66,11 @@ const tryActionPrivileged = async (
   projectSettings: ProjectSettings,
   authuid: string
 ): Promise<Result<string>> => {
-  if (!permission(editors, problem, authuid, type)) return { status: 400, value: "forbidden" };
+  if (!permission(editors, problem, authuid, type))
+    return { status: 400, value: "forbidden" };
   switch (type) {
     case "editTitle":
-      if (typeof data !== "string") {
+      if (typeof data !== "string" || data.length > problemTitleMaxLength) {
         return { status: 400, value: "invalid-input" };
       }
 
@@ -72,7 +82,7 @@ const tryActionPrivileged = async (
 
       break;
     case "editText":
-      if (typeof data !== "string") {
+      if (typeof data !== "string" || data.length > problemTextMaxLength) {
         return { status: 400, value: "invalid-input" };
       }
 

@@ -5,11 +5,21 @@ import {
   Slider,
   Button,
   Paper,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@material-ui/core";
 import React from "react";
 import { ViewSectionProps } from "../..";
 
-import { DifficultyRange, Server, Votes } from "../../../../../../../.shared";
+import {
+  DifficultyRange,
+  problemTextMaxLength,
+  problemTitleMaxLength,
+  Server,
+  Votes,
+} from "../../../../../../../.shared";
 import {
   newProblem,
   problemProps,
@@ -36,6 +46,9 @@ interface NewProblemState {
   text: string;
   category: string;
   difficulty: number;
+  titleError: string;
+  textError: string;
+  categoryError: string;
 }
 
 class NewProblem extends React.Component<
@@ -47,8 +60,11 @@ class NewProblem extends React.Component<
   state = {
     title: "",
     text: "",
-    category: "miscellaneous",
+    category: "",
     difficulty: 0,
+    titleError: "",
+    textError: "",
+    categoryError: "",
   };
 
   constructor(
@@ -59,53 +75,65 @@ class NewProblem extends React.Component<
   ) {
     super(props);
 
+    this.state = {
+      ...this.state,
+      category: Object.keys(props.categoryColors)[0],
+      difficulty: props.difficultyRange.start,
+    };
+
     this.newProblem = this.newProblem.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
   newProblem() {
-    const uid = !!this.props.authUser.uid ? this.props.authUser.uid : "";
+    const uid = this.props.authUser.uid;
     const { uuid, project } = this.props;
     var { title, text, category, difficulty } = this.state;
+
+    let titleError = "",
+      textError = "",
+      categoryError = "";
+
     if (title.length === 0) {
-      title = "Untitled";
+      titleError = "The title cannot be empty";
     }
     if (text.length === 0) {
-      text = "Empty";
+      textError = "The problem text cannot be empty";
     }
-    if (
-      !["algebra", "geometry", "numberTheory", "combinatorics"].includes(
-        category
-      )
-    ) {
-      category = "miscellaneous";
+    if (category.length === 0) {
+      categoryError = "The category cannot be empty";
     }
-    this.props.newProblem({
-      author: uid,
-      title,
-      text,
-      category,
-      difficulty,
-      replies: [],
-      votes: {} as Votes,
-      tags: [],
-    });
-    this.props.history.push(
-      ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(
-        ":ind",
-        `${project.problems.length - 1}`
-      )
-    );
+
+    if (!!titleError || !!textError || !!categoryError) {
+      this.setState({ titleError, textError, categoryError });
+    } else {
+      this.props.newProblem({
+        author: uid,
+        title,
+        text,
+        category,
+        difficulty,
+        replies: [],
+        votes: {} as Votes,
+        tags: [],
+      });
+      this.props.history.push(
+        ROUTES.PROJECT_PROBLEM.replace(":uuid", uuid).replace(
+          ":ind",
+          `${project.problems.length - 1}`
+        )
+      );
+    }
   }
 
-  onChange(field: string, value: string | number | number[]) {
+  onChange(field: string, value: string | number) {
     switch (field) {
       case "title":
         if (typeof value != "string") {
           break;
         }
 
-        this.setState({ title: value });
+        this.setState({ title: value.substring(0, problemTitleMaxLength) });
 
         break;
       case "text":
@@ -113,7 +141,7 @@ class NewProblem extends React.Component<
           break;
         }
 
-        this.setState({ text: value });
+        this.setState({ text: value.substring(0, problemTextMaxLength) });
 
         break;
       case "category":
@@ -151,6 +179,7 @@ class NewProblem extends React.Component<
       categoryColors,
       difficultyColors,
     } = this.props;
+    const { titleError, textError, categoryError } = this.state;
 
     return (
       <>
@@ -168,6 +197,8 @@ class NewProblem extends React.Component<
                   value={this.state.title}
                   id="title"
                   label="Title"
+                  error={!!titleError}
+                  helperText={titleError}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     this.onChange("title", e.target.value)
                   }
@@ -184,6 +215,8 @@ class NewProblem extends React.Component<
                   id="text"
                   multiline
                   label="Text"
+                  error={!!textError}
+                  helperText={textError}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     this.onChange("text", e.target.value)
                   }
@@ -192,19 +225,33 @@ class NewProblem extends React.Component<
               <div className={classes.bodyFiller} />
             </div>
             <div className={classes.right}>
-              <div className={classes.rightCategory}>
+              {/* extra padding */}
+              <div
+                className={`${classes.rightCategory} ${classes.rightDifficulty}`}
+              >
                 <Dot
                   color={categoryColors[this.state.category]}
                   style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
                 />
-                <TextField
-                  value={this.state.category}
-                  id="category"
-                  label="Category"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    this.onChange("category", e.target.value)
-                  }
-                />
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    id="category"
+                    label="Category"
+                    fullWidth
+                    value={this.state.category}
+                    error={!!categoryError}
+                    onChange={(e: React.ChangeEvent<{ value: unknown }>) =>
+                      this.onChange("category", e.target.value as string)
+                    }
+                  >
+                    {Object.keys(categoryColors).map((category) => (
+                      <MenuItem key={category} value={category}>
+                        {category}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
               <div className={classes.rightDifficulty}>
                 <Dot
@@ -214,21 +261,32 @@ class NewProblem extends React.Component<
                   )}
                   style={{ top: "0.48rem", margin: "0 0.7rem 0 0.2rem" }}
                 />
-                <Slider
-                  value={this.state.difficulty}
-                  onChange={(
-                    e: React.ChangeEvent<{}>,
-                    value: number | number[]
-                  ) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                <FormControl fullWidth>
+                  {/* copy mui styles here to make category and difficulty selectors consistent */}
+                  <InputLabel className="MuiInputLabel-shrink">
+                    Difficulty
+                  </InputLabel>
+                  <Slider
+                    className="MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
+                    value={this.state.difficulty}
+                    onChange={(
+                      e: React.ChangeEvent<{}>,
+                      value: number | number[]
+                    ) => {
+                      e.preventDefault();
+                      e.stopPropagation();
 
-                    this.onChange("difficulty", value);
-                  }}
-                  valueLabelDisplay="auto"
-                  aria-labelledby="difficulty-header"
-                  getAriaValueText={() => `d-${this.state.difficulty}`}
-                />
+                      if (typeof value !== "number") {
+                        value = value[0];
+                      }
+
+                      this.onChange("difficulty", value);
+                    }}
+                    valueLabelDisplay="auto"
+                    aria-labelledby="difficulty-header"
+                    getAriaValueText={() => `d-${this.state.difficulty}`}
+                  />
+                </FormControl>
               </div>
               <div className={classes.rightFiller} />
             </div>
@@ -239,7 +297,8 @@ class NewProblem extends React.Component<
           color="secondary"
           onClick={() => this.newProblem()}
         >
-          <FiPlus /> Add Problem
+          <FiPlus />
+          &nbsp;Add Problem
         </Button>
       </>
     );

@@ -233,6 +233,11 @@ export interface Problem {
   votes: Votes;
 }
 
+export type ProblemTemplate = Pick<
+  Problem,
+  "author" | "category" | "difficulty" | "text" | "title"
+>;
+
 export type problemAction =
   | "vote"
   | "comment"

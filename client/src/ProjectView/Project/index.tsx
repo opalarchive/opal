@@ -272,14 +272,6 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           break;
         }
 
-        if (
-          !["algebra", "geometry", "numberTheory", "combinatorics"].includes(
-            data
-          )
-        ) {
-          data = "miscellaneous";
-        }
-
         project.value.problems[ind].category = data;
 
         break;

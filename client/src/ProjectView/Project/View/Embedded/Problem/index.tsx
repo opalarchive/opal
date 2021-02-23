@@ -7,6 +7,10 @@ import {
   TextField,
   IconButton,
   Slider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@material-ui/core";
 import {
   FiAlignLeft,
@@ -34,6 +38,8 @@ import {
   DifficultyColors,
   ProjectRole,
   projectRole,
+  problemTextMaxLength,
+  problemTitleMaxLength,
   Server,
 } from "../../../../../../../.shared";
 
@@ -89,25 +95,28 @@ class Problem extends React.PureComponent<
     this.onChange = this.onChange.bind(this);
   }
 
-  onChange(field: string, value: string | number | number[]) {
+  onChange(field: keyof ProblemState, value: string | number) {
     switch (field) {
-      case "title":
+      case "editTitleValue":
+        if (typeof value != "string") {
+          break;
+        }
+        this.setState({
+          editTitleValue: value.substring(0, problemTitleMaxLength),
+        });
+
+        break;
+      case "editTextValue":
         if (typeof value != "string") {
           break;
         }
 
-        this.setState({ editTitleValue: value });
+        this.setState({
+          editTextValue: value.substring(0, problemTextMaxLength),
+        });
 
         break;
-      case "text":
-        if (typeof value != "string") {
-          break;
-        }
-
-        this.setState({ editTextValue: value });
-
-        break;
-      case "category":
+      case "editCategoryValue":
         if (typeof value != "string") {
           break;
         }
@@ -115,7 +124,7 @@ class Problem extends React.PureComponent<
         this.setState({ editCategoryValue: value });
 
         break;
-      case "difficulty":
+      case "editDifficultyValue":
         if (typeof value != "number") {
           break;
         }
@@ -219,7 +228,7 @@ class Problem extends React.PureComponent<
                       fullWidth
                       value={this.state.editTitleValue}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        this.onChange("title", e.target.value)
+                        this.onChange("editTitleValue", e.target.value)
                       }
                     />
                     &nbsp;
@@ -272,7 +281,7 @@ class Problem extends React.PureComponent<
                   multiline
                   value={this.state.editTextValue}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    this.onChange("text", e.target.value)
+                    this.onChange("editTextValue", e.target.value)
                   }
                 />
                 &nbsp;
@@ -356,26 +365,40 @@ class Problem extends React.PureComponent<
             />
             {this.state.editCategory ? (
               <div className={classes.editTextContainer}>
-                <TextField
-                  className={classes.editTextField}
-                  value={this.state.editCategoryValue}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    this.onChange("category", e.target.value)
-                  }
-                />
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    className={classes.editTextField}
+                    value={this.state.editCategoryValue}
+                    onChange={(e: React.ChangeEvent<{ value: unknown }>) =>
+                      this.onChange(
+                        "editCategoryValue",
+                        e.target.value as string
+                      )
+                    }
+                  >
+                    {Object.keys(categoryColors).map((category) => (
+                      <MenuItem key={category} value={category}>
+                        {category}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 &nbsp;
-                <IconButton
-                  size="small"
-                  onClick={(_) => {
-                    tryProblemActionPrivileged(
-                      this.state.editCategoryValue,
-                      "editCategory"
-                    );
-                    this.setState({ editCategory: false });
-                  }}
-                >
-                  <FiCheck />
-                </IconButton>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={(_) => {
+                      tryProblemActionPrivileged(
+                        this.state.editCategoryValue,
+                        "editCategory"
+                      );
+                      this.setState({ editCategory: false });
+                    }}
+                  >
+                    <FiCheck />
+                  </IconButton>
+                </span>
               </div>
             ) : (
               <>
@@ -409,34 +432,49 @@ class Problem extends React.PureComponent<
             />
             {this.state.editDifficulty ? (
               <>
-                <Slider
-                  value={this.state.editDifficultyValue}
-                  onChange={(
-                    e: React.ChangeEvent<{}>,
-                    value: number | number[]
-                  ) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                <FormControl fullWidth>
+                  {/* copy mui styles here to make category and difficulty selectors consistent */}
+                  <InputLabel className="MuiInputLabel-shrink">
+                    Difficulty
+                  </InputLabel>
+                  <Slider
+                    className="MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
+                    value={this.state.editDifficultyValue}
+                    onChange={(
+                      e: React.ChangeEvent<{}>,
+                      value: number | number[]
+                    ) => {
+                      e.preventDefault();
+                      e.stopPropagation();
 
-                    this.onChange("difficulty", value);
-                  }}
-                  valueLabelDisplay="auto"
-                  aria-labelledby="difficulty-header"
-                  getAriaValueText={() => `d-${this.state.editDifficultyValue}`}
-                />
+                      if (typeof value !== "number") {
+                        value = value[0];
+                      }
+
+                      this.onChange("editDifficultyValue", value);
+                    }}
+                    valueLabelDisplay="auto"
+                    aria-labelledby="difficulty-header"
+                    getAriaValueText={() =>
+                      `d-${this.state.editDifficultyValue}`
+                    }
+                  />
+                </FormControl>
                 &nbsp;
-                <IconButton
-                  size="small"
-                  onClick={(_) => {
-                    tryProblemActionPrivileged(
-                      this.state.editDifficultyValue,
-                      "editDifficulty"
-                    );
-                    this.setState({ editDifficulty: false });
-                  }}
-                >
-                  <FiCheck />
-                </IconButton>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={(_) => {
+                      tryProblemActionPrivileged(
+                        this.state.editDifficultyValue,
+                        "editDifficulty"
+                      );
+                      this.setState({ editDifficulty: false });
+                    }}
+                  >
+                    <FiCheck />
+                  </IconButton>
+                </span>
               </>
             ) : (
               <>

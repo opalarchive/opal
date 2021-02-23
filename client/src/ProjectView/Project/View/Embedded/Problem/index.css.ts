@@ -91,7 +91,7 @@ const styles = (theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       fontSize: "1.2rem",
-      width: "11.5rem",
+      minWidth: "10rem",
       flexShrink: 0,
     },
     rightCategory: {
