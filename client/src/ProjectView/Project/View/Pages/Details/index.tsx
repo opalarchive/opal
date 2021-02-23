@@ -163,6 +163,7 @@ interface RoutedDetailsProps
 
 const RoutedDetails: React.FC<RoutedDetailsProps> = ({
   fixedSidebar,
+  bodyHeight,
   project,
   uuid,
   problemProps,
@@ -203,6 +204,7 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
         ...problemPropsExtracted,
         ...problemFunctionsExtracted,
       }}
+      height={bodyHeight}
       fixedSidebar={fixedSidebar}
       authUser={authUser}
     >

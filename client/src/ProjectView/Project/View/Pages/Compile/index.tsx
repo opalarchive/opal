@@ -72,6 +72,7 @@ class Compile extends React.Component<
   render() {
     const {
       uuid,
+      bodyHeight,
       project,
       fixedSidebar,
       categoryColors,
@@ -95,6 +96,7 @@ class Compile extends React.Component<
           currentList: this.state.currentList,
           setCurrentList: this.setCurrentList,
         }}
+        height={bodyHeight}
         fixedSidebar={fixedSidebar}
         authUser={authUser}
       >

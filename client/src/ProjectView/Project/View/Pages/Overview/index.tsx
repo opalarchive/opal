@@ -73,6 +73,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
   render() {
     const {
       fixedSidebar,
+      bodyHeight,
       project,
       myRole,
       problemProps,
@@ -120,6 +121,7 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
           currentList: this.state.currentList,
           setCurrentList: this.setCurrentList,
         }}
+        height={bodyHeight}
         fixedSidebar={fixedSidebar}
         authUser={authUser}
       >

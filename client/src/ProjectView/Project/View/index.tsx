@@ -39,6 +39,7 @@ import Settings from "./Pages/Settings";
 
 interface ViewProps {
   background: string;
+  bodyHeight: number;
   project: ProjectPrivate;
   editors: Client.Editors;
   uuid: string;
@@ -53,6 +54,7 @@ interface ViewProps {
 
 export interface ViewSectionProps {
   fixedSidebar: boolean;
+  bodyHeight: number;
   project: ProjectPrivate;
   uuid: string;
   authUser: firebase.User;
@@ -165,6 +167,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   render() {
     const {
       background,
+      bodyHeight,
       project,
       myRole,
       editors,
@@ -189,6 +192,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
 
     const viewSectionProps: ViewSectionProps = {
       fixedSidebar: true,
+      bodyHeight,
       project,
       uuid,
       authUser,
@@ -247,12 +251,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
           <Route
             exact
             path={[ROUTES.PROJECT_SETTINGS.replace(":uuid", uuid)]}
-            render={(_) => (
-              <Settings
-                {...viewSectionProps}
-                editors={editors}
-              />
-            )}
+            render={(_) => <Settings {...viewSectionProps} editors={editors} />}
           />
           <Route
             exact

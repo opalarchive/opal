@@ -47,6 +47,7 @@ interface ProjectState {
   project: Result<ProjectPrivate | string>;
   editors: Result<Client.Editors>;
   name: Result<string>;
+  bodyHeight: number;
   loading: boolean;
   myRole: projectRole;
 }
@@ -65,10 +66,13 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       success: false,
       value: "",
     },
+    bodyHeight: 0,
     loading: true,
     myRole: "EDITOR" as projectRole,
   };
   private interval: number = -1;
+  private bodyRef = React.createRef<HTMLDivElement>();
+  private bodyRendered = false;
 
   constructor(props: ProjectProps) {
     super(props);
@@ -94,7 +98,10 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         authUser
       );
       const name = await getProjectName(uuid, authUser);
-      const myRole: projectRole = editors.success && !!authUser.displayName ? editors.value[authUser.displayName].role : "EDITOR";
+      const myRole: projectRole =
+        editors.success && !!authUser.displayName
+          ? editors.value[authUser.displayName].role
+          : "EDITOR";
 
       this.setState({ project, editors, name, myRole, loading: false });
     } catch (e) {}
@@ -114,6 +121,8 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       }, 30000);
     } catch (e) {
       this.props.fail();
+    } finally {
+      this.setState({ bodyHeight: this.bodyRef.current?.clientHeight || 0 });
     }
   }
 
@@ -454,7 +463,15 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     }
   }
 
+  // componentDidUpdate() {
+  //   if (this.bodyRendered) {
+  //     this.setState({});
+  //   }
+  // }
+
   render() {
+    this.bodyRendered = false;
+
     const background = "rgb(0, 0, 0, 0.025)";
 
     const uuid = this.props.match.params.uuid;
@@ -510,6 +527,9 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       return "???";
     }
     if (!this.state.editors.success) return "???"; // obviously impossible, but it shuts lint up
+    console.log(this.state.bodyHeight);
+
+    this.bodyRendered = true;
     return (
       <>
         <ProjectAppbar
@@ -519,9 +539,13 @@ class Project extends React.Component<ProjectProps, ProjectState> {
           title={this.state.name.success ? this.state.name.value : ""}
           uuid={uuid}
         />
-        <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
+        <div
+          style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}
+          ref={this.bodyRef}
+        >
           <View
             background={background}
+            bodyHeight={this.state.bodyHeight}
             project={this.state.project.value}
             editors={this.state.editors.value}
             uuid={uuid}

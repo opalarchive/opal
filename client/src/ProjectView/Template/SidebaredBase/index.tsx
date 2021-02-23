@@ -14,6 +14,7 @@ interface SidebaredBaseProps extends WithStyles<typeof styles> {
   sidebarProps?: object;
   fixedSidebar?: boolean;
   sidebarYOffset?: number;
+  height?: number;
   authUser: firebase.User;
 }
 
@@ -47,6 +48,7 @@ class SidebaredBase extends React.Component<SidebaredBaseProps> {
       sidebarProps,
       fixedSidebar,
       sidebarYOffset,
+      height,
       authUser,
       classes,
       children,
@@ -67,6 +69,7 @@ class SidebaredBase extends React.Component<SidebaredBaseProps> {
             style={{
               transform: `translateY(${sidebarYOffset}px)`,
               position: fixedSidebar ? "fixed" : "static",
+              height: !!height ? height : "100%",
             }}
           >
             {!!Sidebar && (

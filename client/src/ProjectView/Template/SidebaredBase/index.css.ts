@@ -8,7 +8,6 @@ const styles = createStyles({
   },
   sidebarWrapper: {
     display: "inline-block",
-    height: "100%",
   },
   inner: {
     position: "relative",
