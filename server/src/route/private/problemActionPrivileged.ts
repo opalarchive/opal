@@ -5,11 +5,51 @@ import {
   actionData,
   problemActionPrivileged,
   ProjectSettings,
+  Server,
+  ProjectRole,
 } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
+import { db } from "../../helpers/firebaseSetup";
+
+const permission = (editors: Server.Editors, problem: Problem, authuid: string, type: problemActionPrivileged): boolean => {
+  switch (type) {
+    case "editTitle":
+      return (
+        ProjectRole[editors[authuid].role] == 0 ||
+        ProjectRole[editors[authuid].role] == 1 ||
+        authuid === problem.author
+      );
+      break;
+    case "editText":
+      return (
+        ProjectRole[editors[authuid].role] == 0 ||
+        ProjectRole[editors[authuid].role] == 1 ||
+        authuid === problem.author
+      );
+      break;
+    case "editCategory":
+      return (
+        ProjectRole[editors[authuid].role] == 0 ||
+        ProjectRole[editors[authuid].role] == 1 ||
+        authuid === problem.author
+      );
+      break;
+    case "editDifficulty":
+      return (
+        ProjectRole[editors[authuid].role] == 0 ||
+        ProjectRole[editors[authuid].role] == 1 ||
+        authuid === problem.author
+      );
+      break;
+    default:
+      break;
+  }
+  return false;
+}
 
 const tryActionPrivileged = async (
   cdb: firebase.database.Database,
+  editors: Server.Editors,
   problem: Problem,
   problemInd: number,
   data: actionData,
@@ -17,24 +57,33 @@ const tryActionPrivileged = async (
   projectSettings: ProjectSettings,
   authuid: string
 ): Promise<Result<string>> => {
+  if (!permission(editors, problem, authuid, type)) return { status: 400, value: "forbidden" };
   switch (type) {
-    case "title":
+    case "editTitle":
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
+      }
+
+      if (data == problem.title) {
+        return { status: 200, value: "no-change" };
       }
 
       await cdb.ref(`problems/${problemInd}/title`).set(data);
 
       break;
-    case "text":
+    case "editText":
       if (typeof data !== "string") {
         return { status: 400, value: "invalid-input" };
+      }
+
+      if (data == problem.text) {
+        return { status: 200, value: "no-change" };
       }
 
       await cdb.ref(`problems/${problemInd}/text`).set(data);
 
       break;
-    case "category":
+    case "editCategory":
       if (
         typeof data !== "string" ||
         !Object.keys(projectSettings.categoryColors).includes(data)
@@ -42,16 +91,24 @@ const tryActionPrivileged = async (
         return { status: 400, value: "invalid-input" };
       }
 
+      if (data == problem.category) {
+        return { status: 200, value: "no-change" };
+      }
+
       await cdb.ref(`problems/${problemInd}/category`).set(data);
 
       break;
-    case "difficulty":
+    case "editDifficulty":
       if (
         typeof data !== "number" ||
         data < projectSettings.difficultyRange.start ||
         data > projectSettings.difficultyRange.end
       ) {
         return { status: 400, value: "invalid-input" };
+      }
+
+      if (data == problem.difficulty) {
+        return { status: 200, value: "no-change" };
       }
 
       await cdb.ref(`problems/${problemInd}/difficulty`).set(data);
@@ -97,8 +154,14 @@ export const execute = async (req, res) => {
     .once("value")
     .then((snapshot) => snapshot.val());
 
+  const editors: Server.Editors = await db
+    .ref(`projectPublic/${uuid}/editors`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
+
   const result = await tryActionPrivileged(
     trydb.value,
+    editors,
     problem,
     problemInd,
     data,

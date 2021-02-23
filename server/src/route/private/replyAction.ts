@@ -6,18 +6,51 @@ import {
   replyAction,
   ReplyType,
   reply,
+  Server,
+  ProjectRole,
 } from "../../../../.shared/src/types";
 import { Result } from "../../helpers/types";
+import { db } from "../../helpers/firebaseSetup";
+
+const permission = (
+  editors: Server.Editors,
+  problem: Problem,
+  reply: reply,
+  authuid: string,
+  type: replyAction
+): boolean => {
+  switch (type) {
+    case "editText":
+      return authuid === reply.author;
+      break;
+    case "editType":
+      return authuid === reply.author;
+      break;
+    case "delete":
+      return (
+        ProjectRole[editors[authuid].role] == 0 ||
+        ProjectRole[editors[authuid].role] == 1 ||
+        authuid === reply.author
+      );
+      break;
+    default:
+      break;
+  }
+  return false;
+};
 
 const tryAction = async (
   cdb: firebase.database.Database,
+  editors: Server.Editors,
   problem: Problem,
   problemInd: number,
+  reply: reply,
   replyInd: number,
   data: actionData,
   type: replyAction,
   authuid: string
 ): Promise<Result<string>> => {
+  if (!permission(editors, problem, reply, authuid, type)) return { status: 400, value: "forbidden" };
   const now = Date.now();
   const replies = problem.replies;
 
@@ -27,8 +60,8 @@ const tryAction = async (
         return { status: 400, value: "invalid-input" };
       }
 
-      if (authuid !== problem.replies[replyInd].author) {
-        return { status: 400, value: "forbidden" };
+      if (data == reply.text) {
+        return { status: 200, value: "no-change" };
       }
 
       await cdb
@@ -44,16 +77,12 @@ const tryAction = async (
         return { status: 400, value: "invalid-input" };
       }
 
-      if (authuid !== problem.replies[replyInd].author) {
-        return { status: 400, value: "forbidden" };
-      }
-
-      if (data == problem.replies[replyInd].type) {
-        break;
+      if (data == reply.type) {
+        return { status: 200, value: "no-change" };
       }
 
       if (!(data in ReplyType)) {
-        break;
+        return { status: 400, value: "invalid-input" };
       }
 
       await cdb
@@ -65,9 +94,6 @@ const tryAction = async (
 
       break;
     case "delete":
-      if (authuid !== problem.replies[replyInd].author) {
-        return { status: 400, value: "forbidden" };
-      }
       let newReplies = replies;
       newReplies.splice(replyInd, 1);
       await cdb.ref(`problems/${problemInd}/replies`).set(newReplies);
@@ -119,10 +145,14 @@ export const execute = async (req, res) => {
     return;
   }
 
+  const editors: Server.Editors = await db.ref(`projectPublic/${uuid}/editors`).once("value").then((snapshot) => snapshot.val());
+
   const result = await tryAction(
     trydb.value,
+    editors,
     problem,
     problemInd,
+    reply,
     replyInd,
     data,
     type,
