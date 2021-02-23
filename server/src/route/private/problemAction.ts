@@ -86,7 +86,7 @@ const tryAction = async (
       }
 
       if (data.length == 0) {
-        break;
+        return { status: 200, value: "no-change" };
       }
 
       newTags = [...tags];
