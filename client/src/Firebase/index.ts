@@ -10,6 +10,7 @@ import {
   actionData,
   Problem,
   Config,
+  projectRole,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
 
@@ -301,41 +302,22 @@ export const reorderList = async (
   );
 };
 
-/*
-export const changeTags = async (
+export const toggleRole = async (
   uuid: string,
-  clickedTags: object,
-  problemInd: number,
-  authUser: firebase.User
+  username: string,
+  subjectNewRole: projectRole,
+  authUser: firebase.User,
 ) => {
   return await post<string>(
-    "private/changeTags",
+    "private/toggleRole",
     {
       uuid,
-      clickedTags,
-      problemInd,
+      username,
+      subjectNewRole,
     },
     authUser
   );
 };
-
-export const newTag = async (
-  uuid: string,
-  newTag: string,
-  problemInd: number,
-  authUser: firebase.User
-) => {
-  return await post<string>(
-    "private/newTag",
-    {
-      uuid,
-      newTag,
-      problemInd,
-    },
-    authUser
-  );
-};
-*/
 
 export const understandSignupError = (e: string) => {
   switch (e) {
