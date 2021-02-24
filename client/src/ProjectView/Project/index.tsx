@@ -527,7 +527,6 @@ class Project extends React.Component<ProjectProps, ProjectState> {
       return "???";
     }
     if (!this.state.editors.success) return "???"; // obviously impossible, but it shuts lint up
-    console.log(this.state.bodyHeight);
 
     this.bodyRendered = true;
     return (

@@ -66,7 +66,7 @@ export interface ViewSectionProps {
 }
 
 interface ViewState {
-  defaultScroll: number;
+  defaultScroll: number | undefined;
   scrollTop: number;
   bodyHeight: number;
   navbarHeight: number;
@@ -74,7 +74,7 @@ interface ViewState {
 
 class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
   state = {
-    defaultScroll: 0,
+    defaultScroll: undefined,
     scrollTop: 0,
     bodyHeight: 0,
     navbarHeight: 0,
