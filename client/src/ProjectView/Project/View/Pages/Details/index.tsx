@@ -177,6 +177,11 @@ const RoutedDetails: React.FC<RoutedDetailsProps> = ({
 }) => {
   const ind = parseInt(match.params.ind);
   const reply = !!match.params.reply ? parseInt(match.params.reply) : undefined;
+
+  if (project.problems[ind] === undefined) {
+    return <>No problem found</>;
+  }
+
   const allTags = new Set<string>();
   project.problems.forEach((prob) => {
     prob.tags.forEach((tag) => allTags.add(tag));
