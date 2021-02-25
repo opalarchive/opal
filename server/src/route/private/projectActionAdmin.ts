@@ -129,8 +129,9 @@ const tryAction = async (
       }
       // the enum is (should) be arranged in order of decreasing power
       if (
+        !!projectPublic.editors[userinfo.uid] &&
         ProjectRole[projectPublic.editors[userinfo.uid].role] <=
-        ProjectRole.EDITOR
+          ProjectRole.EDITOR
       ) {
         return { status: 403, value: "user-is-already-editor" };
       }
