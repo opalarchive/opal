@@ -2,10 +2,13 @@
   "name": "opal",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently -n 'client,server,shared' -c 'cyan,magenta,white' --handle-input --default-input-target 1 \"cd client && npm start\" \"cd server && npm start\" \"cd .shared && npm start\""
+    "start": "concurrently -n 'client,server,shared' -c 'cyan,magenta,white' --handle-input --default-input-target 1 \"cd client && npm start\" \"cd server && npm start\" \"cd .shared && npm start\"",
+    "modules": "npm i && cd .shared && npm i && cd .. && cd server && npm i && cd .. && cd client && npm i && cd ..",
+    "cleanup": "node cleanup.js"
   },
   "dependencies": {
-    "@material-ui/lab": "^4.0.0-alpha.57",
-    "concurrently": "^5.3.0"
+    "concurrently": "^5.3.0",
+    "glob": "^7.1.6",
+    "rimraf": "^3.0.2"
   }
 }
