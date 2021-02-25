@@ -17,14 +17,14 @@ import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
-import { starProject, tryProjectActionProtected } from "../../../Firebase";
+import { starProject, tryProjectActionAdmin } from "../../../Firebase";
 import { camelToTitle } from "../../../Constants";
 import { FiArrowDown } from "react-icons/fi";
 import {
   Client,
   projectAction,
-  isProjectActionProtected,
-  isProjectActionTrivial,
+  isProjectActionAdmin,
+  isProjectActionEditor,
 } from "../../../../../.shared";
 import {
   ProjectDataPoint,
@@ -50,7 +50,6 @@ interface ProjectTableProps extends WithStyles<typeof styles> {
 
 interface ProjectTableState {
   selected: Selected;
-  sortedProjectKeys: string[];
   sort: ProjectViewSort;
   modal: {
     show: boolean;
@@ -66,7 +65,6 @@ class ProjectTable extends React.Component<
 > {
   state = {
     selected: {} as Selected,
-    sortedProjectKeys: [] as string[],
     sort: {
       dataPoint: "name",
       direction: "asc",
@@ -95,10 +93,6 @@ class ProjectTable extends React.Component<
   componentDidMount() {
     this.setState({
       sort: this.props.defaultSort,
-      sortedProjectKeys: this.sortProjectKeys(
-        this.props.defaultSort,
-        Object.keys(this.props.projects)
-      ),
     });
   }
 
@@ -123,13 +117,13 @@ class ProjectTable extends React.Component<
     }
   }
 
-  sortProjectKeys(sort: ProjectViewSort, sortedProjectKeys: string[]) {
+  sortProjectKeys(sort: ProjectViewSort, projectKeys: string[]) {
     type anchoredData = {
       data: string | number;
       key: string;
     };
 
-    let stabilized: anchoredData[] = sortedProjectKeys.map((key) => ({
+    let stabilized: anchoredData[] = projectKeys.map((key) => ({
       data: getDataPoint(
         this.props.projects[key],
         sort.dataPoint,
@@ -170,10 +164,6 @@ class ProjectTable extends React.Component<
     }
     this.setState({
       sort,
-      sortedProjectKeys: this.sortProjectKeys(
-        sort,
-        this.state.sortedProjectKeys
-      ),
     });
   }
 
@@ -202,14 +192,14 @@ class ProjectTable extends React.Component<
 
     let attempt: Result<string> = { success: false, value: "" };
 
-    if (isProjectActionProtected(this.state.modal.type)) {
-      attempt = await tryProjectActionProtected(
+    if (isProjectActionAdmin(this.state.modal.type)) {
+      attempt = await tryProjectActionAdmin(
         this.state.modal.activeProject,
         this.props.authUser,
         this.state.modal.type,
         this.state.modal.input
       );
-    } else if (isProjectActionTrivial(this.state.modal.type)) {
+    } else if (isProjectActionEditor(this.state.modal.type)) {
       // currently this is the only trivial action, but this may change
       // TODO: generalize this
       attempt = await starProject(
@@ -233,6 +223,11 @@ class ProjectTable extends React.Component<
 
     const realSelected = Object.keys(this.state.selected).filter(
       (proj) => this.state.selected[proj]
+    );
+
+    const sortedProjectKeys = this.sortProjectKeys(
+      this.props.defaultSort,
+      Object.keys(this.props.projects)
     );
 
     return (
@@ -309,7 +304,7 @@ class ProjectTable extends React.Component<
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.state.sortedProjectKeys.map((uuid, index) => (
+                {sortedProjectKeys.map((uuid, index) => (
                   <ProjectRow
                     uuid={uuid}
                     index={index}

@@ -1,6 +1,7 @@
 // must be run on a single thread to prevent race conditions
 
-import { v4 as uuidv4 } from "uuid";
+import { nanoid } from "nanoid";
+import { uuidLength } from "../../../../.shared/index";
 import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {
@@ -17,7 +18,7 @@ export const execute = async (req, res) => {
 
   // just create random uuids until it doesn't exist already
   do {
-    uuid = uuidv4();
+    uuid = nanoid(uuidLength);
   } while (!!projectIds && projectIds.includes(uuid));
 
   // create default info in the db
@@ -32,6 +33,7 @@ export const execute = async (req, res) => {
       [authuid]: {
         lastEdit: now,
         shareDate: now,
+        role: "OWNER",
         starred: false,
       },
     },

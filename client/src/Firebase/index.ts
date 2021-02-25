@@ -6,8 +6,11 @@ import {
   ProjectPrivate,
   Notification,
   Client,
-  projectActionProtected,
-  data,
+  projectActionAdmin,
+  actionData,
+  Problem,
+  Config,
+  projectRole,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
 
@@ -87,6 +90,18 @@ export async function post<Output>(
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
 
+export const configureProject = async (
+  uuid: string,
+  config: Config,
+  authUser: firebase.User
+): Promise<Result<string>> => {
+  return await post<string>(
+    "private/configureProject",
+    { uuid, config },
+    authUser
+  );
+};
+
 export const getUsernames = async (): Promise<Result<string[]>> => {
   const usernamesObject = await post<UsernameInfo[]>(
     "public/getAllUsernames",
@@ -124,14 +139,14 @@ export const getVisibleProjects = async (authUser: firebase.User) => {
   return await post<Client.Publico>("private/visibleProjects", {}, authUser);
 };
 
-export const tryProjectActionProtected = async (
+export const tryProjectActionAdmin = async (
   uuid: string,
   authUser: firebase.User,
-  type: projectActionProtected,
+  type: projectActionAdmin,
   data?: string
 ): Promise<Result<string>> => {
   return await post<string>(
-    "private/projectAction",
+    "private/projectActionAdmin",
     {
       uuid,
       type,
@@ -180,7 +195,7 @@ export const newProject = async (authUser: firebase.User) => {
 export const tryProblemAction = async (
   uuid: string,
   problemInd: number,
-  data: data,
+  data: actionData,
   type: string,
   authUser: firebase.User
 ) => {
@@ -191,6 +206,114 @@ export const tryProblemAction = async (
       problemInd,
       data,
       type,
+    },
+    authUser
+  );
+};
+
+export const tryProblemActionPrivileged = async (
+  uuid: string,
+  problemInd: number,
+  data: actionData,
+  type: string,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/problemActionPrivileged",
+    {
+      uuid,
+      problemInd,
+      data,
+      type,
+    },
+    authUser
+  );
+};
+
+export const tryReplyAction = async (
+  uuid: string,
+  problemInd: number,
+  replyInd: number,
+  data: actionData,
+  type: string,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/replyAction",
+    {
+      uuid,
+      problemInd,
+      replyInd,
+      data,
+      type,
+    },
+    authUser
+  );
+};
+
+export const newProblem = async (
+  uuid: string,
+  problem: Omit<Problem, "ind">,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/newProblem",
+    {
+      uuid,
+      problem,
+    },
+    authUser
+  );
+};
+
+export const changeList = async (
+  uuid: string,
+  listSelection: boolean[],
+  problemInd: number,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/changeList",
+    {
+      uuid,
+      listSelection,
+      problemInd,
+    },
+    authUser
+  );
+};
+
+export const reorderList = async (
+  uuid: string,
+  listInd: number,
+  sourceInd: number,
+  destInd: number,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/reorderList",
+    {
+      uuid,
+      listInd,
+      sourceInd,
+      destInd,
+    },
+    authUser
+  );
+};
+
+export const toggleRole = async (
+  uuid: string,
+  username: string,
+  subjectNewRole: projectRole,
+  authUser: firebase.User,
+) => {
+  return await post<string>(
+    "private/toggleRole",
+    {
+      uuid,
+      username,
+      subjectNewRole,
     },
     authUser
   );

@@ -2,7 +2,7 @@ import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
 import {
   Problem,
-  data,
+  actionData,
   problemAction,
   vote,
   ReplyType,
@@ -13,12 +13,14 @@ const tryAction = async (
   cdb: firebase.database.Database,
   problem: Problem,
   problemInd: number,
-  data: data,
+  data: actionData,
   type: problemAction,
   authuid: string
 ): Promise<Result<string>> => {
   const now = Date.now();
-
+  let tags: string[] = problem.tags || [];
+  let newTags: string[] = [];
+  let index = 0;
   switch (type) {
     case "vote":
       if (data !== 1 && data !== -1) {
@@ -35,7 +37,7 @@ const tryAction = async (
         return { status: 400, value: "invalid-input" };
       }
 
-      let index = 0;
+      index = 0;
       if (!!problem.replies) {
         index = problem.replies.length;
       }
@@ -45,7 +47,57 @@ const tryAction = async (
         text: data,
         time: now,
         type: ReplyType.COMMENT,
+        lastEdit: now,
       });
+
+      break;
+    case "solution":
+      if (typeof data !== "string") {
+        return { status: 400, value: "invalid-input" };
+      }
+
+      index = 0;
+      if (!!problem.replies) {
+        index = problem.replies.length;
+      }
+
+      await cdb.ref(`problems/${problemInd}/replies/${index}`).set({
+        author: authuid,
+        text: data,
+        time: now,
+        type: ReplyType.SOLUTION,
+        lastEdit: now,
+      });
+
+      break;
+    case "removeTag":
+      if (typeof data !== "string") {
+        return { status: 400, value: "invalid-input" };
+      }
+
+      newTags = tags.filter((tag) => tag !== data);
+
+      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
+
+      break;
+    case "addTag":
+      if (typeof data !== "object") {
+        return { status: 400, value: "invalid-input" };
+      }
+
+      if (data.length == 0) {
+        return { status: 200, value: "no-change" };
+      }
+
+      newTags = [...tags];
+
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].length > 0 && !tags.includes(data[i])) {
+          newTags.push(data[i]);
+        }
+      }
+
+      await cdb.ref(`problems/${problemInd}/tags`).set(newTags);
 
       break;
     default:
@@ -57,7 +109,7 @@ const tryAction = async (
 export const execute = async (req, res) => {
   const uuid: string = req.body.uuid;
   const problemInd: number = req.body.problemInd;
-  let data: data = req.body.data;
+  let data: actionData = req.body.data;
   const type: problemAction = req.body.type;
   const authuid: string = req.body.authuid;
 

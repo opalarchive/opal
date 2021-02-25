@@ -10,16 +10,22 @@ export const execute = async (req, res) => {
   const tryAccess = await projectAccess(uuid, authuid);
   if (tryAccess.status !== 200) {
     res.status(tryAccess.status).send(tryAccess.value);
+    return;
   }
 
   const idToUsername = await getIdToUsername();
 
-  const editors: Server.Editors = await db
+  const editors: Server.Editors | undefined = await db
     .ref(`projectPublic/${uuid}/editors`)
     .once("value")
     .then((snapshot) => snapshot.val());
 
-  res
-    .status(200)
-    .send(Object.keys(editors).map((authuid) => idToUsername(authuid)));
+  res.status(200).send(
+    Object.fromEntries(
+      Object.entries(editors || []).map(([uid, editStatus]) => {
+        const { starred, ...editStatusWithoutStarred } = editStatus;
+        return [idToUsername(uid), editStatusWithoutStarred];
+      })
+    )
+  );
 };

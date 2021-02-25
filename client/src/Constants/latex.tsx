@@ -20,7 +20,7 @@ export const latexify = (string: string, options: katex.KatexOptions) => {
     .join("\\[\\begin{aligned}")
     .split(`\\end{align*}`)
     .join("\\end{aligned}\\]");
-  const regularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^\$\\]*(?:\\.[^\$\\]*)*\$/g;
+  const regularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\\]*(?:\\.[^$\\]*)*\$/g;
   const blockRegularExpression = /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]/g;
 
   const stripDollars = (stringToStrip: string) =>

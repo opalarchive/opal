@@ -1,4 +1,4 @@
-import { Client, Server, UserInfo } from "../../../../.shared/src/types";
+import { Client, Server } from "../../../../.shared/src/types";
 import { db } from "../../helpers/firebaseSetup";
 import { getIdToUsername } from "../../helpers/idToUsername";
 
@@ -46,6 +46,7 @@ export const execute = async (req, res) => {
         trashed: proj.trashed,
         starred: proj.editors[authuid].starred,
         shareDate: proj.editors[authuid].shareDate,
+        role: proj.editors[authuid].role,
       };
 
       return [uuid, projectPublic];

@@ -1,4 +1,11 @@
-import { data, problemAction, ReplyType } from "../../../.shared";
+import {
+  actionData,
+  problemAction,
+  problemActionPrivileged,
+  ReplyType,
+  Problem,
+  replyAction,
+} from "../../../.shared";
 
 /*
  * The idea here is that if success is true, the value must be of type output.
@@ -68,28 +75,61 @@ export interface Difficulty {
 
 export type tryProblemAction = (
   ind: number,
-  data: data,
+  data: actionData,
   type: problemAction
 ) => Promise<void>;
 
-export interface ProblemDetails {
+export type tryProblemActionPrivileged = (
+  ind: number,
+  data: actionData,
+  type: problemActionPrivileged
+) => Promise<void>;
+
+export type tryReplyAction = (
+  ind: number,
+  replyInd: number,
+  data: actionData,
+  type: replyAction
+) => Promise<void>;
+
+export type newProblem = (problem: Omit<Problem, "ind">) => Promise<void>;
+
+export type problemProps = (
+  uuid: string,
+  prob: Problem,
+  authUser: firebase.User
+) => ClientProblem;
+
+export interface problemFunctionsExtracted {
+  tryProblemAction: (data: actionData, type: problemAction) => Promise<void>;
+  tryProblemActionPrivileged: (
+    data: actionData,
+    type: problemActionPrivileged
+  ) => Promise<void>;
+  tryReplyAction: (
+    replyInd: number,
+    data: actionData,
+    type: replyAction
+  ) => Promise<void>;
+}
+
+export type problemFunctions = (
+  uuid: string,
+  prob: Problem,
+  authUser: firebase.User
+) => problemFunctionsExtracted;
+
+export interface ClientProblem {
   uuid: string;
   ind: number;
   title: string;
   text: string;
-  category: {
-    name: string;
-    color: string;
-  };
-  difficulty: {
-    name: number;
-    color: string;
-  };
+  category: string;
+  difficulty: number;
   author: string;
   tags: string[];
   votes: number;
   myVote: number;
-  tryProblemAction: (data: data, type: problemAction) => Promise<void>;
   replyTypes: replyTypes;
   authUser: firebase.User;
 }

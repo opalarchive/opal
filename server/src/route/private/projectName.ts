@@ -8,6 +8,7 @@ export const execute = async (req, res) => {
   const tryAccess = await projectAccess(uuid, authuid);
   if (tryAccess.status !== 200) {
     res.status(tryAccess.status).send(tryAccess.value);
+    return;
   }
 
   const name: string = await db
