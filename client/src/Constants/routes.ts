@@ -16,6 +16,8 @@ export const PROJECT_ALL_PROBLEMS = "/project/view/:uuid/compile/all";
 export const PROJECT_LIST = "/project/view/:uuid/compile/l:list";
 
 export const PROJECT_SETTINGS = "/project/view/:uuid/settings";
+export const PROJECT_TYPES = "/project/view/:uuid/settings/types";
+export const PROJECT_USERS = "/project/view/:uuid/settings/users";
 
 export const SELECTION_PRIORITY = "/project/priority";
 export const SELECTION_MY_PROJECTS = "/project/my-projects";

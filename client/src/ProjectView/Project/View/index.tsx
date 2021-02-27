@@ -249,7 +249,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
             render={(_) => <Compile {...viewSectionProps} />}
           />
           <Route
-            exact
             path={[ROUTES.PROJECT_SETTINGS.replace(":uuid", uuid)]}
             render={(_) => <Settings {...viewSectionProps} editors={editors} />}
           />
