@@ -81,7 +81,7 @@ class Action extends React.Component<ActionProps, ActionState> {
     e: React.ChangeEvent<HTMLInputElement>,
     listInd: number
   ) {
-    const listSelection = this.state.listSelection;
+    const listSelection = [...this.state.listSelection];
     listSelection[listInd] = !listSelection[listInd];
     let canChangeList = false;
     for (let i = 0; i < listSelection.length; i++) {

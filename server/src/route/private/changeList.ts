@@ -12,13 +12,14 @@ const tryChangeList = async (
   let lists: List[] = await cdb
     .ref(`lists`)
     .once("value")
-    .then((snapshot) => snapshot.val());
+    .then((snapshot) => snapshot.val()) || [];
 
-  if (lists.length != listSelection.length) {
+  if (lists.length !== listSelection.length) {
     return { status: 400, value: "invalid-input" };
   }
 
   for (let i = 0; i < listSelection.length; i++) {
+    if (!lists[i].problems) lists[i].problems = [];
     if (listSelection[i]) {
       if (!lists[i].problems.includes(problemInd)) {
         lists[i].problems.push(problemInd);
