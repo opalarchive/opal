@@ -182,9 +182,48 @@ export const RGBToString = (rgb: RGB) => {
   return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 };
 
-export const spacingRem = (theme: Theme, size: number) => {
-  return theme.typography.pxToRem(theme.spacing(size));
-};
+// overload the function to allow for csslike lazy spacing
+// e.g. padding: 5px 6px is 5px vertical, 6px horizontal
+export function spacingRem(theme: Theme, size: number): string;
+export function spacingRem(
+  theme: Theme,
+  vertical: number,
+  horizontal: number
+): string;
+export function spacingRem(
+  theme: Theme,
+  top: number,
+  horizontal: number,
+  bottom: number
+): string;
+export function spacingRem(
+  theme: Theme,
+  top: number,
+  right: number,
+  bottom: number,
+  left: number
+): string;
+export function spacingRem(
+  theme: Theme,
+  v1: number,
+  v2?: number,
+  v3?: number,
+  v4?: number
+): string {
+  const singleSpace = (size: number): string => {
+    return theme.typography.pxToRem(theme.spacing(size));
+  };
+  const optionalParams = [v2, v3, v4];
+  let result = singleSpace(v1);
+  for (let i = 0; i < optionalParams.length; i++) {
+    const param = optionalParams[i];
+    if (!param) {
+      break;
+    }
+    result += " " + singleSpace(param);
+  }
+  return result;
+}
 
 /*
  * + denotes union
