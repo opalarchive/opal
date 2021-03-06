@@ -8,16 +8,18 @@ import Sidebar from "./Sidebar";
 import Loading from "../../Loading";
 import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
-import MenuBase from "../MenuBase";
+import ScrollBase from "../Template/ScrollBase";
 import { poll, projectViewTypes } from "../../Constants";
 import { Client } from "../../../../.shared";
 import {
   ProjectViewSort,
   ProjectDataPoint,
   ProjectViewType,
-  Result,
   ProjectViewFilter,
 } from "../../Constants/types";
+import SidebaredBase from "../Template/SidebaredBase";
+import { NotificationsProps } from "../Template/Notifications";
+import SelectionAppbar from "./SelectionAppbar";
 
 interface SelectionBaseProps {
   refreshProjects: () => Promise<void>;
@@ -26,27 +28,16 @@ interface SelectionBaseProps {
   authUser: firebase.User;
 }
 
-interface SelectionBaseState {
-  projects: Client.Publico;
-  data: ProjectDataPoint[];
-  fixed: boolean;
-  defaultSort: ProjectViewSort;
-  loading: boolean;
-}
-
-class SelectionBase extends React.Component<
-  SelectionBaseProps,
-  SelectionBaseState
-> {
-  state = {
-    projects: {} as Client.Publico,
-    data: [] as ProjectDataPoint[],
-    fixed: false, // whether we can't sort (i.e. fixed => no sorting)
-    defaultSort: {} as ProjectViewSort,
-    loading: true,
+class SelectionBase extends React.Component<SelectionBaseProps> {
+  private projects: Client.Publico = {};
+  private data: ProjectDataPoint[] = [];
+  private fixed: boolean = false; // whether we can't sort (i.e. fixed => no sorting)
+  private defaultSort: ProjectViewSort = {
+    dataPoint: "name",
+    direction: "asc",
   };
 
-  componentDidMount() {
+  resetProjects() {
     let projectsKeys = Object.keys(this.props.visibleProjects).filter((id) =>
       this.isIncludable(
         this.props.visibleProjects[id],
@@ -54,17 +45,18 @@ class SelectionBase extends React.Component<
       )
     );
 
-    if (projectsKeys && projectsKeys[0]) {
+    if (projectsKeys.length > 0) {
       let projects = Object.fromEntries(
         projectsKeys.map((id) => [id, this.props.visibleProjects[id]])
       );
-      let data = projectViewTypes[this.props.type].data;
-      let fixed = projectViewTypes[this.props.type].fixed;
-      let defaultSort = projectViewTypes[this.props.type].defaultSort;
-
-      this.setState({ projects, data, fixed, defaultSort, loading: false });
+      this.projects = projects;
+    } else {
+      this.projects = {};
     }
-    this.setState({ loading: false });
+
+    this.data = projectViewTypes[this.props.type].data;
+    this.fixed = projectViewTypes[this.props.type].fixed;
+    this.defaultSort = projectViewTypes[this.props.type].defaultSort;
   }
 
   isIncludable(project: Client.ProjectPublic, filter: ProjectViewFilter) {
@@ -88,14 +80,13 @@ class SelectionBase extends React.Component<
   }
 
   render() {
-    if (this.state.loading) return <div></div>;
-
+    this.resetProjects();
     return (
       <Table
-        projects={this.state.projects}
-        data={this.state.data}
-        fixed={this.state.fixed}
-        defaultSort={this.state.defaultSort}
+        projects={this.projects}
+        data={this.data}
+        fixed={this.fixed}
+        defaultSort={this.defaultSort}
         authUser={this.props.authUser}
         name={this.props.type}
         refreshProjects={this.props.refreshProjects}
@@ -104,10 +95,9 @@ class SelectionBase extends React.Component<
   }
 }
 
-interface SelectionProps {
+interface SelectionProps extends NotificationsProps {
   authUser: firebase.User;
   setNotifications: () => Promise<void>;
-  setTitle: (title: string) => void;
   fail: () => void;
 }
 
@@ -145,8 +135,6 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
   }
 
   async componentDidMount() {
-    this.props.setTitle("Project Selection");
-
     try {
       await poll(this.setProjects, () => !this.state.loading, 1500, 200);
 
@@ -169,86 +157,97 @@ class Selection extends React.Component<SelectionProps, SelectionState> {
       return <Loading background="white" />;
     }
     return (
-      <MenuBase
-        sidebarWidth={15}
-        maxWidth={1280}
-        background="rgb(0, 0, 0, 0.025)"
-        Sidebar={Sidebar}
-        authUser={this.props.authUser}
-      >
-        <Route
-          exact
-          path={ROUTES.PROJECT}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="priority"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
+      <>
+        <SelectionAppbar
+          notifs={this.props.notifs}
+          notifsLoading={this.props.notifsLoading}
+          markNotifications={this.props.markNotifications}
+          title={"Project Selection"}
         />
-        <Route
-          exact
-          path={ROUTES.PROJECT_PRIORITY}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="priority"
-              visibleProjects={this.state.visibleProjects}
+        <div style={{ position: "relative", flexGrow: 1, overflow: "hidden" }}>
+          <ScrollBase maxWidth={1320} background="rgb(0, 0, 0, 0.025)">
+            <SidebaredBase
+              sidebarWidth={15}
+              Sidebar={Sidebar}
+              fixedSidebar
               authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.PROJECT_MY_PROJECTS}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="myProjects"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.PROJECT_SHARED_WITH_ME}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="sharedWithMe"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.PROJECT_RECENT}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="recent"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={ROUTES.PROJECT_TRASH}
-          render={() => (
-            <SelectionBase
-              refreshProjects={this.setProjects}
-              type="trash"
-              visibleProjects={this.state.visibleProjects}
-              authUser={this.props.authUser}
-            />
-          )}
-        />
-      </MenuBase>
+            >
+              <Route
+                exact
+                path={ROUTES.PROJECT}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="priority"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={ROUTES.SELECTION_PRIORITY}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="priority"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={ROUTES.SELECTION_MY_PROJECTS}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="myProjects"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={ROUTES.SELECTION_SHARED_WITH_ME}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="sharedWithMe"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={ROUTES.SELECTION_RECENT}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="recent"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path={ROUTES.SELECTION_TRASH}
+                render={() => (
+                  <SelectionBase
+                    refreshProjects={this.setProjects}
+                    type="trash"
+                    visibleProjects={this.state.visibleProjects}
+                    authUser={this.props.authUser}
+                  />
+                )}
+              />
+            </SidebaredBase>
+          </ScrollBase>
+        </div>
+      </>
     );
   }
 }

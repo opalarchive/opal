@@ -1,9 +1,18 @@
 import { Theme } from "@material-ui/core";
+import { DifficultyColors, RGB } from "../../../.shared";
 import { ProjectView, ProjectViewType } from "./types";
 
 export const camelToTitle = (input: string): string => {
   let result = input.replace(/([A-Z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
+};
+
+//from SO but simple at heart
+export const anyToProper = (input: string): string => {
+  return input
+    .split(" ")
+    .map((w) => w[0].toUpperCase() + w.substr(1).toLowerCase())
+    .join(" ");
 };
 
 const preciseTime = (hours: number, minutes: number): string => {
@@ -111,9 +120,65 @@ export function lowerBound<T>(arr: T[], x: T): number {
   return lo;
 }
 
-// tuples seem to be broken rn
-export const tupleToRGBString = (arr?: number[]) => {
-  return arr ? `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})` : "";
+// linearlly interpolate the difficulty color using keyframesque colors
+export function getDifficultyColor(
+  colors: DifficultyColors,
+  difficulty: number
+) {
+  const keys = Object.keys(colors).map((key) => parseInt(key));
+
+  let top = lowerBound(keys, difficulty);
+  const difficultyColor = colors[keys[top]];
+
+  if (top === 0) {
+    return difficultyColor;
+  }
+  return (Object.fromEntries(
+    Object.entries(difficultyColor).map(([primaryColor, value]) => [
+      primaryColor,
+      lerp(
+        keys[top - 1],
+        keys[top],
+        colors[keys[top - 1]][primaryColor as keyof RGB],
+        colors[keys[top]][primaryColor as keyof RGB],
+        difficulty
+      ),
+    ])
+  ) as unknown) as RGB;
+}
+
+export function getMean(arr: number[]) {
+  if (arr.length === 0) return 0;
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum / arr.length;
+}
+
+// log n = 1 said the engineer
+export function getMedianSlow(arr: number[]) {
+  const n = arr.length;
+  if (n === 0) return 0;
+  arr.sort((a, b) => a - b);
+
+  return (arr[Math.floor((n - 1) / 2)] + arr[Math.ceil((n - 1) / 2)]) / 2;
+}
+
+export function getStDev(arr: number[]) {
+  if (arr.length === 0) return 0;
+
+  const mean = getMean(arr);
+
+  return Math.sqrt(
+    arr
+      .map((val) => (mean - val) * (mean - val))
+      .reduce((prev, cur) => prev + cur, 0) / arr.length
+  );
+}
+
+export const RGBToString = (rgb: RGB) => {
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 };
 
 export const spacingRem = (theme: Theme, size: number) => {
