@@ -2,7 +2,7 @@ import React from "react";
 import katex from "katex";
 
 // there are no types in these two packages
-import { render as renderBBCode } from "@bbob/react";
+import renderBBCode from "./render";
 import bbcodePreset from "@bbob/preset-react";
 
 import "katex/dist/katex.min.css";

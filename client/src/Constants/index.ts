@@ -112,8 +112,8 @@ export function lowerBound<T>(arr: T[], x: T): number {
 }
 
 // tuples seem to be broken rn
-export const tupleToRGBString = (arr: number[]) => {
-  return `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})`;
+export const tupleToRGBString = (arr?: number[]) => {
+  return arr ? `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})` : "";
 };
 
 export const spacingRem = (theme: Theme, size: number) => {
