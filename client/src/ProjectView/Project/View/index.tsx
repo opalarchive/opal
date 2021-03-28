@@ -19,7 +19,6 @@ import {
   ProjectPrivate,
   replyAction,
   ReplyType,
-  Server,
   projectRole,
   Client,
 } from "../../../../../.shared/src/types";
@@ -31,11 +30,13 @@ import {
   tryReplyAction,
   problemProps,
   problemFunctions,
+  newList,
 } from "../../../Constants/types";
 import Overview from "./Pages/Overview";
 import Compile from "./Pages/Compile";
 import NewProblem from "./Pages/NewProblem";
 import Settings from "./Pages/Settings";
+import NewList from "./Pages/NewList";
 
 interface ViewProps {
   background: string;
@@ -50,6 +51,7 @@ interface ViewProps {
   authUser: firebase.User;
   myRole: projectRole;
   newProblem: newProblem;
+  newList: newList;
 }
 
 export interface ViewSectionProps {
@@ -174,6 +176,7 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
       uuid,
       authUser,
       newProblem,
+      newList,
     } = this.props;
 
     // don't set the scroll again if you've already done it once
@@ -241,19 +244,6 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
           />
           <Route
             exact
-            path={[
-              ROUTES.PROJECT_COMPILE.replace(":uuid", uuid),
-              ROUTES.PROJECT_LIST.replace(":uuid", uuid),
-              ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", uuid),
-            ]}
-            render={(_) => <Compile {...viewSectionProps} />}
-          />
-          <Route
-            path={[ROUTES.PROJECT_SETTINGS.replace(":uuid", uuid)]}
-            render={(_) => <Settings {...viewSectionProps} editors={editors} />}
-          />
-          <Route
-            exact
             path={[ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)]}
             render={(_) => (
               <NewProblem
@@ -262,6 +252,24 @@ class View extends React.Component<ViewProps & RouteComponentProps, ViewState> {
                 difficultyRange={project.settings.difficultyRange}
               />
             )}
+          />
+          <Route
+            exact
+            path={[
+              ROUTES.PROJECT_COMPILE.replace(":uuid", uuid),
+              ROUTES.PROJECT_LIST.replace(":uuid", uuid),
+              ROUTES.PROJECT_ALL_PROBLEMS.replace(":uuid", uuid),
+            ]}
+            render={(_) => <Compile {...viewSectionProps} />}
+          />
+          <Route
+            exact
+            path={[ROUTES.PROJECT_NEW_LIST.replace(":uuid", uuid)]}
+            render={(_) => <NewList {...viewSectionProps} newList={newList} />}
+          />
+          <Route
+            path={[ROUTES.PROJECT_SETTINGS.replace(":uuid", uuid)]}
+            render={(_) => <Settings {...viewSectionProps} editors={editors} />}
           />
         </Switch>
       </ScrollBase>

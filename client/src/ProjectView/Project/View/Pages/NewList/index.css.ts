@@ -4,8 +4,15 @@ import { spacingRem } from "../../../../../Constants";
 const styles = (theme: Theme) =>
   createStyles({
     root: {
-      padding: spacingRem(theme, 3),
-      paddingLeft: spacingRem(theme, 1.5),
+      width: "100%",
+      marginBottom: "1rem",
+      display: "flex",
+    },
+    body: {
+      padding: spacingRem(theme, 1),
+      display: "flex",
+      flexDirection: "column",
+      flexGrow: 1,
     },
   });
 

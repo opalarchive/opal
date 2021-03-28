@@ -13,6 +13,16 @@ const styles = (theme: Theme) =>
       paddingLeft: spacingRem(theme, 3),
       paddingRight: spacingRem(theme, 1.5),
     },
+    buttonWrapper: {
+      display: "flex",
+    },
+    filler: {
+      flexGrow: 1,
+    },
+    buttonContainer: {
+      float: "right",
+      paddingBottom: spacingRem(theme, 2),
+    },
     paper: {
       marginBottom: spacingRem(theme, 3),
       paddingBottom: spacingRem(theme, 1.5),

@@ -11,6 +11,7 @@ import {
   Problem,
   Config,
   projectRole,
+  List,
 } from "../../../.shared/";
 import { Result } from "../Constants/types";
 
@@ -266,6 +267,21 @@ export const newProblem = async (
   );
 };
 
+export const newList = async (
+  uuid: string,
+  list: List,
+  authUser: firebase.User
+) => {
+  return await post<string>(
+    "private/newList",
+    {
+      uuid,
+      list,
+    },
+    authUser
+  );
+};
+
 export const changeList = async (
   uuid: string,
   listSelection: boolean[],
@@ -306,7 +322,7 @@ export const toggleRole = async (
   uuid: string,
   username: string,
   subjectNewRole: projectRole,
-  authUser: firebase.User,
+  authUser: firebase.User
 ) => {
   return await post<string>(
     "private/toggleRole",

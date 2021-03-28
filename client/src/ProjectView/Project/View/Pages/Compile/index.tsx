@@ -4,7 +4,6 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { ViewSectionProps } from "../..";
 
-import { Server } from "../../../../../../../.shared";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import styles from "./index.css";
@@ -92,6 +91,7 @@ class Compile extends React.Component<
         sidebarWidth={18}
         Sidebar={Navigation}
         sidebarProps={{
+          uuid: uuid,
           lists: project.lists,
           currentList: this.state.currentList,
           setCurrentList: this.setCurrentList,

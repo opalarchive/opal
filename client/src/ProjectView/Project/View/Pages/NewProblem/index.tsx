@@ -17,7 +17,6 @@ import {
   DifficultyRange,
   problemTextMaxLength,
   problemTitleMaxLength,
-  Server,
   Votes,
 } from "../../../../../../../.shared";
 import {
@@ -70,8 +69,7 @@ class NewProblem extends React.Component<
   constructor(
     props: NewProblemProps &
       WithStyles<typeof problemContainerStyles> &
-      RouteComponentProps &
-      ViewSectionProps
+      RouteComponentProps
   ) {
     super(props);
 
@@ -167,17 +165,16 @@ class NewProblem extends React.Component<
 
   render() {
     const {
-      // height,
+      // bodyHeight,
       project,
-      // categoryColors,
+      categoryColors,
+      difficultyColors,
       // editors,
       // problemProps,
       // uuid,
       // tryProblemAction,
       authUser,
       classes,
-      categoryColors,
-      difficultyColors,
     } = this.props;
     const { titleError, textError, categoryError } = this.state;
 
