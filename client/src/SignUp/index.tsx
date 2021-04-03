@@ -1,503 +1,398 @@
-import React from "react";
-import { withRouter, Link as RouterLink } from "react-router-dom";
-import { createUser } from "../Firebase";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import { FiLoader } from "react-icons/fi";
+import React, { useEffect, useState } from "react";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import {
-  withStyles,
-  Container,
-  Typography,
-  Grid,
-  Link,
-  TextField,
-  CssBaseline,
-  Button,
   Avatar,
-  InputAdornment,
+  Button,
+  Container,
+  CssBaseline,
+  Grid,
   IconButton,
-  Checkbox,
+  InputAdornment,
+  Link,
+  makeStyles,
+  TextField,
+  Typography,
 } from "@material-ui/core";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import { compose } from "recompose";
-
-import { withSnackbar } from "notistack";
+import { createUser, understandSignupError } from "../Firebase";
+import firebase from "firebase";
+import { ImEye, ImEyeBlocked } from "react-icons/im";
 
 import * as ROUTES from "../Constants/routes";
 
-import styles from "./index.css.ts";
-import NameInput from "../Input/name";
+import styles from "./index.css";
+import { FiLoader, FiLock } from "react-icons/fi";
 
-class SignUp extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      username: {
-        value: "",
-        valid: true,
-        helper: -1,
-      },
-      firstName: {
-        value: "",
-        valid: true,
-        helper: -1,
-      },
-      lastName: {
-        value: "",
-        valid: true,
-        helper: -1,
-      },
-      password: {
-        value: "",
-        valid: true,
-        helper: -1,
-      },
-      confirmPassword: {
-        value: "",
-        valid: true,
-        helper: -1,
-      },
-      email: {
-        value: "",
-        valid: true,
-        helper: -1,
-      },
-      error: "",
-      showPassword: false,
-      showConfirmPassword: false,
-    };
-
-    this.checkEvent = this.checkEvent.bind(this);
-    this.checkAll = this.checkAll.bind(this);
-    this.validateInput = this.validateInput.bind(this);
-    this.concernValid = this.concernValid.bind(this);
-    this.onSignUp = this.onSignUp.bind(this);
-    this.setValue = this.setValue.bind(this);
-    this.submissionErrorInfo = this.submissionErrorInfo.bind(this);
-    this.handleClickShowPassword = this.handleClickShowPassword.bind(this);
-    this.handleMouseDownPassword = this.handleMouseDownPassword.bind(this);
-    this.handleClickShowConfirmPassword = this.handleClickShowConfirmPassword.bind(
-      this
-    );
-    this.handleMouseDownConfirmPassword = this.handleMouseDownConfirmPassword.bind(
-      this
-    );
-
-    this.errors = {
-      email: [
-        "Your email cannot be empty.",
-        "This does not match the standard format. Make sure that you enter a valid email.",
-        "Emails should be at most 60 characters.",
-      ],
-      username: [
-        "Your username cannot be empty.",
-        "Please only use the latin alphabet (capital and lowercase characters), numerals, and underscores.",
-        "Userames should be at most 40 characters.",
-      ],
-      firstName: [
-        "Your first name cannot be empty.",
-        "Please only use the latin alphabet (capital and lowercase characters), spaces, and hyphens.",
-      ],
-      lastName: [
-        "Your last name cannot be empty.",
-        "Please only use the latin alphabet (capital and lowercase characters), spaces, and hyphens.",
-      ],
-      password: [
-        "Your password must contain at least 8 characters.",
-        "Your password must contain at least one capital letter, one lowercase letter, number, and special character.",
-        "Your password should only contain ASCII characters from 0 to 255.",
-      ],
-      confirmPassword: ["Your password must match the above password."],
-    };
-    this.checks = {
-      email: [
-        (value) => value.length === 0,
-        (value) =>
-          !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-            value
-          ),
-        (value) => value.length > 60,
-      ],
-      username: [
-        (value) => value.length === 0,
-        (value) => !/^[A-za-z_0-9]*$/.test(value),
-        (value) => value.length > 40,
-      ],
-      firstName: [
-        (value) => !value || value.length === 0,
-        (value) => value.match(/[^a-zA-Z -]+/g),
-      ],
-      lastName: [
-        (value) => !value || value.length === 0,
-        (value) => value.match(/[^a-zA-Z -]+/g),
-      ],
-      password: [
-        (value) => value.length < 8,
-        (value) =>
-          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*{}"'`/,._[\]~\-+])[a-zA-Z\d\w\W]{8,}$/.test(
-            value
-          ),
-        (value) => {
-          for (let i = 0; i < value.length; i++)
-            if (value.charCodeAt(i) < 0 || value.charCodeAt(i) > 255)
-              return true;
-          return false;
-        },
-      ],
-      confirmPassword: [(value) => value !== this.state.password.value],
-    };
-  }
-
-  handleClickShowPassword() {
-    this.setState({ showPassword: !this.state.showPassword });
-  }
-
-  handleMouseDownPassword() {
-    this.setState({ showPassword: !this.state.showPassword });
-  }
-
-  handleClickShowConfirmPassword() {
-    this.setState({ showConfirmPassword: !this.state.showConfirmPassword });
-  }
-
-  handleMouseDownConfirmPassword() {
-    this.setState({ showConfirmPassword: !this.state.showConfirmPassword });
-  }
-
-  setValue(event) {
-    let value = event.target.value;
-    let valid = this.state[event.target.name].valid;
-    if (
-      !this.state[event.target.name].valid &&
-      !this.concernValid(
-        event.target.name,
-        this.state[event.target.name].helper,
-        value
-      )
-    )
-      valid = true;
-
-    this.setState({
-      [event.target.name]: {
-        ...this.state[event.target.name],
-        value,
-        valid,
-      },
-    });
-    if (event.target.name === "password" && !this.state.confirmPassword.valid) {
-      if (value === this.state.confirmPassword.value)
-        this.setState({
-          confirmPassword: { ...this.state.confirmPassword, valid: true },
-        });
-    }
-  }
-
-  validateInput(value, type) {
-    const errors = this.errors[type];
-    const checks = this.checks[type];
-
-    for (let i = 0; i < errors.length; i++) {
-      if (checks[i](value)) return i;
-    }
-
-    return -1;
-  }
-
-  checkEvent(event) {
-    let validation = "";
-
-    if (!Object.keys(this.errors).some((el) => event.target.name === el))
-      return;
-    validation = this.validateInput(
-      this.state[event.target.name].value,
-      event.target.name
-    );
-    if (validation > -1)
-      this.setState({
-        [event.target.name]: {
-          ...this.state[event.target.name],
-          valid: false,
-          helper: validation,
-        },
-      });
-
-    return false;
-  }
-
-  concernValid(category, concern, value) {
-    return this.checks[category][concern](value);
-  }
-
-  checkAll() {
-    const components = Object.keys(this.errors);
-    for (let i = 0; i < components.length; i++) {
-      for (let j = 0; j < this.checks[components[i]].length; j++) {
-        if (this.checks[components[i]][j](this.state[components[i]].value)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  async onSignUp(e) {
-    e.preventDefault();
-    this.setState({ signingIn: true });
-
-    if (this.checkAll()) {
-      this.setState({ signingIn: false });
-      this.props.enqueueSnackbar("Please check all errors and sign up again.", {
-        variant: "error",
-      });
-      return;
-    }
-
-    const trySignUp = await createUser(
-      this.state.username.value,
-      this.state.firstName.value,
-      this.state.lastName.value,
-      this.state.password.value,
-      this.state.email.value
-    );
-
-    if (!trySignUp.success) {
-      this.props.enqueueSnackbar(`There was an error: ${trySignUp}`, {
-        variant: "error",
-      });
-      this.setState({ error: trySignUp, signingIn: false });
-    } else {
-      this.props.enqueueSnackbar("You've successfully signed up!", {
-        variant: "success",
-      });
-      this.props.history.push(ROUTES.PROJECT);
-    }
-  }
-
-  submissionErrorInfo() {
-    if (this.checkAll()) {
-      const components = Object.keys(this.errors);
-      for (let i = 0; i < components.length; i++) {
-        let validation = this.validateInput(
-          this.state[components[i]].value,
-          components[i]
-        );
-        if (validation > -1)
-          this.setState({
-            [components[i]]: {
-              ...this.state[components[i]],
-              valid: false,
-              helper: validation,
-            },
-          });
-      }
-    }
-    return false;
-  }
-
-  async componentDidMount() {
-    if (this.props.authUser) this.props.history.push(ROUTES.PROJECT);
-    this.props.updateHash();
-  }
-
-  render() {
-    const { classes } = this.props;
-    const {
-      username,
-      password,
-      email,
-      firstName,
-      lastName,
-      confirmPassword,
-      signingIn,
-    } = this.state;
-
-    let usernameError = !username.valid,
-      passwordError = !password.valid,
-      emailError = !email.valid,
-      confirmPasswordError = !confirmPassword.valid;
-    let usernameHelper =
-        !username.valid && this.errors.username[username.helper],
-      passwordHelper = !password.valid && this.errors.password[password.helper],
-      emailHelper = !email.valid && this.errors.email[email.helper],
-      confirmPasswordHelper =
-        !confirmPassword.valid &&
-        this.errors.confirmPassword[confirmPassword.helper];
-
-    let disabled = this.checkAll();
-
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
-          <form className={classes.form} onSubmit={this.onSignUp} noValidate>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  name="username"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="username"
-                  label="Username"
-                  autoFocus
-                  error={usernameError}
-                  helperText={usernameError && usernameHelper}
-                  value={this.state.username.value}
-                  onChange={this.setValue}
-                  onBlur={this.checkEvent}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  error={emailError}
-                  helperText={emailError && emailHelper}
-                  value={this.state.email.value}
-                  onChange={this.setValue}
-                  onBlur={this.checkEvent}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <NameInput
-                  variant="outlined"
-                  first={{
-                    firstName: firstName.value,
-                    firstNameError: !firstName.valid,
-                    firstNameHelper:
-                      !firstName.valid &&
-                      this.errors.firstName[firstName.helper],
-                  }}
-                  last={{
-                    lastName: lastName.value,
-                    lastNameError: !lastName.valid,
-                    lastNameHelper:
-                      !lastName.valid && this.errors.lastName[lastName.helper],
-                  }}
-                  onChange={this.setValue}
-                  onBlur={this.checkEvent}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type={this.state.showPassword ? "text" : "password"}
-                  id="password"
-                  error={passwordError}
-                  helperText={passwordError && passwordHelper}
-                  value={this.state.password.value}
-                  onChange={this.setValue}
-                  onBlur={this.checkEvent}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={this.handleClickShowPassword}
-                          onMouseDown={this.handleMouseDownPassword}
-                          tabIndex="-1"
-                        >
-                          {this.state.showPassword ? (
-                            <Visibility />
-                          ) : (
-                            <VisibilityOff />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  type={this.state.showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  error={confirmPasswordError}
-                  helperText={confirmPasswordError && confirmPasswordHelper}
-                  value={this.state.confirmPassword.value}
-                  onChange={this.setValue}
-                  onBlur={this.checkEvent}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={this.handleClickShowConfirmPassword}
-                          onMouseDown={this.handleMouseDownConfirmPassword}
-                          tabIndex="-1"
-                        >
-                          {this.state.showConfirmPassword ? (
-                            <Visibility />
-                          ) : (
-                            <VisibilityOff />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
-            {signingIn ? (
-              <Button
-                fullWidth
-                variant="contained"
-                color="secondary"
-                className={`${classes.submit} ${classes.noHover}`}
-                endIcon={<FiLoader />}
-              >
-                Loading
-              </Button>
-            ) : (
-              <div onClick={this.submissionErrorInfo}>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  onClick={this.onSignUp}
-                  disabled={disabled}
-                >
-                  Sign Up
-                </Button>
-              </div>
-            )}
-            <Grid container justify="flex-end">
-              <Grid item>
-                <Link component={RouterLink} to={ROUTES.HOME} variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
-
-            <Typography color="error">{this.state.error}</Typography>
-          </form>
-        </div>
-      </Container>
-    );
-  }
+interface SignUpProps {
+  authUser?: firebase.User;
 }
 
-export default compose(withSnackbar, withRouter, withStyles(styles))(SignUp);
+// data that is inputed
+// error is the index of the error that is being produced
+// -1 means no error
+// see the errors object for the list of errors
+// and the checks object for the checks for those errors
+interface InputData {
+  value: string;
+  error: number;
+}
+
+const defaultInputData = { value: "", error: -1 };
+
+const SignUp: React.FC<SignUpProps> = ({ authUser }) => {
+  // history for redirecting to account page
+  const history = useHistory();
+
+  useEffect(() => {
+    if (!!authUser) history.push(ROUTES.PROJECT);
+  }, [authUser, history]);
+
+  // style classes
+  const classes = makeStyles(styles)();
+
+  const [email, setEmail] = useState<InputData>(defaultInputData);
+  const [confirmEmail, setConfirmEmail] = useState<InputData>(defaultInputData);
+  const [username, setUsername] = useState<InputData>(defaultInputData);
+  const [password, setPassword] = useState<InputData>(defaultInputData);
+  const [confirmPassword, setConfirmPassword] = useState<InputData>(
+    defaultInputData
+  );
+
+  const getInput = (name: string) => {
+    switch (name) {
+      case "email":
+        return email;
+      case "confirmEmail":
+        return confirmEmail;
+      case "username":
+        return username;
+      case "password":
+        return password;
+      case "confirmPassword":
+        return confirmPassword;
+      default:
+        return defaultInputData;
+    }
+  };
+
+  const getSetInput = (name: string) => {
+    switch (name) {
+      case "email":
+        return setEmail;
+      case "confirmEmail":
+        return setConfirmEmail;
+      case "username":
+        return setUsername;
+      case "password":
+        return setPassword;
+      case "confirmPassword":
+        return setConfirmPassword;
+      default:
+        return () => {};
+    }
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [signUpError, setSignUpError] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const errors: { [input: string]: string[] } = {
+    email: [
+      "Your email cannot be empty.",
+      "This does not match the standard format. Make sure that you enter a valid email.",
+      "Emails should be at most 60 characters.",
+    ],
+    confirmEmail: ["Your email must match the above email."],
+    username: [
+      "Your username cannot be empty.",
+      "Please only use the latin alphabet (capital and lowercase characters), numerals, and underscores.",
+      "Userames should be at most 40 characters.",
+    ],
+    password: [
+      "Your password must contain at least 8 characters.",
+      "Your password must contain at least one capital letter, one lowercase letter, number, and special character.",
+      "Your password should only contain ASCII characters from 0 to 255.",
+    ],
+    confirmPassword: ["Your password must match the above password."],
+  };
+
+  const isValid: { [input: string]: ((value: string) => boolean)[] } = {
+    email: [
+      (value) => value.length > 0,
+      (value) =>
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          value
+        ),
+      (value) => value.length <= 60,
+    ],
+    confirmEmail: [(value) => value === email.value],
+    username: [
+      (value) => value.length > 0,
+      (value) => /^[A-za-z_0-9]*$/.test(value),
+      (value) => value.length <= 40,
+    ],
+    password: [
+      (value) => value.length >= 8,
+      (value) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*{}"'`/,._[\]~\-+])[a-zA-Z\d\w\W]{8,}$/.test(
+          value
+        ),
+      (value) => {
+        for (let i = 0; i < value.length; i++)
+          if (value.charCodeAt(i) < 0 || value.charCodeAt(i) > 255)
+            return false;
+        return true;
+      },
+    ],
+    confirmPassword: [(value) => value === password.value],
+  };
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+  const toggleShowConfirmPassword = () =>
+    setShowConfirmPassword(!showConfirmPassword);
+
+  // check if a value for a certain input name is valid and return the error index for it (-1 for valid)
+  const getErrorIndex = (name: string, value: string) => {
+    // we use a normal for loop here because if just one check fails, we should short circuit and return false
+    for (let i = 0; i < isValid[name].length; i++) {
+      if (!isValid[name][i](value)) return i;
+    }
+    return -1;
+  };
+
+  // check ALL inputs to see if they are valid and set the errors
+  // returns true if all is valid
+  const checkAll = () => {
+    let valid = true;
+    const inputs = Object.keys(isValid);
+    for (let i = 0; i < inputs.length; i++) {
+      const value = getInput(inputs[i]).value;
+      const errorIndex = getErrorIndex(inputs[i], value);
+
+      getSetInput(inputs[i])({ value, error: errorIndex });
+      if (errorIndex !== -1) {
+        valid = false;
+      }
+    }
+
+    return valid;
+  };
+
+  // when a new character is typed
+  // here we only check if typing more characters causes the error to disappear
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = event.target;
+    const oldInput = getInput(name);
+
+    // if there shouldn't be an error anymore
+    const valid = oldInput.error === -1 || isValid[name][oldInput.error](value);
+
+    getSetInput(name)({ value, error: valid ? -1 : oldInput.error });
+
+    // if it is email or password, typing could cause the confirm counterpart to match up
+    // which would make the error disappear
+    if (name === "email") {
+      const confirmEmailInput = getInput("confirmEmail");
+      if (confirmEmailInput.error !== -1 && confirmEmailInput.value === value) {
+        getSetInput("confirmEmail")({ value, error: -1 });
+      }
+    } else if (name === "password") {
+      const confirmPasswordInput = getInput("confirmPassword");
+      if (
+        confirmPasswordInput.error !== -1 &&
+        confirmPasswordInput.value === value
+      ) {
+        getSetInput("confirmPassword")({ value, error: -1 });
+      }
+    }
+  };
+
+  // when the user clicks off the input
+  // here we can check if an error should appear
+  const onBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const { value, name } = event.target;
+
+    getSetInput(name)({ value, error: getErrorIndex(name, value) });
+  };
+
+  // when the user submits
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    // start load for signing in time
+    setLoading(true);
+
+    if (checkAll()) {
+      const trySignUp = await createUser(
+        username.value,
+        password.value,
+        email.value
+      );
+
+      if (!trySignUp.success) {
+        setSignUpError(understandSignupError(trySignUp.value));
+      }
+    }
+  };
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <FiLock />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign up
+        </Typography>
+        <form className={classes.form} onSubmit={onSubmit} noValidate>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name="email"
+                id="email"
+                label="Email Address"
+                error={email.error !== -1}
+                helperText={email.error !== -1 && errors.email[email.error]}
+                value={email.value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name="confirmEmail"
+                id="confirmEmail"
+                label="Confirm Email Address"
+                error={confirmEmail.error !== -1}
+                helperText={
+                  confirmEmail.error !== -1 &&
+                  errors.confirmEmail[confirmEmail.error]
+                }
+                value={confirmEmail.value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name="username"
+                id="username"
+                label="Username"
+                autoFocus
+                error={username.error !== -1}
+                helperText={
+                  username.error !== -1 && errors.username[username.error]
+                }
+                value={username.value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name="password"
+                id="password"
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                error={password.error !== -1}
+                helperText={
+                  password.error !== -1 && errors.password[password.error]
+                }
+                value={password.value}
+                onChange={onChange}
+                onBlur={onBlur}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={toggleShowPassword}
+                        tabIndex="-1"
+                      >
+                        {showPassword ? <ImEye /> : <ImEyeBlocked />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name="confirmPassword"
+                id="confirmPassword"
+                label="Confirm Password"
+                type={showConfirmPassword ? "text" : "password"}
+                error={confirmPassword.error !== -1}
+                helperText={
+                  confirmPassword.error !== -1 &&
+                  errors.confirmPassword[confirmPassword.error]
+                }
+                value={confirmPassword.value}
+                onChange={onChange}
+                onBlur={onBlur}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={toggleShowConfirmPassword}
+                        tabIndex="-1"
+                      >
+                        {showConfirmPassword ? <ImEye /> : <ImEyeBlocked />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
+          {loading ? (
+            <Button
+              fullWidth
+              variant="contained"
+              color="secondary"
+              className={classes.submit}
+              endIcon={<FiLoader />}
+            >
+              Loading
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Sign Up
+            </Button>
+          )}
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Link component={RouterLink} to={ROUTES.HOME} variant="body2">
+                Already have an account? Sign in
+              </Link>
+            </Grid>
+          </Grid>
+
+          <Typography color="error">{signUpError}</Typography>
+        </form>
+      </div>
+    </Container>
+  );
+};
+
+export default SignUp;

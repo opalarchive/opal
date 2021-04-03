@@ -214,10 +214,11 @@ export function spacingRem(
     return theme.typography.pxToRem(theme.spacing(size));
   };
   const optionalParams = [v2, v3, v4];
+
   let result = singleSpace(v1);
   for (let i = 0; i < optionalParams.length; i++) {
     const param = optionalParams[i];
-    if (!param) {
+    if (param === undefined) {
       break;
     }
     result += " " + singleSpace(param);
