@@ -23,7 +23,7 @@ import styles from "./index.css";
 import { FiLoader, FiLock } from "react-icons/fi";
 
 interface SignUpProps {
-  authUser?: firebase.User;
+  authUser: firebase.User | null;
 }
 
 // data that is inputed
@@ -41,6 +41,8 @@ const defaultInputData = { value: "", error: -1 };
 const SignUp: React.FC<SignUpProps> = ({ authUser }) => {
   // history for redirecting to account page
   const history = useHistory();
+
+  console.log(authUser);
 
   useEffect(() => {
     if (!!authUser) history.push(ROUTES.PROJECT);
