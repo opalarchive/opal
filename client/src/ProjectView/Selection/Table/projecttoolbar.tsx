@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { FiFilter, FiTrash2 } from "react-icons/fi";
 import { toolbarStyles } from "./constants";
-import { projectAction } from "../../../../../.shared";
+import { projectAction } from "../../../../../.shared/src";
 
 interface ProjectToolbarProps extends WithStyles<typeof toolbarStyles> {
   selected: string[];

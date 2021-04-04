@@ -11,7 +11,7 @@ import {
   DifficultyColors,
   projectRole,
   reply as replyType,
-} from "../../../../../../../.shared";
+} from "../../../../../../../.shared/src";
 import styles from "./index.css";
 import {
   ClientProblem,

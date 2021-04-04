@@ -14,7 +14,7 @@ import {
   DifficultyRange,
   List,
   Problem,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 import { FiArrowDown, FiFilter, FiList } from "react-icons/fi";
 import { HiOutlineSortDescending } from "react-icons/hi";
 import Dot from "../../../Embedded/Dot";

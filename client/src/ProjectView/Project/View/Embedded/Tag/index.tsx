@@ -7,7 +7,7 @@ import {
 import React from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 import { compose } from "recompose";
-import { actionData, problemAction } from "../../../../../../../.shared";
+import { actionData, problemAction } from "../../../../../../../.shared/src";
 import styles from "./index.css";
 
 interface TagProps {

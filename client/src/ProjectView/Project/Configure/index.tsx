@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import ScrollBase from "../../Template/ScrollBase";
 import styles from "./index.css";
-import { isConfig } from "../../../../../.shared";
+import { isConfig } from "../../../../../.shared/src";
 import { configureProject } from "../../../Firebase";
 
 interface ConfigureProps extends WithStyles<typeof styles> {

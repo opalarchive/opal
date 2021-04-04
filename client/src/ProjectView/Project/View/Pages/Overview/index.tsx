@@ -2,7 +2,7 @@ import { Button, withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { ViewSectionProps } from "../..";
 
-import { Problem as ProblemType } from "../../../../../../../.shared";
+import { Problem as ProblemType } from "../../../../../../../.shared/src";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import Filter from "./Filter";

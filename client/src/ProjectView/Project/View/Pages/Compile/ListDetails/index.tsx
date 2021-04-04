@@ -4,7 +4,7 @@ import {
   CategoryColors,
   DifficultyColors,
   Problem,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 import { HiOutlineViewList } from "react-icons/hi";
 import styles from "./index.css";
 import {

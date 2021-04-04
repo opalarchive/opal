@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { ViewSectionProps } from "../..";
 
-import { listNameMaxLength } from "../../../../../../../.shared";
+import { listNameMaxLength } from "../../../../../../../.shared/src";
 import { newList } from "../../../../../Constants/types";
 import detailsStyles from "../../Pages/Details/index.css";
 import { FiChevronLeft, FiPlus } from "react-icons/fi";

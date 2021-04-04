@@ -15,7 +15,7 @@ import {
   projectAction,
   ProjectActionAdmin,
   ProjectActionEditor,
-} from "../../../../../.shared";
+} from "../../../../../.shared/src";
 
 interface ModalProps {
   show: boolean;

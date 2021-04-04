@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { FiList, FiPlus } from "react-icons/fi";
 import Scrollbar from "react-scrollbars-custom";
-import { List } from "../../../../../../../../.shared";
+import { List } from "../../../../../../../../.shared/src";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
 import ListSelect from "../../../Embedded/ListSelect";
 

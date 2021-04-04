@@ -40,7 +40,7 @@ import {
   projectRole,
   problemTextMaxLength,
   problemTitleMaxLength,
-} from "../../../../../../../.shared";
+} from "../../../../../../../.shared/src";
 
 interface ProblemProps extends ClientProblem, problemFunctionsExtracted {
   abridged?: boolean;

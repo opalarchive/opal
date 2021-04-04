@@ -9,7 +9,10 @@ import { GrDrag } from "react-icons/gr";
 import styles from "./index.css";
 import Dot from "../Dot";
 import { FiLock } from "react-icons/fi";
-import { CategoryColors, DifficultyColors } from "../../../../../../../.shared";
+import {
+  CategoryColors,
+  DifficultyColors,
+} from "../../../../../../../.shared/src";
 import { getDifficultyColor } from "../../../../../Constants";
 
 interface ProblemProps {

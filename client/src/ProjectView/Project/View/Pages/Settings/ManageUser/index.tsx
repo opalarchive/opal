@@ -14,7 +14,7 @@ import {
   Client,
   ProjectRole,
   projectRole,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 
 import { FiChevronDown } from "react-icons/fi";
 import { toggleRole } from "../../../../../../Firebase";

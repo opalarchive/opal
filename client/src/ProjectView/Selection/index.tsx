@@ -10,7 +10,7 @@ import Table from "./Table";
 import { getVisibleProjects } from "../../Firebase";
 import ScrollBase from "../Template/ScrollBase";
 import { poll, projectViewTypes } from "../../Constants";
-import { Client } from "../../../../.shared";
+import { Client } from "../../../../.shared/src";
 import {
   ProjectViewSort,
   ProjectDataPoint,

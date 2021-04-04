@@ -21,7 +21,7 @@ import {
   ReplyType,
   projectRole,
   Client,
-} from "../../../../../.shared/src/types";
+} from "../../../../../.shared/src";
 import {
   replyTypes,
   tryProblemAction,

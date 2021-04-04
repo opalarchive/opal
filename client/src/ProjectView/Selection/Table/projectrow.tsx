@@ -22,7 +22,7 @@ import {
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { rowStyles, dataPointDisplay, IfDisplay } from "./constants";
-import { Client, projectAction } from "../../../../../.shared";
+import { Client, projectAction } from "../../../../../.shared/src";
 import { ProjectDataPoint } from "../../../Constants/types";
 
 interface ProjectRowProps extends WithStyles<typeof rowStyles> {

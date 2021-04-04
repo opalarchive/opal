@@ -1,6 +1,6 @@
 import React from "react";
 import Tag from "../Tag";
-import { actionData, problemAction } from "../../../../../../../.shared";
+import { actionData, problemAction } from "../../../../../../../.shared/src";
 import { Autocomplete } from "@material-ui/lab";
 import { IconButton, TextField } from "@material-ui/core";
 import { FiCheck } from "react-icons/fi";

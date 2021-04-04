@@ -18,7 +18,7 @@ import {
   problemTextMaxLength,
   problemTitleMaxLength,
   Votes,
-} from "../../../../../../../.shared";
+} from "../../../../../../../.shared/src";
 import {
   newProblem,
   problemProps,

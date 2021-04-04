@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { FiBell } from "react-icons/fi";
-import { Notification } from "../../../../../.shared";
+import { Notification } from "../../../../../.shared/src";
 import { Result } from "../../../Constants/types";
 import Loading from "../../../Loading";
 import styles from "./index.css";

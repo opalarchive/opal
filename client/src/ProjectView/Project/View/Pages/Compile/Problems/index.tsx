@@ -10,7 +10,7 @@ import {
   CategoryColors,
   DifficultyColors,
   Problem,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 import ProblemDraggable from "../../../Embedded/ProblemDraggable";
 import { AiOutlineEdit } from "react-icons/ai";
 import styles from "./index.css";

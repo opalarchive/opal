@@ -17,7 +17,7 @@ import TagGroup from "../../../Embedded/TagGroup";
 import {
   CategoryColors,
   DifficultyRange,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 
 interface AccordionProps extends WithStyles<typeof styles> {
   filterUsedDot: JSX.Element;

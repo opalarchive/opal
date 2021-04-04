@@ -25,7 +25,7 @@ import {
   projectAction,
   isProjectActionAdmin,
   isProjectActionEditor,
-} from "../../../../../.shared";
+} from "../../../../../.shared/src";
 import {
   ProjectDataPoint,
   ProjectViewSort,

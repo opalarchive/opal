@@ -1,7 +1,7 @@
 import React from "react";
 import { withStyles, WithStyles } from "@material-ui/core";
 import { ViewSectionProps } from "../..";
-import { Client } from "../../../../../../../.shared";
+import { Client } from "../../../../../../../.shared/src";
 import styles from "./index.css";
 import { Route, Switch } from "react-router-dom";
 import ManageUser from "./ManageUser";

@@ -4,7 +4,7 @@ import {
   DifficultyColors,
   Problem as ProblemType,
   projectRole,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 import {
   problemFunctions,
   problemProps,

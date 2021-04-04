@@ -1,4 +1,4 @@
-import { Problem, reply } from "../../../.shared";
+import { Problem, reply } from "../../../.shared/src";
 
 export interface Template {
   body: string;

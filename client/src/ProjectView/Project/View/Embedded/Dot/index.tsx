@@ -1,6 +1,6 @@
 import { withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
-import { RGB } from "../../../../../../../.shared";
+import { RGB } from "../../../../../../../.shared/src";
 import { RGBToString } from "../../../../../Constants";
 import styles from "./index.css";
 

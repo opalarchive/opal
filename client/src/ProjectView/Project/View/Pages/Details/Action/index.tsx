@@ -21,7 +21,7 @@ import {
   ProjectPrivate,
   projectRole,
   ProjectRole,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 import { changeList } from "../../../../../../Firebase";
 import Scrollbar from "react-scrollbars-custom";
 import { ClientProblem } from "../../../../../../Constants/types";

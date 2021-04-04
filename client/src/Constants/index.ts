@@ -1,5 +1,5 @@
 import { Theme } from "@material-ui/core";
-import { DifficultyColors, RGB } from "../../../.shared";
+import { DifficultyColors, RGB } from "../../../.shared/src";
 import { ProjectView, ProjectViewType } from "./types";
 
 export const camelToTitle = (input: string): string => {

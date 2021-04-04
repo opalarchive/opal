@@ -6,7 +6,7 @@ import {
   Problem,
   replyAction,
   List,
-} from "../../../.shared";
+} from "../../../.shared/src";
 
 /*
  * The idea here is that if success is true, the value must be of type output.

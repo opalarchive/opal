@@ -13,7 +13,7 @@ import {
   projectRole,
   Client,
   List,
-} from "../../../../.shared";
+} from "../../../../.shared/src";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
 import {

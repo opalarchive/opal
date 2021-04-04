@@ -12,7 +12,7 @@ import {
   Config,
   projectRole,
   List,
-} from "../../../.shared/";
+} from "../../../.shared/src";
 import { Result } from "../Constants/types";
 
 export { FirebaseContext, withFirebase };

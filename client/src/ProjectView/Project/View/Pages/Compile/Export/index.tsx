@@ -10,7 +10,7 @@ import {
   WithStyles,
   withStyles,
 } from "@material-ui/core";
-import { Problem } from "../../../../../../../../.shared";
+import { Problem } from "../../../../../../../../.shared/src";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import styles from "./index.css";
 import {

@@ -19,7 +19,7 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": [{ "path": "../.shared", "prepend": true }],
+  "references": [{ "path": "../.shared" }],
   "paths": {
     "@types/*": "../.shared/types/*"
   }

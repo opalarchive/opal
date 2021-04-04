@@ -36,7 +36,7 @@ import {
   projectRole,
   reply,
   ReplyType,
-} from "../../../../../../../../.shared";
+} from "../../../../../../../../.shared/src";
 import styles from "./index.css";
 import { problemFunctionsExtracted } from "../../../../../../Constants/types";
 import { IconType } from "react-icons";

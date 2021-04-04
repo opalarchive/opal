@@ -11,7 +11,7 @@ import { getNotifications, markAllNotifications } from "../Firebase";
 import { poll } from "../Constants";
 import Fail from "../Fail";
 import { WithAuthorization } from "../Session/withAuthorization";
-import { Notification } from "../../../.shared";
+import { Notification } from "../../../.shared/src";
 import { Result } from "../Constants/types";
 
 interface ProjectViewProps extends WithAuthorization {}
