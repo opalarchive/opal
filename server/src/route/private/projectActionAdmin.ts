@@ -4,7 +4,7 @@ import {
   Server,
   UsernameInfo,
   ProjectRole,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared/src";
 import { editProject } from "../../helpers/editProject";
 import { sendEmail } from "../../helpers/emailSetup";
 import { db } from "../../helpers/firebaseSetup";

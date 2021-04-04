@@ -1,7 +1,9 @@
-import { UsernameInfo } from "../../../.shared/src/types";
+import { UsernameInfo } from "../../../.shared/src";
 import { db } from "./firebaseSetup";
 
-export const getUsernameToId = async (): Promise<(username: string) => string> => {
+export const getUsernameToId = async (): Promise<
+  (username: string) => string
+> => {
   const users: { [username: string]: UsernameInfo } = await db
     .ref(`users`)
     .once("value")

@@ -12,6 +12,7 @@ import {
   replyAction,
   projectRole,
   Client,
+  List,
 } from "../../../../.shared";
 import { poll } from "../../Constants";
 import { Result } from "../../Constants/types";
@@ -23,6 +24,7 @@ import {
   tryReplyAction,
   getProjectName,
   post,
+  newList,
 } from "../../Firebase";
 import { NotificationsProps } from "../Template/Notifications";
 
@@ -84,6 +86,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     );
     this.tryReplyAction = this.tryReplyAction.bind(this);
     this.newProblem = this.newProblem.bind(this);
+    this.newList = this.newList.bind(this);
   }
 
   async setProject(uuid: string, authUser: firebase.User) {
@@ -446,8 +449,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
         ...problem,
         ind: project.value.problems.length,
       };
-      let problems = [...project.value.problems, problemWithInd];
-      project.value.problems = problems;
+      project.value.problems = [...project.value.problems, problemWithInd];
     }
 
     this.setState({ project });
@@ -455,6 +457,26 @@ class Project extends React.Component<ProjectProps, ProjectState> {
     const result = await newProblem(
       this.props.match.params.uuid,
       problem,
+      this.props.authUser
+    );
+
+    if (!result.success) {
+      this.setState({ project: oldProject });
+    }
+  }
+
+  async newList(list: List) {
+    const oldProject = this.state.project;
+    let project = this.state.project;
+    if (project.success && typeof project.value != "string") {
+      project.value.lists = [...project.value.lists, list];
+    }
+
+    this.setState({ project });
+
+    const result = await newList(
+      this.props.match.params.uuid,
+      list,
       this.props.authUser
     );
 
@@ -555,6 +577,7 @@ class Project extends React.Component<ProjectProps, ProjectState> {
             authUser={this.props.authUser}
             myRole={this.state.myRole}
             newProblem={this.newProblem}
+            newList={this.newList}
           />
         </div>
       </>

@@ -1,7 +1,7 @@
 // must be run on a single thread to prevent race conditions
 
 import { nanoid } from "nanoid";
-import { uuidLength } from "../../../../.shared/index";
+import { uuidLength } from "../../../../.shared/src";
 import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {

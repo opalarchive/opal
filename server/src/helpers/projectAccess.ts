@@ -1,4 +1,4 @@
-import { Server } from "../../../.shared/src/types";
+import { Server } from "../../../.shared/src";
 import { db } from "./firebaseSetup";
 import { Result } from "./types";
 

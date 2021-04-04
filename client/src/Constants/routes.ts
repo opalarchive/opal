@@ -1,6 +1,7 @@
 export const HOME = "/home";
 export const CUSTOM_HOME = "/";
 
+export const LOGIN = "/login";
 export const SIGNUP = "/signup";
 
 export const PROJECT = "/project";
@@ -14,6 +15,7 @@ export const PROJECT_NEW_PROBLEM = "/project/view/:uuid/new-problem";
 export const PROJECT_COMPILE = "/project/view/:uuid/compile";
 export const PROJECT_ALL_PROBLEMS = "/project/view/:uuid/compile/all";
 export const PROJECT_LIST = "/project/view/:uuid/compile/l:list";
+export const PROJECT_NEW_LIST = "/project/view/:uuid/compile/new-list";
 
 export const PROJECT_SETTINGS = "/project/view/:uuid/settings";
 export const PROJECT_TYPES = "/project/view/:uuid/settings/types";

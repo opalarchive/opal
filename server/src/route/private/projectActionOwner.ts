@@ -4,7 +4,7 @@ import {
   ProjectRole,
   projectActionOwner,
   ProjectActionOwner,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared/src";
 import { editProject } from "../../helpers/editProject";
 import { db } from "../../helpers/firebaseSetup";
 import { pushNotification } from "../../helpers/notification";

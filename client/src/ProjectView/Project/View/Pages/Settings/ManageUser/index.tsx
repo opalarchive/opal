@@ -162,7 +162,11 @@ class UserItem extends React.Component<UserItemProps, UserItemState> {
   }
 
   render() {
-    const { username, editStatus, myRole } = this.props;
+    const {
+      // username,
+      editStatus,
+      myRole,
+    } = this.props;
 
     return (
       <div>
@@ -173,7 +177,7 @@ class UserItem extends React.Component<UserItemProps, UserItemState> {
         </div>
         <br />
         Role:&nbsp;
-        {ProjectRole[myRole] == 0 ||
+        {ProjectRole[myRole] === 0 ||
         ProjectRole[myRole] < ProjectRole[this.state.subjectNewRole] ? (
           <IconButton
             size="small"

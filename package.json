@@ -2,9 +2,10 @@
   "name": "opal",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently -n 'client,server,shared' -c 'cyan,magenta,white' --handle-input --default-input-target 1 \"cd client && npm start\" \"cd server && npm start\" \"cd .shared && npm start\"",
+    "dev": "concurrently -n 'client,server,shared' -c 'cyan,magenta,white' --handle-input --default-input-target 1 \"cd client && npm start\" \"cd server && npm run dev\" \"cd .shared && npm run dev\"",
     "modules": "npm i && cd .shared && npm i && cd .. && cd server && npm i && cd .. && cd client && npm i && cd ..",
-    "cleanup": "node cleanup.js"
+    "cleanup": "node cleanup.js",
+    "postinstall": "npm install --prefix server"
   },
   "dependencies": {
     "concurrently": "^5.3.0",

@@ -1,6 +1,6 @@
 import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import { Problem } from "../../../../.shared/src/types";
+import { Problem } from "../../../../.shared/src";
 import { Result } from "../../helpers/types";
 
 const tryChangeList = async (

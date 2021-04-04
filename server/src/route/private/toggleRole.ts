@@ -1,6 +1,4 @@
-import { clientdb } from "../../helpers/clientdb";
-import * as firebase from "firebase-admin";
-import { Problem, ProjectRole, projectRole, Server } from "../../../../.shared/src/types";
+import { ProjectRole, projectRole, Server } from "../../../../.shared/src";
 import { Result } from "../../helpers/types";
 import { getUsernameToId } from "../../helpers/usernameToId";
 import { db } from "../../helpers/firebaseSetup";
@@ -20,14 +18,20 @@ const tryAction = async (
   const usernameToId = await getUsernameToId();
 
   const subjectUid = usernameToId(username);
-  
+
   const subjectCurrentRole: projectRole = editors[subjectUid].role;
 
-  if (ProjectRole[myRole] > 0 && (ProjectRole[myRole] >= ProjectRole[subjectCurrentRole] || ProjectRole[myRole] >= ProjectRole[subjectNewRole])) {
+  if (
+    ProjectRole[myRole] > 0 &&
+    (ProjectRole[myRole] >= ProjectRole[subjectCurrentRole] ||
+      ProjectRole[myRole] >= ProjectRole[subjectNewRole])
+  ) {
     return { status: 400, value: "forbidden" };
   }
 
-  await db.ref(`projectPublic/${uuid}/editors/${subjectUid}/role`).set(subjectNewRole);
+  await db
+    .ref(`projectPublic/${uuid}/editors/${subjectUid}/role`)
+    .set(subjectNewRole);
 
   return { status: 200, value: "success" };
 };
@@ -43,6 +47,12 @@ export const execute = async (req, res) => {
     .once("value")
     .then((snapshot) => snapshot.val());
 
-  const result = await tryAction(uuid, editors, username, subjectNewRole, authuid);
+  const result = await tryAction(
+    uuid,
+    editors,
+    username,
+    subjectNewRole,
+    authuid
+  );
   res.status(result.status).send(result.value);
 };

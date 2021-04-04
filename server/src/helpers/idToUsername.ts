@@ -1,4 +1,4 @@
-import { UserInfo } from "../../../.shared/src/types";
+import { UserInfo } from "../../../.shared/src";
 import { db } from "./firebaseSetup";
 
 export const getIdToUsername = async (): Promise<(id: string) => string> => {

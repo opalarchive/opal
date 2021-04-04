@@ -4,7 +4,7 @@ import {
   ProjectPrivate,
   reply,
   Votes,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared/src";
 import { clientdb } from "../../helpers/clientdb";
 import { getIdToUsername } from "../../helpers/idToUsername";
 

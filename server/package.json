@@ -4,7 +4,8 @@
   "description": "Opal Backend",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently -n 'js,ts' -c 'green,red' -i \"nodemon -w ./built-src built-src/index.js\" \"tsc -w\""
+    "dev": "concurrently -n 'ts,js' -c 'red,green' -i --default-input-target 1 \"tsc -w\" \"nodemon -w ./built-src built-src/index.js\"",
+    "start": "node built-src/index.js"
   },
   "author": "",
   "license": "ISC",

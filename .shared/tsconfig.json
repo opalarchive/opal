@@ -18,4 +18,7 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true,
   },
+  "include": [
+    "./src/**/*"
+  ]
 }

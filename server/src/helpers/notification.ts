@@ -1,6 +1,5 @@
-import { Notification } from "../../../.shared/src/types";
+import { Notification } from "../../../.shared/src";
 import { db } from "./firebaseSetup";
-import { getIdToUsername } from "./idToUsername";
 
 export const getNotifications = async (
   uid: string

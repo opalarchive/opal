@@ -153,6 +153,13 @@ routeWithCondition("/private", (req, res, execute) => {
 
 routeWithCondition("/public", (req, res, execute) => execute(req, res));
 
+if (!!process.env.PRODUCTION) {
+  app.use(express.static(path.join(__dirname, "../../client/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../client/build/index.html"));
+  });
+}
+
 app.listen(env.PORT, () => {
   console.log(`Listening at http://localhost:${env.PORT}`);
 });

@@ -2,7 +2,7 @@ import { Button, withStyles, WithStyles } from "@material-ui/core";
 import React from "react";
 import { ViewSectionProps } from "../..";
 
-import { Problem as ProblemType, Server } from "../../../../../../../.shared";
+import { Problem as ProblemType } from "../../../../../../../.shared";
 import { problemFunctions, problemProps } from "../../../../../Constants/types";
 import SidebaredBase from "../../../../Template/SidebaredBase";
 import Filter from "./Filter";
@@ -126,15 +126,18 @@ class Overview extends React.Component<OverviewProps, OverviewState> {
         authUser={authUser}
       >
         <div className={classes.root}>
-          <div className={classes.buttonContainer}>
-            <Button
-              variant="contained"
-              color="secondary"
-              href={ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)}
-            >
-              <FiPlus />
-              &nbsp;New Problem
-            </Button>
+          <div className={classes.buttonWrapper}>
+            <div className={classes.filler} />
+            <div className={classes.buttonContainer}>
+              <Button
+                variant="contained"
+                color="secondary"
+                href={ROUTES.PROJECT_NEW_PROBLEM.replace(":uuid", uuid)}
+              >
+                <FiPlus />
+                &nbsp;New Problem
+              </Button>
+            </div>
           </div>
           <ListViewer
             problemList={problemList}

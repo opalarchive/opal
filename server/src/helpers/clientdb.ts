@@ -2,7 +2,7 @@ import { db } from "./firebaseSetup";
 import * as firebase from "firebase-admin";
 import { projectAccess } from "./projectAccess";
 import { Result } from "./types";
-import { Config } from "../../../.shared/src/types";
+import { Config } from "../../../.shared/src";
 
 export const clientdb = async (
   uuid: string,

@@ -1,4 +1,4 @@
-import { UserInfo } from "../../../../.shared/src/types";
+import { UserInfo } from "../../../../.shared/src";
 import { db } from "../../helpers/firebaseSetup";
 import { getNotifications } from "../../helpers/notification";
 

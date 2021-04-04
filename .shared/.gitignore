@@ -115,6 +115,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# ts built files
+# production
+build
 *.js
 *.d.ts

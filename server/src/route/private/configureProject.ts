@@ -1,5 +1,5 @@
 import * as firebase from "firebase-admin";
-import { isConfig, ProjectRole, Server } from "../../../../.shared/src/types";
+import { isConfig, ProjectRole, Server } from "../../../../.shared/src";
 import { db } from "../../helpers/firebaseSetup";
 
 export const execute = async (req, res) => {

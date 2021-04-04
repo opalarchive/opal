@@ -7,13 +7,13 @@ import {
   ProjectSettings,
   Server,
   ProjectRole,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared/src";
 import { Result } from "../../helpers/types";
 import { db } from "../../helpers/firebaseSetup";
 import {
   problemTextMaxLength,
   problemTitleMaxLength,
-} from "../../../../.shared/src/constants";
+} from "../../../../.shared/src";
 
 const permission = (
   editors: Server.Editors,

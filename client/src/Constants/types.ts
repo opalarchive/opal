@@ -5,6 +5,7 @@ import {
   ReplyType,
   Problem,
   replyAction,
+  List,
 } from "../../../.shared";
 
 /*
@@ -93,6 +94,7 @@ export type tryReplyAction = (
 ) => Promise<void>;
 
 export type newProblem = (problem: Omit<Problem, "ind">) => Promise<void>;
+export type newList = (list: List) => Promise<void>;
 
 export type problemProps = (
   uuid: string,

@@ -40,7 +40,6 @@ import {
   projectRole,
   problemTextMaxLength,
   problemTitleMaxLength,
-  Server,
 } from "../../../../../../../.shared";
 
 interface ProblemProps extends ClientProblem, problemFunctionsExtracted {
@@ -169,8 +168,8 @@ class Problem extends React.PureComponent<
 
     const canEdit =
       !abridged &&
-      (ProjectRole[myRole] == 0 ||
-        ProjectRole[myRole] == 1 ||
+      (ProjectRole[myRole] === 0 ||
+        ProjectRole[myRole] === 1 ||
         authUser.displayName === author);
 
     return (

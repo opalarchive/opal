@@ -6,7 +6,7 @@ import {
   problemAction,
   vote,
   ReplyType,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared/src";
 import { Result } from "../../helpers/types";
 
 const tryAction = async (

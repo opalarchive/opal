@@ -8,7 +8,7 @@ import {
   reply,
   Server,
   ProjectRole,
-} from "../../../../.shared/src/types";
+} from "../../../../.shared/src";
 import { Result } from "../../helpers/types";
 import { db } from "../../helpers/firebaseSetup";
 
@@ -50,7 +50,8 @@ const tryAction = async (
   type: replyAction,
   authuid: string
 ): Promise<Result<string>> => {
-  if (!permission(editors, problem, reply, authuid, type)) return { status: 400, value: "forbidden" };
+  if (!permission(editors, problem, reply, authuid, type))
+    return { status: 400, value: "forbidden" };
   const now = Date.now();
   const replies = problem.replies;
 
@@ -145,7 +146,10 @@ export const execute = async (req, res) => {
     return;
   }
 
-  const editors: Server.Editors = await db.ref(`projectPublic/${uuid}/editors`).once("value").then((snapshot) => snapshot.val());
+  const editors: Server.Editors = await db
+    .ref(`projectPublic/${uuid}/editors`)
+    .once("value")
+    .then((snapshot) => snapshot.val());
 
   const result = await tryAction(
     trydb.value,

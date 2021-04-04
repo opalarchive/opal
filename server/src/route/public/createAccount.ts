@@ -1,6 +1,6 @@
 // must be run on a single thread to prevent race conditions
 
-import { UsernameInfo } from "../../../../.shared/src/types";
+import { UsernameInfo } from "../../../../.shared/src";
 import { convertToURL } from "../../helpers/cryptoSetup";
 import { sendEmail } from "../../helpers/emailSetup";
 import { auth, db } from "../../helpers/firebaseSetup";

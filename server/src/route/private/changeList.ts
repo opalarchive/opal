@@ -1,6 +1,6 @@
 import { clientdb } from "../../helpers/clientdb";
 import * as firebase from "firebase-admin";
-import { Problem, List } from "../../../../.shared/src/types";
+import { Problem, List } from "../../../../.shared/src";
 import { Result } from "../../helpers/types";
 
 const tryChangeList = async (
@@ -9,10 +9,11 @@ const tryChangeList = async (
   problemInd: number,
   authuid: string
 ): Promise<Result<string>> => {
-  let lists: List[] = await cdb
-    .ref(`lists`)
-    .once("value")
-    .then((snapshot) => snapshot.val()) || [];
+  let lists: List[] =
+    (await cdb
+      .ref(`lists`)
+      .once("value")
+      .then((snapshot) => snapshot.val())) || [];
 
   if (lists.length !== listSelection.length) {
     return { status: 400, value: "invalid-input" };

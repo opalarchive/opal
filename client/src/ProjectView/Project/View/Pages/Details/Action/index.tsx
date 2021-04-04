@@ -17,7 +17,11 @@ import {
 import { FiList, FiChevronDown } from "react-icons/fi";
 import styles from "./index.css";
 import { SidebarProps } from "../../../../../Template/SidebaredBase";
-import { ProjectPrivate, projectRole, ProjectRole, Server } from "../../../../../../../../.shared";
+import {
+  ProjectPrivate,
+  projectRole,
+  ProjectRole,
+} from "../../../../../../../../.shared";
 import { changeList } from "../../../../../../Firebase";
 import Scrollbar from "react-scrollbars-custom";
 import { ClientProblem } from "../../../../../../Constants/types";
@@ -111,8 +115,8 @@ class Action extends React.Component<ActionProps, ActionState> {
   render() {
     const { classes, width, project, myRole, authUser, author } = this.props;
     const canEdit: boolean =
-      ProjectRole[myRole] == 0 ||
-      ProjectRole[myRole] == 1 ||
+      ProjectRole[myRole] === 0 ||
+      ProjectRole[myRole] === 1 ||
       authUser.displayName === author;
     return (
       <div className={classes.root} style={{ width: `${width}rem` }}>
