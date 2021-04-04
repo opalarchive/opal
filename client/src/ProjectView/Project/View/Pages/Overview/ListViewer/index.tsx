@@ -4,7 +4,6 @@ import {
   DifficultyColors,
   Problem as ProblemType,
   projectRole,
-  Server,
 } from "../../../../../../../../.shared";
 import {
   problemFunctions,
@@ -43,7 +42,7 @@ export default class ListViewer extends React.PureComponent<ListViewerProps> {
       onClickTag,
       authUser,
       allTags,
-      myRole
+      myRole,
     } = this.props;
 
     return problemList.map((prob) => (

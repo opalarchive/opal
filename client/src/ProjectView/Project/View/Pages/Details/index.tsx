@@ -11,7 +11,6 @@ import {
   DifficultyColors,
   projectRole,
   reply as replyType,
-  Server,
 } from "../../../../../../../.shared";
 import styles from "./index.css";
 import {

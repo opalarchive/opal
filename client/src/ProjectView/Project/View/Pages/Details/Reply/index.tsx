@@ -7,7 +7,6 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   IconButton,
   Menu,
   MenuItem,
@@ -137,7 +136,11 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
   handleSubmitEdit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (this.state.editValue.length < 8 || (!!this.props.content && this.state.editValue === this.props.content.text)) return;
+    if (
+      this.state.editValue.length < 8 ||
+      (!!this.props.content && this.state.editValue === this.props.content.text)
+    )
+      return;
 
     this.props.problemFunctionsExtracted.tryReplyAction(
       this.props.reply,
@@ -209,8 +212,14 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
         .replace(":ind", "" + ind)
         .replace(":reply", "" + reply);
 
-    const canEdit: boolean = !!content ? content.author === authUser.displayName : false;
-    const canDelete: boolean = !!content ? (ProjectRole[myRole] == 0 || ProjectRole[myRole] == 1 || content.author === authUser.displayName) : false;
+    const canEdit: boolean = !!content
+      ? content.author === authUser.displayName
+      : false;
+    const canDelete: boolean = !!content
+      ? ProjectRole[myRole] === 0 ||
+        ProjectRole[myRole] === 1 ||
+        content.author === authUser.displayName
+      : false;
 
     return (
       <div className={classes.root}>
@@ -270,7 +279,11 @@ class ReplyBase<State extends ReplyBaseState> extends React.PureComponent<
                         </DialogContentText>
                       </DialogContent>
                       <DialogActions>
-                        <Button onClick={this.handleCloseDeleteModal} color="primary" autoFocus>
+                        <Button
+                          onClick={this.handleCloseDeleteModal}
+                          color="primary"
+                          autoFocus
+                        >
                           No
                         </Button>
                         <Button
