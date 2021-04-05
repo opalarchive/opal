@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import * as ROUTES from "../Constants/routes";
 
@@ -6,134 +6,123 @@ import { Route, Switch } from "react-router-dom";
 
 import Project from "./Project";
 import Selection from "./Selection";
-import { withAuthorization } from "../Session";
 import { getNotifications, markAllNotifications } from "../Firebase";
 import { poll } from "../Constants";
 import Fail from "../Fail";
-import { WithAuthorization } from "../Session/withAuthorization";
 import { Notification } from "../../../.shared/src";
 import { Result } from "../Constants/types";
+import useAuthUser from "../Session/useAuthUser";
 
-interface ProjectViewProps extends WithAuthorization {}
-interface ProjectViewState {
-  notifsLoading: boolean;
-  notifications: Result<Notification[]>;
-  fail: boolean;
-}
+const ProjectView: React.FC<{}> = () => {
+  // get user object
+  const authUser = useAuthUser();
 
-class ProjectView extends React.Component<ProjectViewProps, ProjectViewState> {
-  state = {
-    notifsLoading: true,
-    notifications: {
-      success: true,
-      value: [],
-    } as Result<Notification[]>,
-    fail: false,
+  const [notifsLoading, setnotifsLoading] = useState(true);
+  const [notifications, setNotifications] = useState<Result<Notification[]>>({
+    success: true,
+    value: [],
+  });
+  const [fail, setFail] = useState(false);
+
+  const markNotifications = async (number: number) => {
+    if (!authUser) return;
+
+    await markAllNotifications(authUser, number);
   };
 
-  private interval: number = -1;
+  useEffect(() => {
+    if (!authUser) return;
 
-  constructor(props: ProjectViewProps) {
-    super(props);
+    let fetchInterval = -1;
 
-    this.setNotifications = this.setNotifications.bind(this);
-    this.markNotifications = this.markNotifications.bind(this);
-    this.fail = this.fail.bind(this);
-  }
+    const fetchNotifications = async () => {
+      if (!authUser) return;
 
-  async setNotifications(): Promise<void> {
-    try {
-      let notifications = await getNotifications(this.props.authUser);
-      if (notifications.success) {
-        this.setState({
-          notifications,
-          notifsLoading: false,
-        });
-      } else {
-        this.setState({ notifications });
+      let success = false;
+
+      try {
+        let notifications = await getNotifications(authUser);
+        setNotifications(notifications);
+
+        if (notifications.success) {
+          setnotifsLoading(false);
+          success = true;
+        }
+      } catch (e) {
+      } finally {
+        return success;
       }
-    } catch (e) {
-      return e;
-    }
+    };
+
+    (async () => {
+      try {
+        await poll(fetchNotifications, (o) => o, 1500, 200);
+        fetchInterval = window.setInterval(fetchNotifications, 30000);
+      } catch (e) {
+        console.log(e);
+        setFail(true);
+      }
+    })();
+
+    return () => {
+      if (fetchInterval !== -1) {
+        window.clearInterval(fetchInterval);
+      }
+    };
+  }, [authUser]);
+
+  if (fail) {
+    return <Fail />;
   }
 
-  async markNotifications(number: number) {
-    await markAllNotifications(this.props.authUser, number);
-    this.setNotifications();
+  // still loading session
+  if (authUser === undefined) {
+    return <></>;
   }
 
-  fail() {
-    this.setState({ fail: true });
+  // not logged in
+  if (authUser === null) {
+    return <>Not logged in</>;
   }
 
-  async componentDidMount() {
-    try {
-      await poll(
-        this.setNotifications,
-        () => !this.state.notifsLoading,
-        1500,
-        200
-      );
-      this.interval = window.setInterval(() => {
-        this.setNotifications();
-      }, 30000);
-    } catch (e) {
-      this.fail();
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.interval !== -1) {
-      window.clearInterval(this.interval);
-    }
-  }
-
-  render() {
-    if (this.state.fail) {
-      return <Fail />;
-    }
-
-    return (
-      <div>
-        <div
-          style={{
-            position: "relative",
-            height: "100vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Switch>
-            <Route
-              path={ROUTES.PROJECT_VIEW}
-              render={() => (
-                <Project
-                  authUser={this.props.authUser}
-                  setNotifications={this.setNotifications}
-                  fail={this.fail}
-                  notifs={this.state.notifications}
-                  notifsLoading={this.state.notifsLoading}
-                  markNotifications={this.markNotifications}
-                />
-              )}
-            />
-            <Route
-              render={() => (
-                <Selection
-                  authUser={this.props.authUser}
-                  setNotifications={this.setNotifications}
-                  fail={this.fail}
-                  notifs={this.state.notifications}
-                  notifsLoading={this.state.notifsLoading}
-                  markNotifications={this.markNotifications}
-                />
-              )}
-            />
-          </Switch>
-        </div>
+  return (
+    <div>
+      <div
+        style={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Switch>
+          <Route
+            path={ROUTES.PROJECT_VIEW}
+            render={() => (
+              <Project
+                authUser={authUser}
+                fail={() => setFail(true)}
+                notifs={notifications}
+                notifsLoading={notifsLoading}
+                markNotifications={markNotifications}
+              />
+            )}
+          />
+          <Route
+            render={() => (
+              <Selection
+                authUser={authUser}
+                fail={() => setFail(true)}
+                notifs={notifications}
+                notifsLoading={notifsLoading}
+                markNotifications={markNotifications}
+              />
+            )}
+          />
+        </Switch>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-export default withAuthorization()(ProjectView);
+export default ProjectView;

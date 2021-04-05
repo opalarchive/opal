@@ -17,17 +17,13 @@ import {
   Typography,
 } from "@material-ui/core";
 import { auth, understandLoginError } from "../Firebase";
-import firebase from "firebase";
 import { ImEye, ImEyeBlocked } from "react-icons/im";
 
 import * as ROUTES from "../Constants/routes";
 
 import styles from "./index.css";
 import { FiLoader, FiLock } from "react-icons/fi";
-
-interface LoginProps {
-  authUser: firebase.User | null;
-}
+import useAuthUser from "../Session/useAuthUser";
 
 interface InputData {
   value: string;
@@ -36,7 +32,10 @@ interface InputData {
 
 const defaultInputData = { value: "", error: -1 };
 
-const Login: React.FC<LoginProps> = ({ authUser }) => {
+const Login: React.FC<{}> = () => {
+  // user object
+  const authUser = useAuthUser();
+
   // history for redirecting to account page
   const history = useHistory();
 
@@ -164,6 +163,11 @@ const Login: React.FC<LoginProps> = ({ authUser }) => {
     }
     setLoading(false);
   };
+
+  // still loading session
+  if (authUser === undefined) {
+    return <></>;
+  }
 
   return (
     <Container component="main" maxWidth="xs">

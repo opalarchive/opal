@@ -97,7 +97,6 @@ class SelectionBase extends React.Component<SelectionBaseProps> {
 
 interface SelectionProps extends NotificationsProps {
   authUser: firebase.User;
-  setNotifications: () => Promise<void>;
   fail: () => void;
 }
 

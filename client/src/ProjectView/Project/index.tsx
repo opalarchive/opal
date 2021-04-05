@@ -41,7 +41,6 @@ interface ProjectProps
   extends RouteComponentProps<ProjectMatch>,
     NotificationsProps {
   authUser: firebase.User;
-  setNotifications: () => Promise<void>;
   fail: () => void;
 }
 

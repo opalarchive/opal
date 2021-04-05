@@ -14,17 +14,13 @@ import {
   Typography,
 } from "@material-ui/core";
 import { createUser, understandSignupError } from "../Firebase";
-import firebase from "firebase";
 import { ImEye, ImEyeBlocked } from "react-icons/im";
 
 import * as ROUTES from "../Constants/routes";
 
 import styles from "./index.css";
 import { FiLoader, FiLock } from "react-icons/fi";
-
-interface SignUpProps {
-  authUser: firebase.User | null;
-}
+import useAuthUser from "../Session/useAuthUser";
 
 // data that is inputed
 // error is the index of the error that is being produced
@@ -38,11 +34,12 @@ interface InputData {
 
 const defaultInputData = { value: "", error: -1 };
 
-const SignUp: React.FC<SignUpProps> = ({ authUser }) => {
+const SignUp: React.FC<{}> = () => {
+  // get user object
+  const authUser = useAuthUser();
+
   // history for redirecting to account page
   const history = useHistory();
-
-  console.log(authUser);
 
   useEffect(() => {
     if (!!authUser) history.push(ROUTES.PROJECT);
@@ -239,6 +236,11 @@ const SignUp: React.FC<SignUpProps> = ({ authUser }) => {
     }
     setLoading(false);
   };
+
+  // still loading session
+  if (authUser === undefined) {
+    return <></>;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
