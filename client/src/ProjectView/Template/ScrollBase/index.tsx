@@ -1,4 +1,4 @@
-import { withStyles, WithStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import React from "react";
 import Scrollbar from "react-scrollbars-custom";
 import { ScrollState } from "react-scrollbars-custom/dist/types/types";
@@ -10,78 +10,41 @@ export interface ScrollBaseProps {
   customScrollTop?: number;
   onScrollTopChange?: (scrollTop: number) => void;
 }
-// const relevantProps: (keyof ScrollBaseProps)[] = [
-//   "maxWidth",
-//   "background",
-//   "customScrollTop",
-// ];
 
-class ScrollBase extends React.Component<
-  ScrollBaseProps & WithStyles<typeof styles>
-> {
-  // shouldComponentUpdate(nextProps: ScrollBaseProps) {
-  //   for (let i = 0; i < relevantProps.length; i++) {
-  //     if (
-  //       JSON.stringify(nextProps[relevantProps[i]]) !==
-  //       JSON.stringify(this.props[relevantProps[i]])
-  //     ) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
+const ScrollBase: React.FC<ScrollBaseProps> = ({
+  maxWidth,
+  background,
+  customScrollTop,
+  onScrollTopChange,
+  children,
+}) => {
+  const classes = makeStyles(styles)();
 
-  constructor(props: ScrollBaseProps & WithStyles<typeof styles>) {
-    super(props);
+  const setScroll = ((
+    scrollValues: ScrollState,
+    prevScrollState: ScrollState
+  ) => {
+    !!onScrollTopChange && onScrollTopChange(scrollValues.scrollTop);
+  }) as ((event: React.UIEvent<HTMLDivElement, UIEvent>) => void) & // which is clearly impossible since a function cannot have 2 different numbers of required parameters // (event: React.UIEvent<HTMLDivElement, UIEvent>) => void) & ((scrollValues: ScrollState, prevScrollState: ScrollState) => void // with different function parameters, but the type of onScroll is given as // jsx has a default onScroll prop while the custom scrollbar has a custom onScroll prop // bodge cast to get around what I assume is a typo in @types/react or react-scrollbars-custom
+    ((scrollValues: ScrollState, prevScrollState: ScrollState) => void);
 
-    this.setScroll = this.setScroll.bind(this);
-  }
-
-  setScroll(scrollValues: ScrollState, prevScrollState: ScrollState) {
-    !!this.props.onScrollTopChange &&
-      this.props.onScrollTopChange(scrollValues.scrollTop);
-  }
-
-  render() {
-    const {
-      maxWidth,
-      background,
-      customScrollTop,
-      children,
-      classes,
-    } = this.props;
-
-    // bodge cast to get around what I assume is a typo in @types/react or react-scrollbars-custom
-    // jsx has a default onScroll prop while the custom scrollbar has a custom onScroll prop
-    // with different function parameters, but the type of onScroll is given as
-    // (event: React.UIEvent<HTMLDivElement, UIEvent>) => void) & ((scrollValues: ScrollState, prevScrollState: ScrollState) => void
-    // which is clearly impossible since a function cannot have 2 different numbers of required parameters
-    const onScroll = this.setScroll as ((
-      event: React.UIEvent<HTMLDivElement, UIEvent>
-    ) => void) &
-      ((scrollValues: ScrollState, prevScrollState: ScrollState) => void);
-
-    return (
-      <div
-        className={classes.container}
-        style={{ backgroundColor: background }}
+  return (
+    <div className={classes.container} style={{ backgroundColor: background }}>
+      <Scrollbar
+        noScrollX
+        disableTrackYWidthCompensation
+        scrollTop={customScrollTop}
+        onScroll={setScroll}
       >
-        <Scrollbar
-          noScrollX
-          disableTrackYWidthCompensation
-          scrollTop={customScrollTop}
-          onScroll={onScroll}
+        <div
+          className={`${classes.container} ${classes.centered}`}
+          style={{ maxWidth }}
         >
-          <div
-            className={`${classes.container} ${classes.centered}`}
-            style={{ maxWidth }}
-          >
-            {children}
-          </div>
-        </Scrollbar>
-      </div>
-    );
-  }
-}
+          {children}
+        </div>
+      </Scrollbar>
+    </div>
+  );
+};
 
-export default withStyles(styles)(ScrollBase);
+export default ScrollBase;

@@ -1,6 +1,19 @@
 import { createStyles, Theme } from "@material-ui/core";
 import { spacingRem } from "../../../Constants";
 
+export const notifBoxStyles = (theme: Theme) =>
+  createStyles({
+    listItem: {
+      display: "flex",
+      flexDirection: "column",
+    },
+    notificationDot: {
+      fontSize: "4rem",
+      marginLeft: "0.2em",
+      color: theme.palette.primary.light,
+    },
+  });
+
 const styles = (theme: Theme) =>
   createStyles({
     root: {
@@ -18,10 +31,6 @@ const styles = (theme: Theme) =>
       maxHeight: spacingRem(theme, 40),
       overflow: "auto",
     },
-    listItem: {
-      display: "flex",
-      flexDirection: "column",
-    },
     loading: {
       display: "flex",
       justifyContent: "center",
@@ -33,11 +42,6 @@ const styles = (theme: Theme) =>
     centeredSpace: {
       padding: spacingRem(theme, 1),
       textAlign: "center",
-    },
-    notificationDot: {
-      fontSize: "4rem",
-      marginLeft: "0.2em",
-      color: theme.palette.primary.light,
     },
     link: {
       color: theme.palette.primary.light,

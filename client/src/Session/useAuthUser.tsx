@@ -14,7 +14,7 @@ const useAuthUser = () => {
   );
 
   useEffect(() => {
-    const listener = auth.onAuthStateChanged(
+    const unsubscribe = auth.onAuthStateChanged(
       // session status found
       (user) => {
         setAuthUser(user);
@@ -26,7 +26,7 @@ const useAuthUser = () => {
     );
 
     return () => {
-      if (!!listener) listener();
+      if (!!unsubscribe) unsubscribe();
     };
   }, []);
 

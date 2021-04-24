@@ -1,4 +1,4 @@
-import { withStyles, WithStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import React from "react";
 import styles from "./index.css";
 
@@ -7,7 +7,7 @@ export interface SidebarProps {
   authUser: firebase.User;
 }
 
-interface SidebaredBaseProps extends WithStyles<typeof styles> {
+interface SidebaredBaseProps {
   sidebarWidth: number;
   right?: boolean;
   Sidebar?: React.ComponentType<any & SidebarProps>;
@@ -18,81 +18,57 @@ interface SidebaredBaseProps extends WithStyles<typeof styles> {
   authUser: firebase.User;
 }
 
-// const relevantProps: (keyof SidebaredBaseProps)[] = [
-//   "sidebarWidth",
-//   "right",
-//   "sidebarProps",
-//   "fixedSidebar",
-//   "sidebarYOffset",
-//   "height",
-// ];
+const SidebaredBase: React.FC<SidebaredBaseProps> = ({
+  sidebarWidth,
+  right,
+  Sidebar,
+  sidebarProps,
+  fixedSidebar,
+  sidebarYOffset,
+  height,
+  authUser,
+  children,
+}) => {
+  const classes = makeStyles(styles)();
 
-class SidebaredBase extends React.Component<SidebaredBaseProps> {
-  // shouldComponentUpdate(nextProps: SidebaredBaseProps) {
-  //   for (let i = 0; i < relevantProps.length; i++) {
-  //     if (
-  //       JSON.stringify(nextProps[relevantProps[i]]) !==
-  //       JSON.stringify(this.props[relevantProps[i]])
-  //     ) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  render() {
-    const {
-      sidebarWidth,
-      right,
-      Sidebar,
-      sidebarProps,
-      fixedSidebar,
-      sidebarYOffset,
-      height,
-      authUser,
-      classes,
-      children,
-    } = this.props;
-
-    return (
-      <>
+  return (
+    <>
+      <div
+        className={classes.sidebar}
+        style={{
+          width: `${sidebarWidth}rem`,
+          left: right ? "auto" : 0,
+          right: right ? 0 : "auto",
+        }}
+      >
         <div
-          className={classes.sidebar}
+          className={classes.sidebarWrapper}
           style={{
-            width: `${sidebarWidth}rem`,
-            left: right ? "auto" : 0,
-            right: right ? 0 : "auto",
+            transform: `translateY(${sidebarYOffset}px)`,
+            position: fixedSidebar ? "fixed" : "static",
+            height: !!height ? height : "100%",
           }}
         >
-          <div
-            className={classes.sidebarWrapper}
-            style={{
-              transform: `translateY(${sidebarYOffset}px)`,
-              position: fixedSidebar ? "fixed" : "static",
-              height: !!height ? height : "100%",
-            }}
-          >
-            {!!Sidebar && (
-              <Sidebar
-                width={sidebarWidth}
-                authUser={authUser}
-                {...sidebarProps}
-              />
-            )}
-          </div>
+          {!!Sidebar && (
+            <Sidebar
+              width={sidebarWidth}
+              authUser={authUser}
+              {...sidebarProps}
+            />
+          )}
         </div>
-        <div
-          className={classes.inner}
-          style={{
-            marginLeft: !!right ? 0 : `${sidebarWidth}rem`,
-            marginRight: !!right ? `${sidebarWidth}rem` : 0,
-          }}
-        >
-          {children}
-        </div>
-      </>
-    );
-  }
-}
+      </div>
+      <div
+        className={classes.inner}
+        style={{
+          marginLeft: !!right ? 0 : `${sidebarWidth}rem`,
+          marginRight: !!right ? `${sidebarWidth}rem` : 0,
+        }}
+      >
+        {children}
+      </div>
+    </>
+  );
+};
 
-export default withStyles(styles)(SidebaredBase);
+export default SidebaredBase;
