@@ -4,14 +4,13 @@ import {
   Tooltip,
   IconButton,
   Toolbar,
-  withStyles,
-  WithStyles,
+  makeStyles,
 } from "@material-ui/core";
 import { FiFilter, FiTrash2 } from "react-icons/fi";
 import { toolbarStyles } from "./constants";
 import { projectAction } from "../../../../../.shared/src";
 
-interface ProjectToolbarProps extends WithStyles<typeof toolbarStyles> {
+interface ProjectToolbarProps {
   selected: string[];
   name: string;
   showModal: (type: projectAction) => void;
@@ -21,9 +20,9 @@ const ProjectToolbar: React.FC<ProjectToolbarProps> = ({
   selected,
   name,
   showModal,
-  classes,
 }) => {
   const numSelected = selected.length;
+  const classes = makeStyles(toolbarStyles)();
 
   return (
     <Toolbar
@@ -68,4 +67,4 @@ const ProjectToolbar: React.FC<ProjectToolbarProps> = ({
   );
 };
 
-export default withStyles(toolbarStyles)(ProjectToolbar);
+export default ProjectToolbar;

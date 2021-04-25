@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   TableContainer,
@@ -10,8 +10,7 @@ import {
   TableBody,
   Checkbox,
   TableSortLabel,
-  WithStyles,
-  withStyles,
+  makeStyles,
 } from "@material-ui/core";
 import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
@@ -38,7 +37,7 @@ interface Selected {
   [uuid: string]: boolean;
 }
 
-interface ProjectTableProps extends WithStyles<typeof styles> {
+interface ProjectTableProps {
   projects: Client.Publico;
   data: ProjectDataPoint[];
   fixed: boolean;
@@ -48,87 +47,67 @@ interface ProjectTableProps extends WithStyles<typeof styles> {
   refreshProjects: () => Promise<void>;
 }
 
-interface ProjectTableState {
-  selected: Selected;
-  sort: ProjectViewSort;
-  modal: {
+const ProjectTable: React.FC<ProjectTableProps> = ({
+  projects,
+  data,
+  fixed,
+  defaultSort,
+  authUser,
+  name,
+  refreshProjects,
+}) => {
+  const classes = makeStyles(styles)();
+
+  const [selected, setSelected] = useState<Selected>({});
+  const [sort, setSort] = useState<ProjectViewSort>(defaultSort);
+  const [modal, setModal] = useState<{
     show: boolean;
     type: projectAction;
     input: string;
     activeProject: string;
-  };
-}
+  }>({
+    show: false,
+    type: "SHARE" as projectAction,
+    input: "",
+    activeProject: "",
+  });
 
-class ProjectTable extends React.Component<
-  ProjectTableProps,
-  ProjectTableState
-> {
-  state = {
-    selected: {} as Selected,
-    sort: {
-      dataPoint: "name",
-      direction: "asc",
-    } as ProjectViewSort,
-    modal: {
-      show: false,
-      type: "SHARE" as projectAction,
-      input: "",
-      activeProject: "",
-    },
-  };
-
-  constructor(props: ProjectTableProps) {
-    super(props);
-
-    this.onRowClick = this.onRowClick.bind(this);
-    this.onAllClick = this.onAllClick.bind(this);
-    this.sortProjectKeys = this.sortProjectKeys.bind(this);
-    this.onSortClick = this.onSortClick.bind(this);
-    this.showModal = this.showModal.bind(this);
-    this.updateModalInput = this.updateModalInput.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.modalSuccess = this.modalSuccess.bind(this);
-  }
-
-  componentDidMount() {
-    this.setState({
-      sort: this.props.defaultSort,
-    });
-  }
-
-  onRowClick(event: React.MouseEvent<HTMLTableRowElement>, uuid: string) {
+  const onRowClick = (
+    event: React.MouseEvent<HTMLTableRowElement>,
+    uuid: string
+  ) => {
     event.preventDefault();
 
-    let selected = this.state.selected;
     selected[uuid] = !selected[uuid];
 
-    this.setState({ selected });
-  }
+    setSelected((prevSelected) => {
+      prevSelected[uuid] = !prevSelected[uuid];
+      return prevSelected;
+    });
+  };
 
-  onAllClick(event: React.ChangeEvent<HTMLInputElement>) {
+  const onAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      let selected = {} as Selected;
-      Object.keys(this.props.projects).forEach((uuid) => {
-        selected[uuid] = true;
+      setSelected((prevSelected) => {
+        let selected = {} as Selected;
+        Object.keys(projects).forEach((uuid) => {
+          selected[uuid] = true;
+        });
+        return selected;
       });
-      this.setState({ selected });
     } else {
-      this.setState({ selected: {} as Selected });
+      setSelected({});
     }
-  }
+  };
 
-  sortProjectKeys(sort: ProjectViewSort, projectKeys: string[]) {
+  const sortProjectKeys = (sort: ProjectViewSort, projectKeys: string[]) => {
     type anchoredData = {
       data: string | number;
       key: string;
     };
 
     let stabilized: anchoredData[] = projectKeys.map((key) => ({
-      data: getDataPoint(
-        this.props.projects[key],
-        sort.dataPoint,
-        this.props.authUser.displayName!
-      ),
+      data: getDataPoint(projects[key], sort.dataPoint, authUser.displayName!),
       key,
     }));
 
@@ -149,182 +128,160 @@ class ProjectTable extends React.Component<
     });
 
     return stabilized.map((arr) => arr.key);
-  }
+  };
 
-  onSortClick(
+  const onSortClick = (
     event: React.MouseEvent<HTMLButtonElement>,
     dataPoint: ProjectDataPoint
-  ) {
+  ) => {
     let sort: ProjectViewSort = { dataPoint: dataPoint, direction: "asc" };
-    if (dataPoint === this.state.sort.dataPoint) {
+    if (dataPoint === sort.dataPoint) {
       sort = {
         dataPoint,
-        direction: this.state.sort.direction === "asc" ? "desc" : "asc",
+        direction: sort.direction === "asc" ? "desc" : "asc",
       };
     }
-    this.setState({
-      sort,
-    });
-  }
+    setSort(sort);
+  };
 
-  showModal(type: projectAction, activeProject: string) {
-    this.setState({ modal: { show: true, type, input: "", activeProject } });
-  }
+  const showModal = (type: projectAction, activeProject: string) => {
+    setModal({ show: true, type, input: "", activeProject });
+  };
 
-  updateModalInput(event: React.ChangeEvent<HTMLInputElement>) {
+  const updateModalInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
-    this.setState({
-      modal: { ...this.state.modal, input: event.target.value },
-    });
-  }
+    setModal((prevModal) => ({ ...prevModal, input: event.target.value }));
+  };
 
-  closeModal(event?: React.MouseEvent<HTMLButtonElement>) {
+  const closeModal = (event?: React.MouseEvent<HTMLButtonElement>) => {
     if (!!event) event.preventDefault();
 
-    this.setState({
-      modal: { ...this.state.modal, show: !this.state.modal.show },
-    });
-  }
+    setModal((prevModal) => ({ ...prevModal, show: !prevModal.show }));
+  };
 
-  async modalSuccess(event?: React.MouseEvent<HTMLButtonElement>) {
+  const modalSuccess = async (event?: React.MouseEvent<HTMLButtonElement>) => {
     if (!!event) event.preventDefault();
 
     let attempt: Result<string> = { success: false, value: "" };
 
-    if (isProjectActionAdmin(this.state.modal.type)) {
+    if (isProjectActionAdmin(modal.type)) {
       attempt = await tryProjectActionAdmin(
-        this.state.modal.activeProject,
-        this.props.authUser,
-        this.state.modal.type,
-        this.state.modal.input
+        modal.activeProject,
+        authUser,
+        modal.type,
+        modal.input
       );
-    } else if (isProjectActionEditor(this.state.modal.type)) {
+    } else if (isProjectActionEditor(modal.type)) {
       // currently this is the only trivial action, but this may change
       // TODO: generalize this
-      attempt = await starProject(
-        this.state.modal.activeProject,
-        this.props.authUser
-      );
+      attempt = await starProject(modal.activeProject, authUser);
     } else {
       console.log("Undefined");
     }
 
     if (attempt.success) {
-      this.closeModal();
-      this.props.refreshProjects();
+      closeModal();
+      refreshProjects();
     } else {
       // maybe display error
     }
-  }
+  };
 
-  render() {
-    const { projects, data, name, classes } = this.props;
+  const selectedList = Object.keys(selected).filter((proj) => selected[proj]);
 
-    const realSelected = Object.keys(this.state.selected).filter(
-      (proj) => this.state.selected[proj]
-    );
+  const sortedProjectKeys = sortProjectKeys(defaultSort, Object.keys(projects));
 
-    const sortedProjectKeys = this.sortProjectKeys(
-      this.props.defaultSort,
-      Object.keys(this.props.projects)
-    );
-
-    return (
-      <div className={classes.root}>
-        <Paper elevation={2}>
-          <Modal
-            show={this.state.modal.show}
-            type={this.state.modal.type}
-            closeModal={this.closeModal}
-            input={this.state.modal.input}
-            inputChange={this.updateModalInput}
-            modalSuccess={this.modalSuccess}
-          />
-          <ProjectToolbar
-            selected={realSelected}
-            name={camelToTitle(name)}
-            showModal={(type: projectAction) =>
-              this.setState({
-                modal: {
-                  show: !this.state.modal.show,
-                  type,
-                  input: "",
-                  activeProject: "",
-                },
-              })
-            }
-          />
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      indeterminate={
-                        realSelected.length > 0 &&
-                        realSelected.length < Object.values(projects).length
-                      }
-                      checked={
-                        Object.values(projects).length > 0 &&
-                        realSelected.length === Object.values(projects).length
-                      }
-                      onChange={this.onAllClick}
-                      inputProps={{ "aria-label": "select all projects" }}
-                    />
-                  </TableCell>
-                  {data.map((dataPoint, index) => (
-                    <TableCell
-                      component="th"
-                      scope="col"
-                      padding={index === 0 ? "none" : "default"}
-                      align={index === 0 ? "left" : "right"}
-                      key={dataPoint}
-                    >
-                      {this.props.fixed ? (
-                        camelToTitle(dataPoint)
-                      ) : (
-                        <TableSortLabel
-                          active={this.state.sort.dataPoint === dataPoint}
-                          direction={
-                            this.state.sort.dataPoint === dataPoint
-                              ? this.state.sort.direction
-                              : "asc"
-                          }
-                          onClick={(
-                            event: React.MouseEvent<HTMLButtonElement>
-                          ) => this.onSortClick(event, dataPoint)}
-                          IconComponent={FiArrowDown}
-                        >
-                          {camelToTitle(dataPoint)}
-                        </TableSortLabel>
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedProjectKeys.map((uuid, index) => (
-                  <ProjectRow
-                    uuid={uuid}
-                    index={index}
-                    data={data}
-                    proj={projects[uuid]}
-                    selected={!!this.state.selected[uuid]}
-                    onRowClick={this.onRowClick}
-                    username={this.props.authUser.displayName!}
-                    showModal={this.showModal}
-                    name={name}
-                    key={`project-row-${uuid}`}
+  return (
+    <div className={classes.root}>
+      <Paper elevation={2}>
+        <Modal
+          show={modal.show}
+          type={modal.type}
+          closeModal={closeModal}
+          input={modal.input}
+          inputChange={updateModalInput}
+          modalSuccess={modalSuccess}
+        />
+        <ProjectToolbar
+          selected={selectedList}
+          name={camelToTitle(name)}
+          showModal={(type: projectAction) =>
+            setModal((prevModal) => ({
+              show: !prevModal.show,
+              type,
+              input: "",
+              activeProject: "",
+            }))
+          }
+        />
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={
+                      selectedList.length > 0 &&
+                      selectedList.length < Object.values(projects).length
+                    }
+                    checked={
+                      Object.values(projects).length > 0 &&
+                      selectedList.length === Object.values(projects).length
+                    }
+                    onChange={onAllClick}
+                    inputProps={{ "aria-label": "select all projects" }}
                   />
+                </TableCell>
+                {data.map((dataPoint, index) => (
+                  <TableCell
+                    component="th"
+                    scope="col"
+                    padding={index === 0 ? "none" : "default"}
+                    align={index === 0 ? "left" : "right"}
+                    key={dataPoint}
+                  >
+                    {fixed ? (
+                      camelToTitle(dataPoint)
+                    ) : (
+                      <TableSortLabel
+                        active={sort.dataPoint === dataPoint}
+                        direction={
+                          sort.dataPoint === dataPoint ? sort.direction : "asc"
+                        }
+                        onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+                          onSortClick(event, dataPoint)
+                        }
+                        IconComponent={FiArrowDown}
+                      >
+                        {camelToTitle(dataPoint)}
+                      </TableSortLabel>
+                    )}
+                  </TableCell>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      </div>
-    );
-  }
-}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedProjectKeys.map((uuid, index) => (
+                <ProjectRow
+                  uuid={uuid}
+                  index={index}
+                  data={data}
+                  proj={projects[uuid]}
+                  selected={!!selected[uuid]}
+                  onRowClick={onRowClick}
+                  username={authUser.displayName!}
+                  showModal={showModal}
+                  name={name}
+                  key={`project-row-${uuid}`}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </div>
+  );
+};
 
-export default withStyles(styles)(ProjectTable);
+export default ProjectTable;
