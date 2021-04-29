@@ -196,7 +196,6 @@ const Modal: React.FC<ModalProps> = ({
   } else if (isProjectActionEditor(type)) {
     switch (ProjectActionEditor[type]) {
       case ProjectActionEditor.STAR:
-        if (show) modalSuccess();
         return <></>;
       default:
         return <h1>BLARGH</h1>;

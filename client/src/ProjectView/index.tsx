@@ -33,7 +33,7 @@ const ProjectView: React.FC<{}> = () => {
   useEffect(() => {
     if (!authUser) return;
 
-    let fetchInterval = -1;
+    let backgroundFetch = -1;
 
     const fetchNotifications = async () => {
       if (!authUser) return;
@@ -56,8 +56,8 @@ const ProjectView: React.FC<{}> = () => {
 
     (async () => {
       try {
-        await poll(fetchNotifications, (o) => o, 1500, 200);
-        fetchInterval = window.setInterval(fetchNotifications, 30000);
+        await poll(fetchNotifications, (o) => !!o, 1500, 200);
+        backgroundFetch = window.setInterval(fetchNotifications, 30000);
       } catch (e) {
         console.log(e);
         setFail(true);
@@ -65,8 +65,8 @@ const ProjectView: React.FC<{}> = () => {
     })();
 
     return () => {
-      if (fetchInterval !== -1) {
-        window.clearInterval(fetchInterval);
+      if (backgroundFetch !== -1) {
+        window.clearInterval(backgroundFetch);
       }
     };
   }, [authUser]);

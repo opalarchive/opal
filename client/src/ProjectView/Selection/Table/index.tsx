@@ -16,20 +16,18 @@ import { getDataPoint } from "./constants";
 import ProjectToolbar from "./projecttoolbar";
 import ProjectRow from "./projectrow";
 import Modal from "./modal";
-import { starProject, tryProjectActionAdmin } from "../../../Firebase";
 import { camelToTitle } from "../../../Constants";
 import { FiArrowDown } from "react-icons/fi";
 import {
   Client,
-  projectAction,
-  isProjectActionAdmin,
   isProjectActionEditor,
+  projectAction,
+  ProjectActionEditor,
 } from "../../../../../.shared/src";
 import {
   ProjectDataPoint,
   ProjectViewSort,
   ProjectViewType,
-  Result,
 } from "../../../Constants/types";
 import styles from "./index.css";
 
@@ -39,22 +37,26 @@ interface Selected {
 
 interface ProjectTableProps {
   projects: Client.Publico;
+  tryProjectAction: (
+    uuid: string,
+    type: projectAction,
+    data?: string
+  ) => Promise<boolean>;
   data: ProjectDataPoint[];
   fixed: boolean;
   defaultSort: ProjectViewSort;
   authUser: firebase.User;
   name: ProjectViewType;
-  refreshProjects: () => Promise<void>;
 }
 
 const ProjectTable: React.FC<ProjectTableProps> = ({
   projects,
+  tryProjectAction,
   data,
   fixed,
   defaultSort,
   authUser,
   name,
-  refreshProjects,
 }) => {
   const classes = makeStyles(styles)();
 
@@ -64,12 +66,12 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
     show: boolean;
     type: projectAction;
     input: string;
-    activeProject: string;
+    activeProjectUUID: string;
   }>({
     show: false,
     type: "SHARE" as projectAction,
     input: "",
-    activeProject: "",
+    activeProjectUUID: "",
   });
 
   const onRowClick = (
@@ -144,48 +146,45 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
     setSort(sort);
   };
 
-  const showModal = (type: projectAction, activeProject: string) => {
-    setModal({ show: true, type, input: "", activeProject });
+  const showModal = (type: projectAction, activeProjectUUID: string) => {
+    if (isProjectActionEditor(type)) {
+      if (ProjectActionEditor[type] === ProjectActionEditor.STAR) {
+        tryModalAction(activeProjectUUID, type);
+        return;
+      }
+    }
+    setModal({ show: true, type, input: "", activeProjectUUID });
   };
 
   const updateModalInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
-    setModal((prevModal) => ({ ...prevModal, input: event.target.value }));
+    const input = event.target.value;
+
+    setModal((prevModal) => ({ ...prevModal, input }));
   };
 
   const closeModal = (event?: React.MouseEvent<HTMLButtonElement>) => {
     if (!!event) event.preventDefault();
 
-    setModal((prevModal) => ({ ...prevModal, show: !prevModal.show }));
+    setModal((prevModal) => ({ ...prevModal, show: false }));
+  };
+
+  const tryModalAction = async (
+    uuid: string,
+    type: projectAction,
+    data?: string
+  ) => {
+    if (await tryProjectAction(uuid, type, data)) {
+      closeModal();
+    }
   };
 
   const modalSuccess = async (event?: React.MouseEvent<HTMLButtonElement>) => {
     if (!!event) event.preventDefault();
+    if (!modal.show) return;
 
-    let attempt: Result<string> = { success: false, value: "" };
-
-    if (isProjectActionAdmin(modal.type)) {
-      attempt = await tryProjectActionAdmin(
-        modal.activeProject,
-        authUser,
-        modal.type,
-        modal.input
-      );
-    } else if (isProjectActionEditor(modal.type)) {
-      // currently this is the only trivial action, but this may change
-      // TODO: generalize this
-      attempt = await starProject(modal.activeProject, authUser);
-    } else {
-      console.log("Undefined");
-    }
-
-    if (attempt.success) {
-      closeModal();
-      refreshProjects();
-    } else {
-      // maybe display error
-    }
+    await tryModalAction(modal.activeProjectUUID, modal.type, modal.input);
   };
 
   const selectedList = Object.keys(selected).filter((proj) => selected[proj]);
@@ -211,7 +210,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
               show: !prevModal.show,
               type,
               input: "",
-              activeProject: "",
+              activeProjectUUID: "",
             }))
           }
         />

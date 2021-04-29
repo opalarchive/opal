@@ -66,7 +66,7 @@ interface ProjectRowProps {
     uuid: string
   ) => void;
   username: string;
-  showModal: (type: projectAction, activeProject: string) => void;
+  showModal: (type: projectAction, activeProjectUUID: string) => void;
   name: string;
 }
 
