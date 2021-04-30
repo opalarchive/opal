@@ -119,62 +119,43 @@ type LatexProps = katex.KatexOptions & {
   children: string;
 };
 
-class Latex extends React.Component<LatexProps> {
-  static defaultProps = {
-    children: "",
-    displayMode: false,
-    output: "htmlAndMathml",
-    leqno: false,
-    fleqn: false,
-    throwOnError: true,
-    errorColor: "#cc0000",
-    macros: {},
-    minRuleThickness: 0.06,
-    colorIsTextColor: false,
-    strict: "warn",
-    trust: false,
-  };
-
-  render() {
-    const {
-      children,
-      displayMode,
-      leqno,
-      fleqn,
-      throwOnError,
-      errorColor,
-      macros,
-      minRuleThickness,
-      colorIsTextColor,
-      maxSize,
-      maxExpand,
-      strict,
-      trust,
-    } = this.props;
-    const id = this.props.id ? this.props.id : "";
-
-    const renderUs = latexify(children, {
-      displayMode,
-      leqno,
-      fleqn,
-      throwOnError,
-      errorColor,
-      macros,
-      minRuleThickness,
-      colorIsTextColor,
-      maxSize,
-      maxExpand,
-      strict,
-      trust,
-    });
-    return (
-      <span>
-        {renderUs.map((render, index) => (
-          <span key={id + index}>{renderElement(render)}</span>
-        ))}
-      </span>
-    );
-  }
-}
+const Latex: React.FC<LatexProps> = ({
+  children = "",
+  displayMode = false,
+  leqno = false,
+  fleqn = false,
+  throwOnError = true,
+  errorColor = "#cc0000",
+  macros = {},
+  minRuleThickness = 0.06,
+  colorIsTextColor = false,
+  maxSize,
+  maxExpand,
+  strict = "warn",
+  trust = false,
+  id,
+}) => {
+  const renderUs = latexify(children, {
+    displayMode,
+    leqno,
+    fleqn,
+    throwOnError,
+    errorColor,
+    macros,
+    minRuleThickness,
+    colorIsTextColor,
+    maxSize,
+    maxExpand,
+    strict,
+    trust,
+  });
+  return (
+    <span>
+      {renderUs.map((render, index) => (
+        <span key={id ?? "" + index}>{renderElement(render)}</span>
+      ))}
+    </span>
+  );
+};
 
 export default Latex;

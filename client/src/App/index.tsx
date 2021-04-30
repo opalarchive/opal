@@ -12,22 +12,20 @@ import ProjectView from "../ProjectView";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "./index.css";
 
-class App extends React.Component {
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <Router>
-          <Switch>
-            <Route exact path={ROUTES.CUSTOM_HOME} render={() => <Home />} />
-            <Route exact path={ROUTES.HOME} render={() => <Home />} />
-            <Route exact path={ROUTES.LOGIN} render={() => <Login />} />
-            <Route exact path={ROUTES.SIGNUP} render={() => <SignUp />} />
-            <Route path={ROUTES.PROJECT} render={() => <ProjectView />} />
-          </Switch>
-        </Router>
-      </ThemeProvider>
-    );
-  }
-}
+const App: React.FC = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <Router>
+        <Switch>
+          <Route exact path={ROUTES.CUSTOM_HOME} render={() => <Home />} />
+          <Route exact path={ROUTES.HOME} render={() => <Home />} />
+          <Route exact path={ROUTES.LOGIN} render={() => <Login />} />
+          <Route exact path={ROUTES.SIGNUP} render={() => <SignUp />} />
+          <Route path={ROUTES.PROJECT} render={() => <ProjectView />} />
+        </Switch>
+      </Router>
+    </ThemeProvider>
+  );
+};
 
 export default App;

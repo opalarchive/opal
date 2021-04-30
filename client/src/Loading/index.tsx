@@ -1,9 +1,9 @@
-import { Theme, withStyles, WithStyles, withTheme } from "@material-ui/core";
+import { makeStyles, Theme, withTheme } from "@material-ui/core";
 import React from "react";
 
 import styles from "./index.css";
 
-interface SpinningProps extends WithStyles<typeof styles> {
+interface SpinningProps {
   background: string;
   inner: string;
   center: string;
@@ -11,50 +11,52 @@ interface SpinningProps extends WithStyles<typeof styles> {
   hideText?: boolean;
 }
 
-class SpinningBase extends React.Component<SpinningProps> {
-  render() {
-    const { background, inner, center, outer, hideText, classes } = this.props;
+export const SpinningBase: React.FC<SpinningProps> = ({
+  background,
+  inner,
+  center,
+  outer,
+  hideText,
+}) => {
+  const classes = makeStyles(styles)();
 
-    const prefix = "3px solid ";
-    const overrideColor = {
-      borderLeft: prefix + background,
-      borderRight: prefix + background,
-    };
-    return (
-      <div
-        style={{
-          position: "relative",
-          marginTop: "2rem",
-          marginBottom: "2rem",
-        }}
-      >
-        <div style={{ position: "relative", height: "8rem" }}>
-          <div
-            className={`${classes.ring} ${classes.inner}`}
-            style={{ ...overrideColor, borderTop: prefix + inner }}
-          ></div>
-          <div
-            className={`${classes.ring} ${classes.center}`}
-            style={{ ...overrideColor, borderTop: prefix + center }}
-          ></div>
-          <div
-            className={`${classes.ring} ${classes.outer}`}
-            style={{ ...overrideColor, borderTop: prefix + outer }}
-          ></div>
-        </div>
-        {!!hideText ? (
-          ""
-        ) : (
-          <div className={`${classes.text}`} style={{ marginTop: "1rem" }}>
-            Loading...
-          </div>
-        )}
+  const prefix = "3px solid ";
+  const overrideColor = {
+    borderLeft: prefix + background,
+    borderRight: prefix + background,
+  };
+  return (
+    <div
+      style={{
+        position: "relative",
+        marginTop: "2rem",
+        marginBottom: "2rem",
+      }}
+    >
+      <div style={{ position: "relative", height: "8rem" }}>
+        <div
+          className={`${classes.ring} ${classes.inner}`}
+          style={{ ...overrideColor, borderTop: prefix + inner }}
+        ></div>
+        <div
+          className={`${classes.ring} ${classes.center}`}
+          style={{ ...overrideColor, borderTop: prefix + center }}
+        ></div>
+        <div
+          className={`${classes.ring} ${classes.outer}`}
+          style={{ ...overrideColor, borderTop: prefix + outer }}
+        ></div>
       </div>
-    );
-  }
-}
-
-const Spinning = withStyles(styles)(SpinningBase);
+      {!!hideText ? (
+        ""
+      ) : (
+        <div className={`${classes.text}`} style={{ marginTop: "1rem" }}>
+          Loading...
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface LoadingProps {
   background: string;
@@ -64,7 +66,7 @@ interface LoadingProps {
 
 const Loading: React.FC<LoadingProps> = ({ background, hideText, theme }) => {
   return (
-    <Spinning
+    <SpinningBase
       background={background}
       inner={theme.palette.primary.light}
       center={theme.palette.primary.dark}
