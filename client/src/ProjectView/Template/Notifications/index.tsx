@@ -11,7 +11,7 @@ import {
   Divider,
   makeStyles,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FiBell } from "react-icons/fi";
 import { Notification } from "../../../../../.shared/src";
 import { Result } from "../../../Constants/types";
@@ -76,7 +76,7 @@ const Notifications: React.FC<NotificationsProps> = ({
   const classes = makeStyles(styles)();
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const notificationButton = React.createRef<HTMLButtonElement>();
+  const notificationButton = useRef<HTMLButtonElement>(null);
 
   // when the notifications dialog is open, set all the notifications to read
   const onDialogOpen = () => {
