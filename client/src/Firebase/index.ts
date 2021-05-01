@@ -165,7 +165,7 @@ export const getNotifications = async (authUser: firebase.User) => {
   return await post<Notification[]>("private/getNotifications", {}, authUser);
 };
 
-export const markAllNotifications = async (
+export const markNotifications = async (
   authUser: firebase.User,
   number: number
 ) => {

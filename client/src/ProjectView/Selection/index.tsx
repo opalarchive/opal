@@ -34,6 +34,8 @@ import SidebaredBase from "../Template/SidebaredBase";
 import { NotificationsProps } from "../Template/Notifications";
 import SelectionAppbar from "./SelectionAppbar";
 
+const LoadingScreen = <Loading background="white" />;
+
 interface SelectionBaseProps {
   tryProjectAction: (
     uuid: string,
@@ -367,6 +369,7 @@ const Selection: React.FC<SelectionProps> = ({
         console.log("Undefined");
       }
 
+      // undo on error
       if (!attempt.success) {
         setVisibleProjects(previousProjectsSnapshot);
       }
@@ -376,7 +379,7 @@ const Selection: React.FC<SelectionProps> = ({
   }, [visibleProjects, authUser]);
 
   if (loading) {
-    return <Loading background="white" />;
+    return LoadingScreen;
   }
   return (
     <>

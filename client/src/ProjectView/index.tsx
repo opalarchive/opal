@@ -6,7 +6,7 @@ import { Route, Switch } from "react-router-dom";
 
 import Project from "./Project";
 import Selection from "./Selection";
-import { getNotifications, markAllNotifications } from "../Firebase";
+import { getNotifications, markNotifications } from "../Firebase";
 import { poll } from "../Constants";
 import Fail from "../Fail";
 import { Notification } from "../../../.shared/src";
@@ -24,10 +24,33 @@ const ProjectView: React.FC<{}> = () => {
   });
   const [fail, setFail] = useState(false);
 
-  const markNotifications = async (number: number) => {
+  const markNotifs = async (number: number) => {
     if (!authUser) return;
 
-    await markAllNotifications(authUser, number);
+    // equivalent of a "client side action"
+    const previousNotifsSnapshot = notifications;
+    if (notifications.success) {
+      setNotifications((notifs) => {
+        if (!notifs.success) return notifs;
+
+        // copy the notifications array
+        const newNotifs: Result<Notification[]> = {
+          success: true,
+          value: [...notifs.value.map((notif) => ({ ...notif }))],
+        };
+        for (let i = 0; i < Math.min(number, newNotifs.value.length); i++) {
+          newNotifs.value[i].read = true;
+        }
+        return newNotifs;
+      });
+    }
+
+    const attempt = await markNotifications(authUser, number);
+
+    // undo on error
+    if (!attempt.success) {
+      setNotifications(previousNotifsSnapshot);
+    }
   };
 
   useEffect(() => {
@@ -104,7 +127,7 @@ const ProjectView: React.FC<{}> = () => {
                 fail={() => setFail(true)}
                 notifs={notifications}
                 notifsLoading={notifsLoading}
-                markNotifications={markNotifications}
+                markNotifications={markNotifs}
               />
             )}
           />
@@ -115,7 +138,7 @@ const ProjectView: React.FC<{}> = () => {
                 fail={() => setFail(true)}
                 notifs={notifications}
                 notifsLoading={notifsLoading}
-                markNotifications={markNotifications}
+                markNotifications={markNotifs}
               />
             )}
           />
