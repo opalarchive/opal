@@ -1,7 +1,7 @@
 // currently just signup with some code deleted
 // TODO: change this to follow dry principle
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link as RouterLink, useHistory } from "react-router-dom";
 import {
   Avatar,
@@ -25,12 +25,143 @@ import styles from "./index.css";
 import { FiLoader, FiLock } from "react-icons/fi";
 import useAuthUser from "../Session/useAuthUser";
 
-interface InputData {
+interface InputDatum {
   value: string;
   error: number;
 }
 
+interface InputData {
+  [name: string]: InputDatum;
+}
+
+const useStyles = makeStyles(styles);
 const defaultInputData = { value: "", error: -1 };
+
+const errors: { [input: string]: string[] } = {
+  email: [
+    "Your email cannot be empty.",
+    "This does not match the standard format. Make sure that you enter a valid email.",
+    "Emails should be at most 60 characters.",
+  ],
+  password: [],
+};
+
+const isValid: {
+  [input: string]: ((value: string, inputData: InputData) => boolean)[];
+} = {
+  email: [
+    (value, inputData) => value.length > 0,
+    (value, inputData) =>
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        value
+      ),
+    (value, inputData) => value.length <= 60,
+  ],
+  password: [],
+};
+
+const copyInputData = (inputData: InputData) =>
+  Object.fromEntries(Object.entries(inputData).map((o) => [...o]));
+
+// check if a value for a certain input name is valid and return the error index for it (-1 for valid)
+const getErrorIndex = (name: string, value: string, inputData: InputData) => {
+  // we use a normal for loop here because if just one check fails, we should short circuit and return false
+  for (let i = 0; i < isValid[name].length; i++) {
+    if (!isValid[name][i](value, inputData)) return i;
+  }
+  return -1;
+};
+
+// checks the input for errors
+// and returns the new version of the input with the errors added on
+const updateInputData = (inputData: InputData) => {
+  const inputs = Object.keys(isValid);
+
+  const inputDataCopy = copyInputData(inputData);
+
+  inputs.forEach((name) => {
+    inputDataCopy[name].error = getErrorIndex(
+      name,
+      inputDataCopy[name].value,
+      inputData
+    );
+  });
+
+  return inputDataCopy;
+};
+
+// when a new character is typed
+// here we only check if typing more characters causes the error to disappear
+const onChange = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  setInputData: React.Dispatch<
+    React.SetStateAction<{
+      [name: string]: InputDatum;
+    }>
+  >
+) => {
+  const { value, name } = event.target;
+
+  setInputData((inputData) => ({
+    ...inputData,
+    [name]: {
+      value,
+      error:
+        inputData[name].error === -1 ||
+        isValid[name][inputData[name].error](value, inputData)
+          ? -1
+          : inputData[name].error,
+    },
+  }));
+};
+
+// when the user clicks off the input
+// here we can check if an error should appear
+const onBlur = (
+  event: React.FocusEvent<HTMLInputElement>,
+  setInputData: React.Dispatch<
+    React.SetStateAction<{
+      [name: string]: InputDatum;
+    }>
+  >
+) => {
+  const { value, name } = event.target;
+
+  setInputData((inputData) => ({
+    ...inputData,
+    [name]: { value, error: getErrorIndex(name, value, inputData) },
+  }));
+};
+
+// when the user submits
+const onSubmit = async (
+  event: React.FormEvent,
+  inputData: {
+    [name: string]: InputDatum;
+  },
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  setLoginError: React.Dispatch<React.SetStateAction<string>>
+) => {
+  event.preventDefault();
+
+  // start load for signing in time
+  setLoading(true);
+
+  const newInputData = updateInputData(inputData);
+
+  if (!Object.values(newInputData).some((data) => data.error !== -1)) {
+    auth
+      .signInWithEmailAndPassword(
+        inputData.email.value,
+        inputData.password.value
+      )
+      .catch((error) => {
+        setLoginError(understandLoginError(error.code));
+      });
+  }
+
+  setLoading(false);
+};
 
 const Login: React.FC<{}> = () => {
   // user object
@@ -39,135 +170,29 @@ const Login: React.FC<{}> = () => {
   // history for redirecting to account page
   const history = useHistory();
 
-  useEffect(() => {
-    if (!!authUser) history.push(ROUTES.PROJECT);
-  }, [authUser, history]);
-
   // style classes
-  const classes = makeStyles(styles)();
+  const classes = useStyles();
 
-  const [email, setEmail] = useState<InputData>(defaultInputData);
-  const [password, setPassword] = useState<InputData>(defaultInputData);
-
-  const getInput = (name: string) => {
-    switch (name) {
-      case "email":
-        return email;
-      case "password":
-        return password;
-      default:
-        return defaultInputData;
-    }
-  };
-
-  const getSetInput = (name: string) => {
-    switch (name) {
-      case "email":
-        return setEmail;
-      case "password":
-        return setPassword;
-      default:
-        return () => {};
-    }
-  };
+  const [inputData, setInputData] = useState<InputData>(
+    Object.fromEntries(
+      ["email", "password"].map((name) => [name, defaultInputData])
+    )
+  );
 
   const [showPassword, setShowPassword] = useState(false);
 
   const [loginError, setLoginError] = useState("");
-
   const [loading, setLoading] = useState(false);
-
-  const errors: { [input: string]: string[] } = {
-    email: [
-      "Your email cannot be empty.",
-      "This does not match the standard format. Make sure that you enter a valid email.",
-      "Emails should be at most 60 characters.",
-    ],
-    password: [],
-  };
-
-  const isValid: { [input: string]: ((value: string) => boolean)[] } = {
-    email: [
-      (value) => value.length > 0,
-      (value) =>
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-          value
-        ),
-      (value) => value.length <= 60,
-    ],
-    password: [],
-  };
-
-  const toggleShowPassword = () => setShowPassword(!showPassword);
-
-  // check if a value for a certain input name is valid and return the error index for it (-1 for valid)
-  const getErrorIndex = (name: string, value: string) => {
-    // we use a normal for loop here because if just one check fails, we should short circuit and return false
-    for (let i = 0; i < isValid[name].length; i++) {
-      if (!isValid[name][i](value)) return i;
-    }
-    return -1;
-  };
-
-  // check ALL inputs to see if they are valid and set the errors
-  // returns true if all is valid
-  const checkAll = () => {
-    let valid = true;
-    const inputs = Object.keys(isValid);
-    for (let i = 0; i < inputs.length; i++) {
-      const value = getInput(inputs[i]).value;
-      const errorIndex = getErrorIndex(inputs[i], value);
-
-      getSetInput(inputs[i])({ value, error: errorIndex });
-      if (errorIndex !== -1) {
-        valid = false;
-      }
-    }
-
-    return valid;
-  };
-
-  // when a new character is typed
-  // here we only check if typing more characters causes the error to disappear
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, name } = event.target;
-    const oldInput = getInput(name);
-
-    // if there shouldn't be an error anymore
-    const valid = oldInput.error === -1 || isValid[name][oldInput.error](value);
-
-    getSetInput(name)({ value, error: valid ? -1 : oldInput.error });
-  };
-
-  // when the user clicks off the input
-  // here we can check if an error should appear
-  const onBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const { value, name } = event.target;
-
-    getSetInput(name)({ value, error: getErrorIndex(name, value) });
-  };
-
-  // when the user submits
-  const onSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    // start load for signing in t(ime
-    setLoading(true);
-
-    if (checkAll()) {
-      auth
-        .signInWithEmailAndPassword(email.value, password.value)
-        .catch((error) => {
-          setLoginError(understandLoginError(error.code));
-        });
-    }
-    setLoading(false);
-  };
 
   // still loading session
   if (authUser === undefined) {
     return <></>;
+  } else if (!!authUser) {
+    history.push(ROUTES.PROJECT);
+    return <></>;
   }
+
+  const { email, password } = inputData;
 
   return (
     <Container component="main" maxWidth="xs">
@@ -179,7 +204,13 @@ const Login: React.FC<{}> = () => {
         <Typography component="h1" variant="h5">
           Log In
         </Typography>
-        <form className={classes.form} onSubmit={onSubmit} noValidate>
+        <form
+          className={classes.form}
+          onSubmit={(event: React.FormEvent) =>
+            onSubmit(event, inputData, setLoading, setLoginError)
+          }
+          noValidate
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -191,8 +222,12 @@ const Login: React.FC<{}> = () => {
                 error={email.error !== -1}
                 helperText={email.error !== -1 && errors.email[email.error]}
                 value={email.value}
-                onChange={onChange}
-                onBlur={onBlur}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange(event, setInputData)
+                }
+                onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
+                  onBlur(event, setInputData)
+                }
               />
             </Grid>
             <Grid item xs={12}>
@@ -208,14 +243,18 @@ const Login: React.FC<{}> = () => {
                   password.error !== -1 && errors.password[password.error]
                 }
                 value={password.value}
-                onChange={onChange}
-                onBlur={onBlur}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange(event, setInputData)
+                }
+                onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
+                  onBlur(event, setInputData)
+                }
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={toggleShowPassword}
+                        onClick={() => setShowPassword((show) => !show)}
                         tabIndex="-1"
                       >
                         {showPassword ? <ImEye /> : <ImEyeBlocked />}

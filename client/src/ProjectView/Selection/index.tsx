@@ -33,8 +33,33 @@ import {
 import SidebaredBase from "../Template/SidebaredBase";
 import { NotificationsProps } from "../Template/Notifications";
 import SelectionAppbar from "./SelectionAppbar";
+import firebase from "firebase";
 
 const LoadingScreen = <Loading background="white" />;
+
+const isProjectSelectable = (
+  project: Client.ProjectPublic,
+  filter: ProjectViewFilter,
+  authUser: firebase.User
+) => {
+  if (project.trashed) {
+    return filter.includeTrash;
+  }
+  if (project.starred && filter.includeAllStarred) {
+    return true;
+  }
+  if (project.owner === authUser.displayName) {
+    if (filter.includeMine) {
+      return true;
+    }
+  } else if (
+    Object.keys(project.editors).includes(authUser.displayName!) &&
+    filter.includeShared
+  ) {
+    return true;
+  }
+  return false;
+};
 
 interface SelectionBaseProps {
   tryProjectAction: (
@@ -53,39 +78,17 @@ const SelectionBase: React.FC<SelectionBaseProps> = ({
   visibleProjects,
   authUser,
 }) => {
-  const isProjectSelectable = (
-    project: Client.ProjectPublic,
-    filter: ProjectViewFilter
-  ) => {
-    if (project.trashed) {
-      return filter.includeTrash;
-    }
-    if (project.starred && filter.includeAllStarred) {
-      return true;
-    }
-    if (project.owner === authUser.displayName) {
-      if (filter.includeMine) {
-        return true;
-      }
-    } else if (
-      Object.keys(project.editors).includes(authUser.displayName!) &&
-      filter.includeShared
-    ) {
-      return true;
-    }
-    return false;
-  };
-
   let projects: Client.Publico = {};
-  let data: ProjectDataPoint[] = [];
-  let fixed: boolean = false; // whether we can't sort (i.e. fixed => no sorting)
-  let defaultSort: ProjectViewSort = {
-    dataPoint: "name",
-    direction: "asc",
-  };
+  let data: ProjectDataPoint[] = projectViewTypes[type].data;
+  let fixed: boolean = projectViewTypes[type].fixed; // whether we can't sort (i.e. fixed => no sorting)
+  let defaultSort: ProjectViewSort = projectViewTypes[type].defaultSort;
 
   let projectsKeys = Object.keys(visibleProjects).filter((id) =>
-    isProjectSelectable(visibleProjects[id], projectViewTypes[type].filter)
+    isProjectSelectable(
+      visibleProjects[id],
+      projectViewTypes[type].filter,
+      authUser
+    )
   );
 
   if (projectsKeys.length > 0) {
@@ -93,9 +96,6 @@ const SelectionBase: React.FC<SelectionBaseProps> = ({
       projectsKeys.map((id) => [id, visibleProjects[id]])
     );
   }
-  data = projectViewTypes[type].data;
-  fixed = projectViewTypes[type].fixed;
-  defaultSort = projectViewTypes[type].defaultSort;
 
   return (
     <Table

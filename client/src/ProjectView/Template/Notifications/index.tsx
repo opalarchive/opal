@@ -18,6 +18,8 @@ import { Result } from "../../../Constants/types";
 import Loading from "../../../Loading";
 import styles, { notifBoxStyles } from "./index.css";
 
+const useStyles = makeStyles(styles);
+
 interface NotificationBoxProps {
   read?: boolean;
   Title: JSX.Element | string;
@@ -68,20 +70,23 @@ export interface NotificationsProps {
   markNotifications: (number: number) => Promise<void>;
 }
 
+// when the notifications dialog is open, set all the notifications to read
+const onDialogOpen = (
+  notifs: Result<Notification[]>,
+  markNotifications: (number: number) => void
+) => {
+  if (notifs.success) markNotifications(notifs.value.length);
+};
+
 const Notifications: React.FC<NotificationsProps> = ({
   notifs,
   notifsLoading,
   markNotifications,
 }) => {
-  const classes = makeStyles(styles)();
+  const classes = useStyles();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const notificationButton = useRef<HTMLButtonElement>(null);
-
-  // when the notifications dialog is open, set all the notifications to read
-  const onDialogOpen = () => {
-    if (notifs.success) markNotifications(notifs.value.length);
-  };
 
   let ariaLabel = "";
   let icon: JSX.Element | string | undefined = undefined;
@@ -189,7 +194,7 @@ const Notifications: React.FC<NotificationsProps> = ({
         className={classes.menuButton}
         onClick={() => {
           setDialogOpen(true);
-          onDialogOpen();
+          onDialogOpen(notifs, markNotifications);
         }}
         ref={notificationButton}
       >

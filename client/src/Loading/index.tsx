@@ -1,5 +1,5 @@
 import { makeStyles, Theme, withTheme } from "@material-ui/core";
-import React from "react";
+import React, { useMemo } from "react";
 
 import styles from "./index.css";
 
@@ -11,6 +11,9 @@ interface SpinningProps {
   hideText?: boolean;
 }
 
+const useStyles = makeStyles(styles);
+const prefix = "3px solid ";
+
 export const SpinningBase: React.FC<SpinningProps> = ({
   background,
   inner,
@@ -18,13 +21,17 @@ export const SpinningBase: React.FC<SpinningProps> = ({
   outer,
   hideText,
 }) => {
-  const classes = makeStyles(styles)();
+  // style classes
+  const classes = useStyles();
 
-  const prefix = "3px solid ";
-  const overrideColor = {
-    borderLeft: prefix + background,
-    borderRight: prefix + background,
-  };
+  const overrideColor = useMemo(
+    () => ({
+      borderLeft: prefix + background,
+      borderRight: prefix + background,
+    }),
+    [background]
+  );
+
   return (
     <div
       style={{

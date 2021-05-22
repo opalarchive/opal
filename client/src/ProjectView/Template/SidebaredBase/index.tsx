@@ -2,6 +2,8 @@ import { makeStyles } from "@material-ui/core";
 import React from "react";
 import styles from "./index.css";
 
+const useStyles = makeStyles(styles);
+
 export interface SidebarProps {
   width: number;
   authUser: firebase.User;
@@ -29,7 +31,7 @@ const SidebaredBase: React.FC<SidebaredBaseProps> = ({
   authUser,
   children,
 }) => {
-  const classes = makeStyles(styles)();
+  const classes = useStyles();
 
   return (
     <>
