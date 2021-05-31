@@ -4,21 +4,25 @@ import connectdb from "../../../helpers/mongo";
 import User, { IUser } from "../../../models/User";
 import Password, { IPassword } from "../../../models/Password";
 import { hash } from "../../../helpers/passwordHash";
+import { Response } from "../../../helpers/types";
 
 connectdb();
 
 type response = string;
 
-export default async (req: NextApiRequest, res: NextApiResponse<response>) => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse<Response<response>>
+) => {
   const { method, body } = req;
 
   if (method !== "POST") {
-    res.status(400).send("POST requests only");
+    res.status(400).send({ success: false, value: "POST requests only" });
     return;
   }
 
   if (!body || !body.email || !body.username || !body.password) {
-    res.status(400).send("Missing arguments");
+    res.status(400).send({ success: false, value: "Missing arguments" });
     return;
   }
 
@@ -30,12 +34,12 @@ export default async (req: NextApiRequest, res: NextApiResponse<response>) => {
   // and one that is already using that username
 
   if (conflictingUsers.some((user) => user.email === body.email)) {
-    res.status(400).send("Email already in use");
+    res.status(400).send({ success: false, value: "Email already in use" });
     return;
   }
 
   if (conflictingUsers.some((user) => user.username === body.username)) {
-    res.status(400).send("Username already in use");
+    res.status(400).send({ success: false, value: "Username already in use" });
     return;
   }
 
@@ -56,5 +60,5 @@ export default async (req: NextApiRequest, res: NextApiResponse<response>) => {
   await newUser.save();
   await newPassword.save();
 
-  res.status(200).send("Success");
+  res.status(200).send({ success: true, value: "Success" });
 };
