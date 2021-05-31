@@ -11,3 +11,5 @@ export const siteURL = !process.env.PRODUCTION
 
 export const passwordSaltLength = 32; // in nibbles (1/2 bytes or hex chars)
 export const passwordKeyLength = 64; // in bytes
+
+export const accessTokenDuration = "10m";

@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { nanoid } from "nanoid";
-import connectdb from "../../../helpers/mongo";
-import User, { IUser } from "../../../models/User";
-import Password, { IPassword } from "../../../models/Password";
-import { hash } from "../../../helpers/passwordHash";
-import { Response } from "../../../helpers/types";
+import connectdb from "../../helpers/mongo";
+import User, { IUser } from "../../models/User";
+import { hash } from "../../helpers/passwordHash";
+import { Response } from "../../helpers/types";
 
 connectdb();
 
@@ -17,13 +16,13 @@ export default async (
   const { method, body } = req;
 
   if (method !== "POST") {
-    res.status(400).send({ success: false, value: "POST requests only" });
-    return;
+    return res
+      .status(400)
+      .send({ success: false, value: "POST requests only" });
   }
 
   if (!body || !body.email || !body.username || !body.password) {
-    res.status(400).send({ success: false, value: "Missing arguments" });
-    return;
+    return res.status(400).send({ success: false, value: "Missing arguments" });
   }
 
   // see if email & username are already in use
@@ -34,31 +33,28 @@ export default async (
   // and one that is already using that username
 
   if (conflictingUsers.some((user) => user.email === body.email)) {
-    res.status(400).send({ success: false, value: "Email already in use" });
-    return;
+    return res
+      .status(400)
+      .send({ success: false, value: "Email already in use" });
   }
 
   if (conflictingUsers.some((user) => user.username === body.username)) {
-    res.status(400).send({ success: false, value: "Username already in use" });
-    return;
+    return res
+      .status(400)
+      .send({ success: false, value: "Username already in use" });
   }
 
   const userId = "u" + nanoid(19);
+  const passwordHash = await hash(body.password);
+
   const newUser: IUser = new User({
     userId,
     email: body.email,
     emailVerified: false,
     username: body.username,
+    passwordHash,
   });
-
-  const passwordHash = await hash(body.password);
-  const newPassword: IPassword = new Password({
-    userId,
-    hash: passwordHash,
-  });
-
   await newUser.save();
-  await newPassword.save();
 
-  res.status(200).send({ success: true, value: "Success" });
+  return res.status(200).send({ success: true, value: "Success" });
 };
