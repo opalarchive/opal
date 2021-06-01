@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { generateAccessToken, getUserData } from "../../helpers/jwt";
-import connectdb from "../../helpers/mongo";
-import { verify } from "../../helpers/passwordHash";
-import { Response } from "../../helpers/types";
+import { generateAccessToken, getUserData } from "../../utils/jwt";
+import connectdb from "../../utils/mongo";
+import { verify } from "../../utils/passwordHash";
+import { Response } from "../../utils/types";
 import User, { IUser } from "../../models/User";
 import jwt from "jsonwebtoken";
 import RefreshToken from "../../models/RefreshToken";
+import { serialize } from "cookie";
 
 connectdb();
 
@@ -50,6 +51,10 @@ export default async (
     const refreshTokenDoc = new RefreshToken({ token: refreshToken });
     await refreshTokenDoc.save();
 
+    res.setHeader("Set-Cookie", [
+      serialize("accessToken", accessToken, { path: "/", httpOnly: true }),
+      serialize("refreshToken", refreshToken, { path: "/", httpOnly: true }),
+    ]);
     return res.status(200).send({
       success: true,
       value: { accessToken, refreshToken },

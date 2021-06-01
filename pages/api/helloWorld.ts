@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Response } from "../../helpers/types";
+import { Response } from "../../utils/types";
 
 type response = string;
 

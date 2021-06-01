@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { nanoid } from "nanoid";
-import connectdb from "../../helpers/mongo";
+import connectdb from "../../utils/mongo";
 import User, { IUser } from "../../models/User";
-import { hash } from "../../helpers/passwordHash";
-import { Response } from "../../helpers/types";
+import { hash } from "../../utils/passwordHash";
+import { Response } from "../../utils/types";
 
 connectdb();
 
@@ -56,5 +56,5 @@ export default async (
   });
   await newUser.save();
 
-  return res.status(200).send({ success: true, value: "Success" });
+  return res.status(201).send({ success: true, value: "Success" });
 };

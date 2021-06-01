@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { withAuth } from "../../helpers/jwt";
-import { Response } from "../../helpers/types";
+import { withAuth } from "../../utils/jwt";
+import { Response } from "../../utils/types";
 
 type response = string;
 

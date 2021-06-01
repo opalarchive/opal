@@ -1,9 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
-import { generateAccessToken, getUserData, UserData } from "../../helpers/jwt";
-import connectdb from "../../helpers/mongo";
-import { Response } from "../../helpers/types";
+import {
+  generateAccessToken,
+  getUserData,
+  parseCookie,
+  UserData,
+} from "../../utils/jwt";
+import connectdb from "../../utils/mongo";
+import { Response } from "../../utils/types";
 import RefreshToken from "../../models/RefreshToken";
+import { serialize } from "cookie";
 
 connectdb();
 
@@ -13,7 +19,7 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<Response<response>>
 ) => {
-  const { method, body } = req;
+  const { method, headers } = req;
 
   if (method !== "POST") {
     return res
@@ -21,20 +27,20 @@ export default async (
       .send({ success: false, value: "POST requests only" });
   }
 
-  if (!body || !body.token) {
-    return res.status(400).send({ success: false, value: "Missing arguments" });
+  const cookie = headers.cookie;
+  const token = !!cookie && parseCookie(cookie).refreshToken;
+  if (!token) {
+    return res.status(401).send({ success: false, value: "Not logged in" });
   }
 
-  const refreshToken: string = body.token;
-
-  if (!(await RefreshToken.exists({ token: refreshToken }))) {
+  if (!(await RefreshToken.exists({ token }))) {
     return res
       .status(403)
       .send({ success: false, value: "Invalid refresh token" });
   }
 
   jwt.verify(
-    refreshToken,
+    token,
     process.env.REFRESH_TOKEN_SECRET as string,
     (err, decoded) => {
       if (!!err || !decoded) {
@@ -45,7 +51,12 @@ export default async (
       const accessToken = generateAccessToken(
         getUserData(decoded as object & UserData) // see line 80 in /helpers/jwt.ts
       );
-      return res.status(200).send({ success: false, value: accessToken });
+
+      res.setHeader(
+        "Set-Cookie",
+        serialize("accessToken", accessToken, { path: "/", httpOnly: true })
+      );
+      return res.status(200).send({ success: false, value: "Success" });
     }
   );
 };
