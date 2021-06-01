@@ -1,4 +1,3 @@
-import { destroyCookie } from "nookies";
 import styles from "../styles/Home.module.css";
 
 const login = () => {
