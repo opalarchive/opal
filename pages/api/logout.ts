@@ -1,15 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import jwt from "jsonwebtoken";
-import {
-  generateAccessToken,
-  getUserData,
-  parseCookie,
-  UserData,
-} from "../../utils/jwt";
 import connectdb from "../../utils/mongo";
 import { Response } from "../../utils/types";
 import RefreshToken from "../../models/RefreshToken";
-import { serialize } from "cookie";
+import { parse, serialize } from "cookie";
 
 connectdb();
 
@@ -28,7 +21,7 @@ export default async (
   }
 
   const cookie = headers.cookie;
-  const token = !!cookie && parseCookie(cookie).refreshToken;
+  const token = !!cookie && parse(cookie).refreshToken;
   if (!token) {
     return res.status(401).send({ success: false, value: "Not logged in" });
   }

@@ -1,4 +1,5 @@
 import styles from "../styles/Home.module.css";
+import { Response } from "../utils/types";
 
 const login = () => {
   fetch(`/api/login`, {
@@ -20,12 +21,8 @@ const logout = () => {
 };
 
 const ping = () => {
-  fetch(`/api/ping`).then(async (res) => console.log("->", await res.text()));
-};
-
-const refreshAccessToken = () => {
-  fetch(`/api/refreshAccessToken`, { method: "POST" }).then(async (res) =>
-    console.log("<-", await res.text())
+  fetch(`/api/ping`).then(async (res) =>
+    console.log("->", (JSON.parse(await res.text()) as Response<string>).value)
   );
 };
 
@@ -35,7 +32,6 @@ const Home: React.FC<{}> = ({}) => {
       Home Page
       <button onClick={login}>login</button>
       <button onClick={logout}>logout</button>
-      <button onClick={refreshAccessToken}>refresh access token</button>
       <button onClick={ping}>ping</button>
     </div>
   );

@@ -1,7 +1,12 @@
 import jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
+import { parse, serialize } from "cookie";
+import RefreshToken from "../models/RefreshToken";
 import { accessTokenDuration } from "./constants";
 import { Response } from "./types";
+import connectdb from "./mongo";
+
+connectdb();
 
 export interface UserData {
   userId: string;
@@ -30,57 +35,105 @@ export const generateAccessToken = (userData: UserData) => {
   });
 };
 
-// parse strings of the form "foo1=bar1; foo2=bar2; foo3=bar3"
-// into { "foo1": "bar1", "foo2": "bar2", "foo3": "bar3" }
-// and also handles escaped characters in urls
-export const parseCookie = (cookieString: string) => {
-  let cookieObject: { [key: string]: string } = {};
+const refreshAccessToken = (
+  refreshToken: string,
+  callback: (res: Response<object>) => void
+): void => {
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET as string,
+    (err, decoded) => {
+      if (!!err || !decoded) {
+        callback({ success: false, value: "Invalid refresh token" });
+        return;
+      }
 
-  cookieString
-    .split(";")
-    .map((keyval) => keyval.split("="))
-    .forEach(([key, val]) => {
-      cookieObject[decodeURIComponent(key.trim())] = decodeURIComponent(
-        val.trim()
-      );
-    });
-  return cookieObject;
+      callback({ success: true, value: decoded });
+    }
+  );
 };
 
 // middleware to get user object and restrict api route to logged in users
-export const withAuth = (
+export function withAuth<
+  Req extends { headers: { cookie?: string } },
+  Res extends {
+    status: (statusCode: number) => Res;
+    send: (body: Response<any>) => void;
+    setHeader(
+      name: string,
+      value: number | string | ReadonlyArray<string>
+    ): void;
+  }
+>(
   handler: (
-    req: NextApiRequestWithUser,
-    res: NextApiResponse
+    req: Req & {
+      user: UserData;
+    },
+    res: Res
   ) => void | Promise<void>
-) => {
-  return async (req: NextApiRequest, res: NextApiResponse<Response<any>>) => {
+) {
+  return async (req: Req, res: Res) => {
     const cookie = req.headers.cookie;
-    const token = !!cookie && parseCookie(cookie).accessToken;
-    if (!token) {
+    const accessToken = !!cookie && parse(cookie).accessToken;
+    if (!accessToken) {
       return res.status(401).send({ success: false, value: "Not logged in" });
     }
 
-    jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET as string,
-      (err, decoded) => {
-        if (!!err || !decoded) {
-          if (!!err && err.message === "jwt expired") {
-            return res.status(401).send({
-              success: false,
-              value: "Temporary access token expired",
-            });
+    return new Promise<void>((resolve, reject) => {
+      jwt.verify(
+        accessToken,
+        process.env.ACCESS_TOKEN_SECRET as string,
+        async (err, decoded) => {
+          // this requires messing with tokens, so it must be invalid, not simply "not logged in"
+          if (!!err && err.message !== "jwt expired") {
+            res
+              .status(403)
+              .send({ success: false, value: "Invalid access token" });
+            return resolve();
           }
-          return res
-            .status(403)
-            .send({ success: false, value: "Invalid access token" });
-        }
-        const newReq = req as NextApiRequestWithUser;
-        newReq.user = getUserData(decoded as object & UserData); // essentially decoded includes stuff we don't need, so we get rid of them here
 
-        return handler(newReq, res);
-      }
-    );
+          if (!!err && err.message === "jwt expired") {
+            const refreshToken = !!cookie && parse(cookie).refreshToken;
+            // it could be invalided by a "sign out from all sessions" causing not logged in
+            if (!refreshToken) {
+              res.status(401).send({ success: false, value: "Not logged in" });
+              return resolve();
+            }
+
+            const exists = await RefreshToken.exists({ token: refreshToken });
+
+            if (exists) {
+              return refreshAccessToken(refreshToken, (response) => {
+                if (response.success) {
+                  const user = getUserData(response.value as object & UserData); // see line 132
+
+                  res.setHeader(
+                    "Set-Cookie",
+                    serialize("accessToken", generateAccessToken(user), {
+                      path: "/",
+                      httpOnly: true,
+                    })
+                  );
+
+                  handler({ ...req, user }, res);
+                  return resolve();
+                } else {
+                  res.status(403).send(response);
+                  return resolve();
+                }
+              });
+            } else {
+              res.status(401).send({ success: false, value: "Not logged in" });
+              return resolve();
+            }
+          }
+
+          const user = getUserData(decoded as object & UserData); // essentially decoded includes stuff we don't need, so we get rid of them here
+
+          handler({ ...req, user }, res);
+          return resolve();
+        }
+      );
+    });
   };
-};
+}

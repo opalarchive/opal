@@ -32,3 +32,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# REST client for testing api
+*.rest
