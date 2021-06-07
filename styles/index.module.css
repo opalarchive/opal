@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.linkContainer {
+  display: flex;
+}
+
+.linkContainer > div {
+  padding: 0 1rem;
+}
+
+.linkContainer a {
+  color: cornflowerblue;
+}
+
+.linkContainer a:hover {
+  color: blue;
+}

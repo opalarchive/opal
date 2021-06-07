@@ -1,0 +1,8 @@
+.pingResults {
+  display: flex;
+  flex-direction: column;
+}
+
+.ping {
+  padding: 0.5rem;
+}

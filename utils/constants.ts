@@ -13,3 +13,20 @@ export const passwordSaltLength = 32; // in nibbles (1/2 bytes or hex chars)
 export const passwordKeyLength = 64; // in bytes
 
 export const accessTokenDuration = "5s";
+
+export interface UserData {
+  userId: string;
+  email: string;
+  emailVerified: boolean;
+  username: string;
+}
+
+// take only these props from an object with these props and possibly more
+export const getUserData = (user: object & UserData) => {
+  return {
+    userId: user.userId,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    username: user.username,
+  };
+};

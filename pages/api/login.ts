@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { generateAccessToken, getUserData } from "../../utils/jwt";
+import { generateAccessToken } from "../../utils/jwt";
 import connectdb from "../../utils/mongo";
 import { verify } from "../../utils/passwordHash";
 import { Response } from "../../utils/types";
@@ -7,10 +7,11 @@ import User, { IUser } from "../../models/User";
 import jwt from "jsonwebtoken";
 import RefreshToken from "../../models/RefreshToken";
 import { serialize } from "cookie";
+import { getUserData } from "../../utils/constants";
 
 connectdb();
 
-type response = { accessToken: string; refreshToken: string };
+type response = string;
 
 export default async (
   req: NextApiRequest,
@@ -57,7 +58,7 @@ export default async (
     ]);
     return res.status(200).send({
       success: true,
-      value: { accessToken, refreshToken },
+      value: `Success. Set accessToken to ${accessToken} and refreshToken to ${refreshToken}`,
     });
   }
 
