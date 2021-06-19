@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
-import { NextApiRequest, GetServerSideProps } from "next";
+import { NextApiRequest } from "next";
 import { parse, serialize } from "cookie";
 import RefreshToken from "../models/RefreshToken";
-import { accessTokenDuration, getUserData, UserData } from "./constants";
+import { accessTokenDuration } from "./constants";
 import { Response } from "./types";
 import connectdb from "./mongo";
+import { getUserData, UserData } from "../models/User";
 
 connectdb();
 
@@ -54,23 +55,19 @@ export function useAuth<
   }
 >(req: Req, res: Res): Promise<UserData | null> {
   const cookie = req.headers.cookie;
-  const accessToken = !!cookie && parse(cookie).accessToken;
-  if (!accessToken) {
+  if (!cookie) {
     return new Promise((resolve, reject) => resolve(null));
   }
+
+  const { accessToken, refreshToken } = parse(cookie);
 
   return new Promise<UserData | null>((resolve, reject) => {
     jwt.verify(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET as string,
       async (err, decoded) => {
-        // this requires messing with tokens, but we can be nice and say "not logged in"
-        if (!!err && err.message !== "jwt expired") {
-          return resolve(null);
-        }
-
-        if (!!err && err.message === "jwt expired") {
-          const refreshToken = !!cookie && parse(cookie).refreshToken;
+        // if the accessToken is not valid, we create a new one with the refreshToken and immediately use it
+        if (!!err) {
           if (!refreshToken) {
             return resolve(null);
           }
@@ -87,6 +84,7 @@ export function useAuth<
                   serialize("accessToken", generateAccessToken(user), {
                     path: "/",
                     httpOnly: true,
+                    maxAge: 1000 * 365 * 24 * 60 * 60,
                   })
                 );
 

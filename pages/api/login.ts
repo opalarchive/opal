@@ -3,11 +3,11 @@ import { generateAccessToken } from "../../utils/jwt";
 import connectdb from "../../utils/mongo";
 import { verify } from "../../utils/passwordHash";
 import { Response } from "../../utils/types";
-import User, { IUser } from "../../models/User";
+import User, { getUserData, IUser } from "../../models/User";
 import jwt from "jsonwebtoken";
 import RefreshToken from "../../models/RefreshToken";
 import { serialize } from "cookie";
-import { getUserData } from "../../utils/constants";
+import { validateString } from "../../utils/bodyValidate";
 
 connectdb();
 
@@ -25,8 +25,8 @@ export default async (
       .send({ success: false, value: "POST requests only" });
   }
 
-  if (!body || !body.username || !body.password) {
-    return res.status(400).send({ success: false, value: "Missing arguments" });
+  if (!body || !validateString(body, ["username", "password"])) {
+    return res.status(400).send({ success: false, value: "Invalid arguments" });
   }
 
   const user: IUser | null = await User.findOne({
@@ -53,8 +53,16 @@ export default async (
     await refreshTokenDoc.save();
 
     res.setHeader("Set-Cookie", [
-      serialize("accessToken", accessToken, { path: "/", httpOnly: true }),
-      serialize("refreshToken", refreshToken, { path: "/", httpOnly: true }),
+      serialize("accessToken", accessToken, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 1000 * 365 * 24 * 60 * 60,
+      }),
+      serialize("refreshToken", refreshToken, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 1000 * 365 * 24 * 60 * 60,
+      }),
     ]);
     return res.status(200).send({
       success: true,

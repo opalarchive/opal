@@ -27,10 +27,19 @@ export default async (
   }
 
   await RefreshToken.deleteMany({ token });
+
   // delete jwt cookies
   res.setHeader("Set-Cookie", [
-    serialize("accessToken", "", { path: "/", httpOnly: true }),
-    serialize("refreshToken", "", { path: "/", httpOnly: true }),
+    serialize("accessToken", "", {
+      path: "/",
+      httpOnly: true,
+      maxAge: 0,
+    }),
+    serialize("refreshToken", "", {
+      path: "/",
+      httpOnly: true,
+      maxAge: 0,
+    }),
   ]);
   return res.status(200).send({ success: true, value: "Success" });
 };

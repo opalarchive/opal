@@ -1,14 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { nanoid } from "nanoid";
 import connectdb from "../../utils/mongo";
-import User, { IUser } from "../../models/User";
+import User, { getUserData, IUser } from "../../models/User";
 import jwt from "jsonwebtoken";
 import { hash } from "../../utils/passwordHash";
 import { Response } from "../../utils/types";
-import { getUserData } from "../../utils/constants";
 import { generateAccessToken } from "../../utils/jwt";
 import RefreshToken from "../../models/RefreshToken";
 import { serialize } from "cookie";
+import { userIdLength } from "../../utils/constants";
+import { validateString } from "../../utils/bodyValidate";
 
 connectdb();
 
@@ -26,8 +27,8 @@ export default async (
       .send({ success: false, value: "POST requests only" });
   }
 
-  if (!body || !body.email || !body.username || !body.password) {
-    return res.status(400).send({ success: false, value: "Missing arguments" });
+  if (!body || !validateString(body, ["email", "username", "password"])) {
+    return res.status(400).send({ success: false, value: "Invalid arguments" });
   }
 
   // see if email & username are already in use
@@ -49,7 +50,7 @@ export default async (
       .send({ success: false, value: "Username already in use" });
   }
 
-  const userId = "u" + nanoid(19);
+  const userId = "u" + nanoid(userIdLength - 1);
   const passwordHash = await hash(body.password);
 
   const newUser: IUser = new User({
@@ -75,8 +76,16 @@ export default async (
   await refreshTokenDoc.save();
 
   res.setHeader("Set-Cookie", [
-    serialize("accessToken", accessToken, { path: "/", httpOnly: true }),
-    serialize("refreshToken", refreshToken, { path: "/", httpOnly: true }),
+    serialize("accessToken", accessToken, {
+      path: "/",
+      httpOnly: true,
+      maxAge: 1000 * 365 * 24 * 60 * 60,
+    }),
+    serialize("refreshToken", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      maxAge: 1000 * 365 * 24 * 60 * 60,
+    }),
   ]);
 
   return res.status(201).send({ success: true, value: "Success" });

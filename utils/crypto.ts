@@ -1,3 +1,8 @@
+/**
+ * NOTE: this module is NOT secure
+ * IVs should not be constant for all messages
+ */
+
 import * as crypto from "crypto";
 import { customAlphabet } from "nanoid";
 

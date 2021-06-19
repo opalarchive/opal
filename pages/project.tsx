@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import { NextRouter, useRouter } from "next/router";
 import { Dispatch, SetStateAction, useState } from "react";
-import { UserData } from "../utils/constants";
+import { UserData } from "../models/User";
 import { useAuth } from "../utils/jwt";
 import { post } from "../utils/restClient";
 

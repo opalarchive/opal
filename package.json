@@ -14,6 +14,7 @@
     "@types/nodemailer": "^6.4.1",
     "@types/react": "17.0.6",
     "cookie": "^0.4.1",
+    "firebase": "^8.6.5",
     "googleapis": "^73.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.12",
