@@ -1,13 +1,18 @@
 import { GetServerSideProps } from "next";
 import { NextRouter, useRouter } from "next/router";
 import { Dispatch, SetStateAction, useState } from "react";
-import { UserData } from "../models/User";
+import User, { IUser, UserData } from "../models/User";
 import { useAuth } from "../utils/jwt";
 import { post } from "../utils/restClient";
 
 interface ProjectProps {
   user: UserData | null;
+  emailVerified: boolean;
 }
+
+const sendEmailVerify = () => {
+  post(`sendEmailVerify`);
+};
 
 const logout = async (router: NextRouter) => {
   const response = await post<string>(`logout`);
@@ -28,13 +33,22 @@ const ping = async (setPingResult: Dispatch<SetStateAction<number[]>>) => {
   }
 };
 
-const Project: React.FC<ProjectProps> = ({ user }) => {
+const Project: React.FC<ProjectProps> = ({ user, emailVerified }) => {
   const router = useRouter();
   const [pingResult, setPingResult] = useState<number[]>([]);
 
   if (!user) {
     return <div>Not logged in.</div>;
   }
+  if (!emailVerified) {
+    return (
+      <div>
+        Email unverified. Click here to resend verification email:{" "}
+        <button onClick={sendEmailVerify}>Resend</button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div>User ID: {user.userId}.</div>
@@ -58,5 +72,12 @@ export const getServerSideProps: GetServerSideProps<ProjectProps> = async ({
 }) => {
   const user = await useAuth(req, res);
 
-  return { props: { user } };
+  let emailVerified = false;
+
+  if (!!user) {
+    const userDoc: IUser = await User.findOne({ userId: user.userId });
+    emailVerified = userDoc.emailVerified;
+  }
+
+  return { props: { user, emailVerified } };
 };

@@ -21,12 +21,19 @@ export default async (
   }
 
   const cookie = headers.cookie;
-  const token = !!cookie && parse(cookie).refreshToken;
-  if (!token) {
+  if (!cookie) {
     return res.status(401).send({ success: false, value: "Not logged in" });
   }
 
-  await RefreshToken.deleteMany({ token });
+  const accessToken = !parse(cookie).accessToken;
+  const refreshToken = !parse(cookie).accessToken;
+  if (!accessToken && !refreshToken) {
+    return res.status(401).send({ success: false, value: "Not logged in" });
+  }
+
+  if (!!refreshToken) {
+    await RefreshToken.deleteMany({ token: refreshToken });
+  }
 
   // delete jwt cookies
   res.setHeader("Set-Cookie", [

@@ -1,9 +1,5 @@
-import firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/database";
 import { GetServerSideProps } from "next";
-import Router, { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Configure from "../../../components/project/view/Configure";
 import ProjectGateway from "../../../components/project/view/ProjectGateway";
 import ProjectConfig, {
@@ -12,21 +8,27 @@ import ProjectConfig, {
   IProjectConfig,
 } from "../../../models/ProjectConfig";
 import ProjectData, { IProjectData } from "../../../models/ProjectData";
-import { UserData } from "../../../models/User";
-import { isUUID, ProjectRole, UserId, UUID } from "../../../utils/constants";
+import User, { IUser, UserData } from "../../../models/User";
+import { isUUID, ProjectRole, UserId } from "../../../utils/constants";
 import { useAuth } from "../../../utils/jwt";
 import { post } from "../../../utils/restClient";
 
 interface ProjectViewProps {
   user: UserData | null;
+  emailVerified: boolean;
   exists?: boolean;
   name?: string;
   owner?: UserId;
   projectConfig?: ConfigData;
 }
 
+const sendEmailVerify = () => {
+  post(`sendEmailVerify`);
+};
+
 const ProjectView: React.FC<ProjectViewProps> = ({
   user,
+  emailVerified,
   exists,
   name,
   owner,
@@ -37,6 +39,14 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
   if (!user) {
     return <div>Not logged in.</div>;
+  }
+  if (!emailVerified) {
+    return (
+      <div>
+        Email unverified. Click here to resend verification email:{" "}
+        <button onClick={sendEmailVerify}>Resend</button>
+      </div>
+    );
   }
 
   if (!exists || !isUUID(uuid)) {
@@ -70,14 +80,18 @@ export const getServerSideProps: GetServerSideProps<ProjectViewProps> = async ({
   req,
 }) => {
   const user = await useAuth(req, res);
+  let emailVerified = false;
 
   if (!params || !user) {
-    return { props: { user: null } };
+    return { props: { user: null, emailVerified } };
   }
+
+  const userDoc: IUser = await User.findOne({ userId: user.userId });
+  emailVerified = userDoc.emailVerified;
 
   // uuid isn't valid (i.e. project doesn't exist)
   if (!isUUID(params.uuid)) {
-    return { props: { user } };
+    return { props: { user, emailVerified } };
   }
 
   const projectData: IProjectData = await ProjectData.findOne({
@@ -90,7 +104,7 @@ export const getServerSideProps: GetServerSideProps<ProjectViewProps> = async ({
 
   // project doesn't exist
   if (!projectData) {
-    return { props: { user } };
+    return { props: { user, emailVerified } };
   }
 
   if (
@@ -102,12 +116,13 @@ export const getServerSideProps: GetServerSideProps<ProjectViewProps> = async ({
   ) {
     // either not in the project, or has been removed
     // hence, it exists, but we don't send any data
-    return { props: { user, exists: true } };
+    return { props: { user, emailVerified, exists: true } };
   }
 
   return {
     props: {
       user,
+      emailVerified,
       exists: true,
       name: projectData.name,
       owner: projectData.owner,

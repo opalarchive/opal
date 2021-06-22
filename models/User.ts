@@ -3,21 +3,20 @@ import mongoose from "mongoose";
 export interface UserData {
   userId: string;
   email: string;
-  emailVerified: boolean;
   username: string;
 }
 
 // take only these props from an object with these props and possibly more
-export const getUserData = (user: object & UserData) => {
+export const getUserData = (user: object & UserData): UserData => {
   return {
     userId: user.userId,
     email: user.email,
-    emailVerified: user.emailVerified,
     username: user.username,
   };
 };
 
 export interface IUser extends mongoose.Document, UserData {
+  emailVerified: boolean;
   passwordHash: string;
 }
 

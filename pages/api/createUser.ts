@@ -10,6 +10,7 @@ import RefreshToken from "../../models/RefreshToken";
 import { serialize } from "cookie";
 import { userIdLength } from "../../utils/constants";
 import { validateString } from "../../utils/bodyValidate";
+import { sendEmailVerify } from "../../utils/email";
 
 connectdb();
 
@@ -87,6 +88,8 @@ export default async (
       maxAge: 1000 * 365 * 24 * 60 * 60,
     }),
   ]);
+
+  await sendEmailVerify(userData);
 
   return res.status(201).send({ success: true, value: "Success" });
 };

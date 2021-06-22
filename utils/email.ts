@@ -22,6 +22,13 @@ import * as nodemailer from "nodemailer";
 import { google } from "googleapis";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import SMTPConnection from "nodemailer/lib/smtp-connection";
+import { UserData } from "../models/User";
+import { emailVerifyCooldown, siteURL } from "./constants";
+import { nanoid } from "nanoid";
+import EmailVerifyToken, {
+  IEmailVerfiyToken,
+} from "../models/EmailVerifyToken";
+import { Response } from "./types";
 
 interface EmailInput {
   targetEmail: string;
@@ -58,7 +65,7 @@ oauth2Client.setCredentials({
  *
  * Note that the function is asynchronous
  */
-export const sendEmail = async (data: EmailInput) => {
+const sendEmail = async (data: EmailInput) => {
   const accessToken = await oauth2Client.getAccessToken();
   const smtpTransport = nodemailer.createTransport({
     service: "gmail",
@@ -79,8 +86,45 @@ export const sendEmail = async (data: EmailInput) => {
     html: data.content,
   };
 
-  smtpTransport.sendMail(mailOptions, (err, info) => {
-    if (err) return err;
-    return info;
+  return new Promise<void>((resolve, reject) =>
+    smtpTransport.sendMail(mailOptions, (err, info) => {
+      if (err) reject(err);
+      return resolve(info);
+    })
+  );
+};
+
+export const sendEmailVerify = async (
+  user: UserData
+): Promise<Response<string>> => {
+  const verificationToken = nanoid(64);
+  const link = `${siteURL}/verify/${verificationToken}`;
+
+  const maybeToken: IEmailVerfiyToken | undefined =
+    await EmailVerifyToken.findOne({ userId: user.userId });
+
+  if (!!maybeToken) {
+    if (maybeToken.creationDate > Date.now() - emailVerifyCooldown) {
+      return {
+        success: false,
+        value:
+          "You are trying to do this too fast! Wait 15 minutes before sending another verification email.",
+      };
+    }
+  }
+
+  let token: IEmailVerfiyToken = !!maybeToken
+    ? maybeToken
+    : new EmailVerifyToken({ userId: user.userId });
+  token.verificationToken = verificationToken;
+  token.creationDate = Date.now();
+
+  await token.save();
+
+  await sendEmail({
+    targetEmail: user.email,
+    subject: `Opalarchive: Please Verify Your Email`,
+    content: `Hi ${user.username},<br /><br />You recently created an account for the Online Problem Archival Location website. We're glad to have you here. But before you can start, you'll need to verify your account by clicking <a href='${link}'>here</a>. If that doesn't work, copy the following into the browser: <a href='${link}'>${link}</a>.`,
   });
+  return { success: true, value: "Successfully sent verification email" };
 };
