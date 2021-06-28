@@ -12,11 +12,3 @@
 .linkContainer > div {
   padding: 0 1rem;
 }
-
-.linkContainer a {
-  color: cornflowerblue;
-}
-
-.linkContainer a:hover {
-  color: blue;
-}

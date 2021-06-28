@@ -13,6 +13,7 @@ import ProjectCorrupted from "../components/project/view/ProjectCorrupted";
 import EmailUnverified from "../components/project/view/EmailUnverified";
 import NoProjectAccess from "../components/project/view/NoProjectAccess";
 import ProjectLoading from "../components/project/view/ProjectLoading";
+import NotLoggedIn from "../components/project/view/NotLoggedIn";
 
 const withProjectViewFC: (fc: FC<ProjectViewProps>) => FC<ProjectViewPropsRaw> =
 
@@ -22,7 +23,7 @@ const withProjectViewFC: (fc: FC<ProjectViewProps>) => FC<ProjectViewPropsRaw> =
       const { uuid } = router.query;
 
       if (!user) {
-        return <div>Not logged in.</div>;
+        return <NotLoggedIn />;
       }
       if (!emailVerified) {
         return <EmailUnverified />;
