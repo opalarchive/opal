@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { projectRole, UUID, UserId } from "../utils/constants";
+import { UUID, UserId } from "../utils/constants";
+import { projectRole } from "../utils/types";
 
 export interface IEditStatus extends mongoose.Document {
   userId: UserId;

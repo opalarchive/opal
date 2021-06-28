@@ -47,30 +47,3 @@ export const passwordSaltLength = 32; // in nibbles (1/2 bytes or hex chars)
 export const passwordKeyLength = 64; // in bytes
 
 export const accessTokenDuration = "5s";
-
-export enum ProjectRole {
-  OWNER,
-  ADMIN,
-  EDITOR,
-  REMOVED,
-}
-
-export type projectRole = keyof typeof ProjectRole;
-
-export interface EditStatus {
-  lastEdit: number;
-  shareDate: number;
-  starred: boolean;
-  role: projectRole;
-}
-
-export interface Editors {
-  [uid: string]: EditStatus;
-}
-
-export interface ProjectPublic {
-  editors: Editors;
-  name: string;
-  owner: string;
-  trashed: boolean;
-}
