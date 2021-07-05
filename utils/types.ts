@@ -1,6 +1,6 @@
 import {
   isUserId,
-  problemTextMaxLength,
+  postTextMaxLength,
   problemTitleMaxLength,
   UserId,
 } from "./constants";
@@ -79,10 +79,17 @@ export interface ProjectPublic {
   trashed: boolean;
 }
 
-/* Project Edtiting */
+/* 
+Project Edtiting Types
+
+NOTE: Because this json is stored in firebase realtime database, null, undefined, and 
+most importantly empty arrays and objects are simply discarded when stored. Thus, 
+when fetching it and checking for validity, we set a value to an empty array/object if
+it is supposed to be an empty array/object when it arrives undefined.
+*/
 export interface Project {
-  lists?: List[];
-  problems?: Problem[];
+  lists: List[];
+  problems: Problem[];
   settings: Settings;
 }
 export const isProject = (o: unknown): o is Project => {
@@ -96,12 +103,16 @@ export const isProject = (o: unknown): o is Project => {
   ) {
     return false;
   }
+  (o as Project).lists = hasOwnProperty(o, "lists") ? (o.lists as List[]) : [];
   if (
     hasOwnProperty(o, "problems") &&
     (!Array.isArray(o.problems) || o.problems.some((prob) => !isProblem(prob)))
   ) {
     return false;
   }
+  (o as Project).problems = hasOwnProperty(o, "problems")
+    ? (o.problems as Problem[])
+    : [];
   if (!hasOwnProperty(o, "settings") || !isSettings(o.settings)) {
     return false;
   }
@@ -109,9 +120,18 @@ export const isProject = (o: unknown): o is Project => {
   return true;
 };
 
+/**
+ * Problems or categories could possibly have been deleted, and valid difficulties
+ * could have changed. This function takes care of that by cleaning up a project
+ * object. Note that it directly modifies said object, rather than returning it.
+ */
+export const cleanupProject = (proj: Project): void => {
+  proj.problems;
+};
+
 export interface List {
   name: string;
-  problems?: number[];
+  problems: number[];
 }
 export const isList = (o: unknown): o is List => {
   if (typeof o !== "object" || !o) {
@@ -127,69 +147,11 @@ export const isList = (o: unknown): o is List => {
   ) {
     return false;
   }
+  (o as List).problems = hasOwnProperty(o, "problems")
+    ? (o.problems as number[])
+    : [];
   return true;
 };
-
-export interface Problem {
-  author: UserId;
-  category: string;
-  difficulty: number;
-  replies?: Reply[];
-  tags?: string[];
-  text: string;
-  title: string;
-  votes?: Votes;
-}
-export const isProblem = (o: unknown): o is Problem => {
-  if (typeof o !== "object" || !o) {
-    return false;
-  }
-  if (!hasOwnProperty(o, "author") || !isUserId(o.author)) {
-    return false;
-  }
-  if (!hasOwnProperty(o, "category") || typeof o.category !== "string") {
-    return false;
-  }
-  if (!hasOwnProperty(o, "difficulty") || typeof o.difficulty !== "number") {
-    return false;
-  }
-  if (
-    hasOwnProperty(o, "replies") &&
-    (!Array.isArray(o.replies) || o.replies.some((reply) => !isReply(reply)))
-  ) {
-    return false;
-  }
-  if (
-    hasOwnProperty(o, "tags") &&
-    (!Array.isArray(o.tags) || o.tags.some((tag) => typeof tag !== "string"))
-  ) {
-    return false;
-  }
-  if (
-    !hasOwnProperty(o, "text") ||
-    typeof o.text !== "string" ||
-    o.text.length > problemTextMaxLength
-  ) {
-    return false;
-  }
-  if (
-    !hasOwnProperty(o, "title") ||
-    typeof o.title !== "string" ||
-    o.title.length > problemTitleMaxLength
-  ) {
-    return false;
-  }
-  if (hasOwnProperty(o, "votes") && !isVotes(o.votes)) {
-    return false;
-  }
-
-  return true;
-};
-
-export enum ReplyType {
-  COMMENT = "COMMENT",
-  SOLUTION = "SOLUTION",
-}
 
 interface Post {
   author: string;
@@ -204,7 +166,11 @@ const isPost = (o: unknown): o is Post => {
   if (!hasOwnProperty(o, "author") || typeof o.author !== "string") {
     return false;
   }
-  if (!hasOwnProperty(o, "text") || typeof o.text !== "string") {
+  if (
+    !hasOwnProperty(o, "text") ||
+    typeof o.text !== "string" ||
+    o.text.length > postTextMaxLength
+  ) {
     return false;
   }
   if (!hasOwnProperty(o, "time") || typeof o.time !== "number") {
@@ -215,6 +181,60 @@ const isPost = (o: unknown): o is Post => {
   }
   return true;
 };
+
+export interface Problem extends Post {
+  category: string;
+  difficulty: number;
+  replies?: Reply[];
+  tags?: string[];
+  title: string;
+  votes?: Votes;
+}
+export const isProblem = (o: unknown): o is Problem => {
+  if (!isPost(o)) {
+    return false;
+  }
+  if (!hasOwnProperty(o, "category") || typeof o.category !== "string") {
+    return false;
+  }
+  if (!hasOwnProperty(o, "difficulty") || typeof o.difficulty !== "number") {
+    return false;
+  }
+  if (
+    hasOwnProperty(o, "replies") &&
+    (!Array.isArray(o.replies) || o.replies.some((reply) => !isReply(reply)))
+  ) {
+    return false;
+  }
+  (o as Problem).replies = hasOwnProperty(o, "replies")
+    ? (o.replies as Reply[])
+    : [];
+  if (
+    hasOwnProperty(o, "tags") &&
+    (!Array.isArray(o.tags) || o.tags.some((tag) => typeof tag !== "string"))
+  ) {
+    return false;
+  }
+  (o as Problem).tags = hasOwnProperty(o, "tags") ? (o.tags as string[]) : [];
+  if (
+    !hasOwnProperty(o, "title") ||
+    typeof o.title !== "string" ||
+    o.title.length > problemTitleMaxLength
+  ) {
+    return false;
+  }
+  if (hasOwnProperty(o, "votes") && !isVotes(o.votes)) {
+    return false;
+  }
+  (o as Problem).votes = hasOwnProperty(o, "votes") ? (o.votes as Votes) : {};
+
+  return true;
+};
+
+export enum ReplyType {
+  COMMENT = "COMMENT",
+  SOLUTION = "SOLUTION",
+}
 
 export interface Comment extends Post {
   type: ReplyType.COMMENT;

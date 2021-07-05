@@ -39,7 +39,7 @@ export const emailVerifyTokenLifespan = 24 * 60 * 60 * 1000; // 24 hours
 export const emailVerifyCooldown = 15 * 60 * 1000; // 15 minute cooldown between sending another in order to not spam the email system
 
 export const problemTitleMaxLength = 64;
-export const problemTextMaxLength = 65536;
+export const postTextMaxLength = 65536;
 
 export const listNameMaxLength = 16;
 
