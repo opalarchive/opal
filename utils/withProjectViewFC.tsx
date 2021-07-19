@@ -3,17 +3,17 @@ import "firebase/auth";
 import "firebase/database";
 import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
-import Configure from "../components/project/view/Configure";
+import Configure from "../components/project/view/pages/Configure";
 import { isUUID } from "./constants";
 import { ProjectViewProps, ProjectViewPropsRaw } from "./getProjectViewProps";
-import ProjectLogin from "../components/project/view/ProjectLogin";
+import ProjectLogin from "../components/project/view/pages/ProjectLogin";
 import { isProject, Project } from "./types";
 import Page404 from "../pages/404";
-import ProjectCorrupted from "../components/project/view/ProjectCorrupted";
-import EmailUnverified from "../components/project/view/EmailUnverified";
-import NoProjectAccess from "../components/project/view/NoProjectAccess";
-import ProjectLoading from "../components/project/view/ProjectLoading";
-import NotLoggedIn from "../components/project/view/NotLoggedIn";
+import ProjectCorrupted from "../components/project/view/pages/ProjectCorrupted";
+import EmailUnverified from "../components/project/view/pages/EmailUnverified";
+import NoProjectAccess from "../components/project/view/pages/NoProjectAccess";
+import ProjectLoading from "../components/project/view/pages/ProjectLoading";
+import NotLoggedIn from "../components/project/view/pages/NotLoggedIn";
 
 const withProjectViewFC: (fc: FC<ProjectViewProps>) => FC<ProjectViewPropsRaw> =
 
@@ -21,6 +21,16 @@ const withProjectViewFC: (fc: FC<ProjectViewProps>) => FC<ProjectViewPropsRaw> =
     ({ user, emailVerified, exists, name, owner, projectConfig }) => {
       const router = useRouter();
       const { uuid } = router.query;
+
+      const [time, setTime] = useState(Date.now());
+
+      const printTime = (text: string) => {
+        setTime((time) => {
+          const now = Date.now();
+          console.log(`${text}: ${now - time}ms`);
+          return now;
+        });
+      };
 
       if (!user) {
         return <NotLoggedIn />;
@@ -57,19 +67,21 @@ const withProjectViewFC: (fc: FC<ProjectViewProps>) => FC<ProjectViewPropsRaw> =
           firebase.initializeApp(projectConfig, "opal");
         }
 
+        printTime("Initialize app");
         firebase
           .app("opal")
           .auth()
           .onAuthStateChanged((user) => {
             setfbUser(user);
             setInitialLoadDone(true);
+            printTime("Load user session");
           });
       }, [projectConfig]);
 
       useEffect(() => {
         if (!!fbUser) {
           const db = firebase.app("opal").database();
-
+          printTime("Connect to database");
           setdb(db);
           db.ref(`${fbUser.uid}`)
             .once("value")
@@ -77,6 +89,7 @@ const withProjectViewFC: (fc: FC<ProjectViewProps>) => FC<ProjectViewPropsRaw> =
             .then((val) => {
               setdbStatus(val);
               setValidProject(isProject(val));
+              printTime("Load and validate database data");
             })
             .then(() => setSetupDone(true));
         } else {

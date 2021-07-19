@@ -1,6 +1,5 @@
 import { GetServerSideProps } from "next";
 import Link from "next/link";
-import { useEffect } from "react";
 import EmailVerifyToken, {
   IEmailVerfiyToken,
 } from "../../models/EmailVerifyToken";

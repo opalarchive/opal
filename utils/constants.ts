@@ -46,4 +46,4 @@ export const listNameMaxLength = 16;
 export const passwordSaltLength = 32; // in nibbles (1/2 bytes or hex chars)
 export const passwordKeyLength = 64; // in bytes
 
-export const accessTokenDuration = "5s";
+export const accessTokenDuration = "5s"; // change this later

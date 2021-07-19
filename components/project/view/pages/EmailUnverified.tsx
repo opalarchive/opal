@@ -1,4 +1,4 @@
-import { post } from "../../../utils/restClient";
+import { post } from "../../../../utils/restClient";
 
 const sendEmailVerify = () => {
   post(`sendEmailVerify`);

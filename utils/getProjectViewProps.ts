@@ -21,7 +21,7 @@ export interface ProjectViewPropsRaw {
 }
 
 export interface ProjectViewProps {
-  user: UserData | null;
+  user: UserData;
   emailVerified: boolean;
   name: string;
   owner: UserId;

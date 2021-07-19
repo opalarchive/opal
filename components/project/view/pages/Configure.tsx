@@ -2,9 +2,9 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
 import Router from "next/router";
-import { UserData } from "../../../models/User";
-import { UserId, UUID } from "../../../utils/constants";
-import { post } from "../../../utils/restClient";
+import { UserData } from "../../../../models/User";
+import { UserId, UUID } from "../../../../utils/constants";
+import { post } from "../../../../utils/restClient";
 
 interface ConfigureProps {
   uuid: UUID;
