@@ -10,7 +10,7 @@ import {
   SliderThumb,
   SliderTrack,
 } from "@chakra-ui/slider";
-import { FC, useState } from "react";
+import { FC, memo, useState } from "react";
 import { BsCaretDownFill, BsCaretUpFill } from "react-icons/bs";
 
 interface RangeSliderProps {
@@ -48,6 +48,7 @@ const RangeSlider: FC<RangeSliderProps> = ({
       if (!!onChange) onChange(lower, val);
     }
   };
+  console.log("a");
 
   return (
     <Box mb={-6}>
@@ -85,4 +86,4 @@ const RangeSlider: FC<RangeSliderProps> = ({
   );
 };
 
-export default RangeSlider;
+export default memo(RangeSlider);

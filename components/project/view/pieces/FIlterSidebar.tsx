@@ -8,13 +8,18 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Dispatch, FC, SetStateAction } from "react";
 import { FiArrowDown, FiArrowUp, FiFilter, FiList } from "react-icons/fi";
 import { Project, SortParam } from "../../../../utils/types";
 import { HiOutlineSortDescending } from "react-icons/hi";
 import RangeSlider from "./RangeSlider";
 import TagPanel from "./TagPanel";
+import { useCallback } from "react";
+
+let sortParamArray: SortParam[] = Object.values(SortParam);
+sortParamArray.splice(sortParamArray.indexOf(SortParam.INDEX), 1);
+sortParamArray = [SortParam.INDEX, ...sortParamArray];
 
 // These are just the functions from useState()[1]
 interface FilterSidebarProps {
@@ -82,9 +87,11 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
       return newTags;
     });
 
-  let sortParamArray: SortParam[] = Object.values(SortParam);
-  sortParamArray.splice(sortParamArray.indexOf(SortParam.INDEX), 1);
-  sortParamArray = [SortParam.INDEX, ...sortParamArray];
+  // We want memo to work here, i.e. the function cannot change
+  const onChangeDifficulty = useCallback((lower: number, upper: number) => {
+    setDifficultyLower(lower);
+    setDifficultyUpper(upper);
+  }, []);
 
   return (
     <Stack direction="column" spacing={4}>
@@ -195,10 +202,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
                 <RangeSlider
                   bottom={project.settings.difficultyRange.start}
                   top={project.settings.difficultyRange.end}
-                  onChangeEnd={(lower, upper) => {
-                    setDifficultyLower(lower);
-                    setDifficultyUpper(upper);
-                  }}
+                  onChangeEnd={onChangeDifficulty}
                 />
               </Box>
               <Text ml={1}>{project.settings.difficultyRange.end}</Text>
