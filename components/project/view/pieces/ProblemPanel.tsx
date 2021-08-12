@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, memo } from "react";
 import { Box, Flex, Stack, Text, VStack } from "@chakra-ui/layout";
 import {
   CategoryColors,
@@ -37,7 +37,7 @@ const ProblemPanel: FC<ProblemProps> = ({
   difficultyColors,
 }) => {
   const problemVoteScore = !!problem.votes
-    ? (Object.values(problem.votes) as number[]).reduce((a, b) => a + b, 0)
+    ? Object.values(problem.votes).reduce<number>((a, b) => a + b, 0)
     : 0;
   const categoryColor = categoryColors[problem.category];
   const difficultyColor = getDifficultyColor(
@@ -64,8 +64,8 @@ const ProblemPanel: FC<ProblemProps> = ({
     <Box w="100%" p={4} borderWidth="1px" bgColor="white">
       <Flex>
         <Box minWidth={8} maxWidth={16}>
-          <VStack>
-            <Text fontSize="lg">#{idx + 1}</Text>
+          <VStack spacing={4}>
+            <Text fontSize="xl">#{idx + 1}</Text>
             <VStack spacing={0}>
               <Text
                 color={
@@ -89,8 +89,14 @@ const ProblemPanel: FC<ProblemProps> = ({
             </VStack>
           </VStack>
         </Box>
-        <Flex flex={1} direction="column" mx={4}>
-          <Text fontSize="lg">{problem.title}</Text>
+        <Flex
+          flex={1}
+          direction="column"
+          mx={4}
+          minWidth="30rem"
+          overflow="hidden"
+        >
+          <Text fontSize="xl">{problem.title}</Text>
           <Box>
             <Box display={["block", "block", "inline-block"]}>
               <Text display="inline-block" fontSize="sm">
@@ -112,7 +118,7 @@ const ProblemPanel: FC<ProblemProps> = ({
               </Text>
             </Box>
           </Box>
-          <Text mt={1}>{problem.text}</Text>
+          <Text overflowWrap="anywhere">{problem.text}</Text>
           <Box flex={1} />
           <Flex mt={2}>
             <Text>Tags:&nbsp;</Text>
@@ -120,7 +126,7 @@ const ProblemPanel: FC<ProblemProps> = ({
             <Box mb={-2}>
               {!!problem.tags &&
                 problem.tags.map((tag) => (
-                  <TagPanel>
+                  <TagPanel key={tag}>
                     {tag}&nbsp;
                     <FiX />
                   </TagPanel>
@@ -137,12 +143,15 @@ const ProblemPanel: FC<ProblemProps> = ({
           <Stack dir="column" spacing={4}>
             <Stack dir="column" spacing={1}>
               <Box>
-                <Dot color={categoryColor} />
+                <Dot color={categoryColor} style={{ marginRight: "0.25rem" }} />
                 &nbsp;
                 {problem.category}
               </Box>
               <Box>
-                <Dot color={difficultyColor} />
+                <Dot
+                  color={difficultyColor}
+                  style={{ marginRight: "0.25rem" }}
+                />
                 &nbsp;d-{problem.difficulty}
               </Box>
             </Stack>
@@ -179,4 +188,4 @@ const ProblemPanel: FC<ProblemProps> = ({
   );
 };
 
-export default ProblemPanel;
+export default memo(ProblemPanel);

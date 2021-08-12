@@ -18,3 +18,18 @@ a:hover {
 * {
   box-sizing: border-box;
 }
+
+.sliderWrapper > .chakra-slider > .chakra-slider__track {
+  background: none;
+}
+
+.sliderWrapper
+  > .chakra-slider
+  > .chakra-slider__track
+  > .chakra-slider__filled-track {
+  background: var(--chakra-colors-gray-200);
+}
+
+.chakra-slider__thumb:focus {
+  box-shadow: var(--chakra-shadows-base) !important;
+}

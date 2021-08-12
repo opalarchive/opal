@@ -185,10 +185,10 @@ const isPost = (o: unknown): o is Post => {
 export interface Problem extends Post {
   category: string;
   difficulty: number;
-  replies?: Reply[];
-  tags?: string[];
+  replies: Reply[];
+  tags: string[];
   title: string;
-  votes?: Votes;
+  votes: Votes;
 }
 export const isProblem = (o: unknown): o is Problem => {
   if (!isPost(o)) {
@@ -376,3 +376,12 @@ export const isDifficultyRange = (o: unknown): o is DifficultyRange => {
 
   return true;
 };
+
+/**
+ * Filtering types
+ */
+export enum SortParam {
+  INDEX = "INDEX",
+  DIFFICULTY = "DIFFICULTY",
+  VOTES = "VOTES",
+}
