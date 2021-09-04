@@ -385,3 +385,13 @@ export enum SortParam {
   DIFFICULTY = "DIFFICULTY",
   VOTES = "VOTES",
 }
+
+/**
+ * Project view page types
+ */
+export enum ProjectViewPage {
+  PROBLEMS = "PROBLEMS",
+  COMPILE = "COMPILE",
+  SETTINGS = "SETTINGS",
+  NOTFOUND = "NOTFOUND",
+}

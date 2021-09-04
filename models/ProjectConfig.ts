@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { validateString } from "../utils/bodyValidate";
 import { UUID } from "../utils/constants";
 
-const configKeys: (keyof ConfigData)[] = [
+export const configKeys: (keyof ConfigData)[] = [
   "apiKey",
   "authDomain",
   "databaseURL",

@@ -1,13 +1,18 @@
-import getProjectViewProps from "../../../../utils/getProjectViewProps";
-import withProjectViewFC from "../../../../utils/withProjectViewFC";
-import ProblemBox from "../../../../components/project/view/pieces/ProblemPanel";
-import { Box, Flex, Stack } from "@chakra-ui/react";
-import { useState } from "react";
-import { SortParam } from "../../../../utils/types";
-import { useMemo } from "react";
-import FilterSidebar from "../../../../components/project/view/pieces/FIlterSidebar";
+import { FC, useState } from "react";
+import { ProjectViewProps } from "../../../../../utils/getProjectViewProps";
 
-const Overview = withProjectViewFC(({ user, fbUser, project, projectEdit }) => {
+import ProblemBox from "../../pieces/ProblemPanel";
+import { Box, Flex, Stack } from "@chakra-ui/react";
+import { SortParam } from "../../../../../utils/types";
+import { useMemo } from "react";
+import FilterSidebar from "../../pieces/FilterSidebar";
+
+const Problems: FC<ProjectViewProps> = ({
+  user,
+  fbUser,
+  project,
+  projectEdit,
+}) => {
   const [list, setList] = useState(-1);
   const [keywordSearch, setKeywordSearch] = useState("");
   const [authorSearch, setAuthorSearch] = useState("");
@@ -113,49 +118,44 @@ const Overview = withProjectViewFC(({ user, fbUser, project, projectEdit }) => {
   );
 
   return (
-    <div>
-      Successfully connected to firebase
-      <br />
-      <Flex p={4} bgColor="gray.50">
-        <Box minWidth={48} maxWidth={72}>
-          <FilterSidebar
-            list={list}
-            keywordSearch={keywordSearch}
-            authorSearch={authorSearch}
-            categorySearch={categorySearch}
-            tagSearch={tagSearch}
-            difficultyLower={difficultyLower}
-            difficultyUpper={difficultyUpper}
-            sortParam={sortParam}
-            sortAsc={sortAsc}
-            setList={setList}
-            setKeywordSearch={setKeywordSearch}
-            setAuthorSearch={setAuthorSearch}
-            setCategorySearch={setCategorySearch}
-            setTagSearch={setTagSearch}
-            setDifficultyLower={setDifficultyLower}
-            setDifficultyUpper={setDifficultyUpper}
-            setSortParam={setSortParam}
-            setSortAsc={setSortAsc}
-            project={project}
+    <Flex p={4} bgColor="gray.50">
+      <Box minWidth={48} maxWidth={72}>
+        <FilterSidebar
+          list={list}
+          keywordSearch={keywordSearch}
+          authorSearch={authorSearch}
+          categorySearch={categorySearch}
+          tagSearch={tagSearch}
+          difficultyLower={difficultyLower}
+          difficultyUpper={difficultyUpper}
+          sortParam={sortParam}
+          sortAsc={sortAsc}
+          setList={setList}
+          setKeywordSearch={setKeywordSearch}
+          setAuthorSearch={setAuthorSearch}
+          setCategorySearch={setCategorySearch}
+          setTagSearch={setTagSearch}
+          setDifficultyLower={setDifficultyLower}
+          setDifficultyUpper={setDifficultyUpper}
+          setSortParam={setSortParam}
+          setSortAsc={setSortAsc}
+          project={project}
+        />
+      </Box>
+      <Stack spacing={4} ml={4} flex={1}>
+        {problemIdx.map((idx) => (
+          <ProblemBox
+            key={`problem-${idx}`}
+            user={user}
+            idx={idx}
+            problem={project.problems[idx]}
+            categoryColors={project.settings.categoryColors}
+            difficultyColors={project.settings.difficultyColors}
           />
-        </Box>
-        <Stack spacing={4} ml={4} flex={1}>
-          {problemIdx.map((idx) => (
-            <ProblemBox
-              key={`problem-${idx}`}
-              user={user}
-              idx={idx}
-              problem={project.problems[idx]}
-              categoryColors={project.settings.categoryColors}
-              difficultyColors={project.settings.difficultyColors}
-            />
-          ))}
-        </Stack>
-      </Flex>
-    </div>
+        ))}
+      </Stack>
+    </Flex>
   );
-});
+};
 
-export const getServerSideProps = getProjectViewProps;
-export default Overview;
+export default Problems;

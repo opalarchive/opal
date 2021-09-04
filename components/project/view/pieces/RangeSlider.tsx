@@ -48,7 +48,6 @@ const RangeSlider: FC<RangeSliderProps> = ({
       if (!!onChange) onChange(lower, val);
     }
   };
-  console.log("a");
 
   return (
     <Box mb={-6}>
