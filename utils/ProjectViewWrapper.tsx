@@ -6,7 +6,7 @@ import Configure from "../components/project/view/pages/Configure";
 import { isUUID, UUID } from "./constants";
 import { ProjectViewProps, ProjectViewPropsRaw } from "./getProjectViewProps";
 import ProjectLogin from "../components/project/view/pages/ProjectLogin";
-import { isProject, Project } from "./types";
+import { isProject, Project, ProjectViewPage } from "./types";
 import Page404 from "../pages/404";
 import ProjectCorrupted from "../components/project/view/pages/ProjectCorrupted";
 import EmailUnverified from "../components/project/view/pages/EmailUnverified";
@@ -17,8 +17,13 @@ import { Box, Flex } from "@chakra-ui/react";
 import Navbar from "../components/project/view/pieces/Navbar";
 
 const ProjectViewWrapper: FC<
-  { Component: FC<ProjectViewProps>; uuid: UUID } & ProjectViewPropsRaw
+  {
+    projectViewPage: ProjectViewPage;
+    Component: FC<ProjectViewProps>;
+    uuid: UUID;
+  } & ProjectViewPropsRaw
 > = ({
+  projectViewPage,
   Component,
   uuid,
   user,
@@ -152,7 +157,11 @@ const ProjectViewWrapper: FC<
 
     return (
       <Flex direction="column" height={height}>
-        <Navbar projectName={name} uuid={uuid} />
+        <Navbar
+          projectViewPage={projectViewPage}
+          projectName={name}
+          uuid={uuid}
+        />
         <Box position="relative" flexGrow={1} overflowY="scroll">
           <Component
             user={user}

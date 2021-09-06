@@ -393,5 +393,5 @@ export enum ProjectViewPage {
   PROBLEMS = "PROBLEMS",
   COMPILE = "COMPILE",
   SETTINGS = "SETTINGS",
-  NOTFOUND = "NOTFOUND",
+  PAGE404 = "PAGE404",
 }

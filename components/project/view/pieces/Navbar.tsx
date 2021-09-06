@@ -1,25 +1,59 @@
-import { Box, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { UUID } from "../../../../utils/constants";
+import { ProjectViewPage } from "../../../../utils/types";
+
+import styles from "../../../../styles/navbar.module.css";
 
 interface NavbarProps {
+  projectViewPage: ProjectViewPage;
   projectName: string;
   uuid: UUID;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ projectName, uuid }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  projectViewPage,
+  projectName,
+  uuid,
+}) => {
   return (
-    <Box p={4} borderBottom="1px" borderColor="gray.200">
+    <Box borderBottom="1px" borderColor="gray.200">
       <Flex>
-        <Text fontSize="lg">Project: {projectName}</Text>
+        <Text fontSize="lg" p={4}>
+          Project: {projectName}
+        </Text>
         <Box flexGrow={1} />
-        <Flex direction="column" pr={4}>
+        <Flex direction="column" pr={8}>
           <Box flexGrow={1} />
-          <Stack direction="row" spacing={4}>
-            <Link href={`/project/view/${uuid}/problems`}>Problems</Link>
-            <Link href={`/project/view/${uuid}/compile`}>Compile</Link>
-            <Link href={`/project/view/${uuid}/settings`}>Settings</Link>
-          </Stack>
+          <Flex direction="row">
+            <Box
+              className={
+                ProjectViewPage[projectViewPage] == ProjectViewPage.PROBLEMS
+                  ? `${styles.linkActive} ${styles.link}`
+                  : styles.link
+              }
+            >
+              <Link href={`/project/view/${uuid}/problems`}>Problems</Link>
+            </Box>
+            <Box
+              className={
+                ProjectViewPage[projectViewPage] == ProjectViewPage.COMPILE
+                  ? `${styles.linkActive} ${styles.link}`
+                  : styles.link
+              }
+            >
+              <Link href={`/project/view/${uuid}/compile`}>Compile</Link>
+            </Box>
+            <Box
+              className={
+                ProjectViewPage[projectViewPage] == ProjectViewPage.SETTINGS
+                  ? `${styles.linkActive} ${styles.link}`
+                  : styles.link
+              }
+            >
+              <Link href={`/project/view/${uuid}/settings`}>Settings</Link>
+            </Box>
+          </Flex>
         </Flex>
       </Flex>
     </Box>
