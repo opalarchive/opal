@@ -21,7 +21,6 @@ let sortParamArray: SortParam[] = Object.values(SortParam);
 sortParamArray.splice(sortParamArray.indexOf(SortParam.INDEX), 1);
 sortParamArray = [SortParam.INDEX, ...sortParamArray];
 
-// These are just the functions from useState()[1]
 interface FilterSidebarProps {
   list: number;
   keywordSearch: string;
@@ -32,6 +31,7 @@ interface FilterSidebarProps {
   difficultyUpper: number;
   sortParam: SortParam;
   sortAsc: boolean;
+  // These are just the functions from useState()[1]
   setList: Dispatch<SetStateAction<number>>;
   setKeywordSearch: Dispatch<SetStateAction<string>>;
   setAuthorSearch: Dispatch<SetStateAction<string>>;

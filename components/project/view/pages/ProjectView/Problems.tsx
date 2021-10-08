@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { ProjectViewProps } from "../../../../../utils/getProjectViewProps";
 
-import ProblemBox from "../../pieces/ProblemPanel";
+import ProblemPanel from "../../pieces/ProblemPanel";
 import { Box, Flex, Stack } from "@chakra-ui/react";
 import { SortParam } from "../../../../../utils/types";
 import { useMemo } from "react";
@@ -118,7 +118,7 @@ const Problems: FC<ProjectViewProps> = ({
   );
 
   return (
-    <Flex p={4} bgColor="gray.50">
+    <Flex p={4} bgColor="gray.50" minHeight="100%">
       <Box minWidth={48} maxWidth={72}>
         <FilterSidebar
           list={list}
@@ -144,7 +144,7 @@ const Problems: FC<ProjectViewProps> = ({
       </Box>
       <Stack spacing={4} ml={4} flex={1}>
         {problemIdx.map((idx) => (
-          <ProblemBox
+          <ProblemPanel
             key={`problem-${idx}`}
             user={user}
             idx={idx}
