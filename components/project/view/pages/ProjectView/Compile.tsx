@@ -209,140 +209,144 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
             </Flex>
           )}
         </Flex>
-        {selectedProblems.length > 0 && (
-          <>
-            {/* Problem selection and ordering */}
-            <Flex
-              w="100%"
-              p={4}
-              borderWidth="1px"
-              bgColor="white"
-              direction="column"
-            >
-              <Text fontSize="xl" mb={2}>
-                Problems&nbsp;
-                <AiOutlineEdit
-                  style={{
-                    display: "inline-block",
-                    position: "relative",
-                    top: "-0.1rem",
-                  }}
+        {/* Problem selection and ordering */}
+        <Flex
+          w="100%"
+          p={4}
+          borderWidth="1px"
+          bgColor="white"
+          direction="column"
+        >
+          <Text fontSize="xl" mb={2}>
+            Problems&nbsp;
+            <AiOutlineEdit
+              style={{
+                display: "inline-block",
+                position: "relative",
+                top: "-0.1rem",
+              }}
+            />
+          </Text>
+          {list === -1 ? (
+            <Stack>
+              {order.map((probIdx) => (
+                <ProblemDraggable
+                  key={probIdx}
+                  idx={probIdx}
+                  problem={project.problems[probIdx]}
+                  categoryColors={project.settings.categoryColors}
+                  difficultyColors={project.settings.difficultyColors}
                 />
-              </Text>
-              {list === -1 ? (
-                order.map((probIdx) => (
-                  <ProblemDraggable
-                    key={probIdx}
-                    idx={probIdx}
-                    problem={project.problems[probIdx]}
-                    categoryColors={project.settings.categoryColors}
-                    difficultyColors={project.settings.difficultyColors}
-                  />
-                ))
-              ) : (
-                <Flex flexGrow={1}>
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Box flexGrow={1} flexBasis={0}>
-                      <Text fontSize="lg" mb={2}>
-                        Not Included Problems
-                      </Text>
-                      <Droppable droppableId="not-included">
-                        {(provided, snapshot) => (
-                          <Stack
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                          >
-                            {notIncluded.map(
-                              (probIdx, index) =>
-                                project.problems[probIdx] && ( // workaround for error when the order updates after the first render directly after the current list changes
-                                  <Draggable
-                                    key={probIdx}
-                                    draggableId={"" + probIdx}
-                                    index={index}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <ProblemDraggable
-                                        refInner={provided.innerRef}
-                                        draggableProps={provided.draggableProps}
-                                        handleProps={provided.dragHandleProps}
-                                        idx={probIdx}
-                                        problem={project.problems[probIdx]}
-                                        categoryColors={
-                                          project.settings.categoryColors
-                                        }
-                                        difficultyColors={
-                                          project.settings.difficultyColors
-                                        }
-                                        style={{
-                                          ...provided.draggableProps.style,
-                                        }}
-                                      />
-                                    )}
-                                  </Draggable>
-                                )
-                            )}
-                            {provided.placeholder}
-                          </Stack>
+              ))}
+            </Stack>
+          ) : (
+            <Flex flexGrow={1}>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Box flexGrow={1} flexBasis={0}>
+                  <Text fontSize="lg" mb={2}>
+                    Not Included Problems
+                  </Text>
+                  {notIncluded.length === 0 &&
+                    "Empty for now. No problem has been left unadded."}
+                  <Droppable droppableId="not-included">
+                    {(provided, snapshot) => (
+                      <Stack
+                        height="100%"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {notIncluded.map(
+                          (probIdx, index) =>
+                            project.problems[probIdx] && ( // workaround for error when the order updates after the first render directly after the current list changes
+                              <Draggable
+                                key={probIdx}
+                                draggableId={"" + probIdx}
+                                index={index}
+                              >
+                                {(provided, snapshot) => (
+                                  <ProblemDraggable
+                                    refInner={provided.innerRef}
+                                    draggableProps={provided.draggableProps}
+                                    handleProps={provided.dragHandleProps}
+                                    idx={probIdx}
+                                    problem={project.problems[probIdx]}
+                                    categoryColors={
+                                      project.settings.categoryColors
+                                    }
+                                    difficultyColors={
+                                      project.settings.difficultyColors
+                                    }
+                                    style={{
+                                      ...provided.draggableProps.style,
+                                    }}
+                                  />
+                                )}
+                              </Draggable>
+                            )
                         )}
-                      </Droppable>
-                    </Box>
-                    <Flex direction="column">
-                      <Divider flexGrow={1} orientation="vertical" mx={6} />
-                      <Box p={2} color="gray.700">
-                        <AiOutlineSwap size="2rem" />
-                      </Box>
-                      <Divider flexGrow={1} orientation="vertical" mx={6} />
-                    </Flex>
-                    <Box flexGrow={1} flexBasis={0}>
-                      <Text fontSize="lg" mb={2}>
-                        Included Problems
-                      </Text>
-                      <Droppable droppableId="included">
-                        {(provided, snapshot) => (
-                          <Stack
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                          >
-                            {order.map(
-                              (probIdx, index) =>
-                                project.problems[probIdx] && ( // workaround for error when the order updates after the first render directly after the current list changes
-                                  <Draggable
-                                    key={probIdx}
-                                    draggableId={"" + probIdx}
-                                    index={index}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <ProblemDraggable
-                                        refInner={provided.innerRef}
-                                        draggableProps={provided.draggableProps}
-                                        handleProps={provided.dragHandleProps}
-                                        idx={probIdx}
-                                        problem={project.problems[probIdx]}
-                                        categoryColors={
-                                          project.settings.categoryColors
-                                        }
-                                        difficultyColors={
-                                          project.settings.difficultyColors
-                                        }
-                                        style={{
-                                          ...provided.draggableProps.style,
-                                        }}
-                                      />
-                                    )}
-                                  </Draggable>
-                                )
-                            )}
-                            {provided.placeholder}
-                          </Stack>
-                        )}
-                      </Droppable>
-                    </Box>
-                  </DragDropContext>
+                        {provided.placeholder}
+                      </Stack>
+                    )}
+                  </Droppable>
+                </Box>
+                <Flex direction="column">
+                  <Divider flexGrow={1} orientation="vertical" mx={6} />
+                  <Box p={2} color="gray.700">
+                    <AiOutlineSwap size="2rem" />
+                  </Box>
+                  <Divider flexGrow={1} orientation="vertical" mx={6} />
                 </Flex>
-              )}
+                <Box flexGrow={1} flexBasis={0}>
+                  <Text fontSize="lg" mb={2}>
+                    Included Problems
+                  </Text>
+                  {order.length === 0 &&
+                    "Empty for now. Try dragging a problem in."}
+                  <Droppable droppableId="included">
+                    {(provided, snapshot) => (
+                      <Stack
+                        height="100%"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {order.map(
+                          (probIdx, index) =>
+                            project.problems[probIdx] && ( // workaround for error when the order updates after the first render directly after the current list changes
+                              <Draggable
+                                key={probIdx}
+                                draggableId={"" + probIdx}
+                                index={index}
+                              >
+                                {(provided, snapshot) => (
+                                  <ProblemDraggable
+                                    refInner={provided.innerRef}
+                                    draggableProps={provided.draggableProps}
+                                    handleProps={provided.dragHandleProps}
+                                    idx={probIdx}
+                                    problem={project.problems[probIdx]}
+                                    categoryColors={
+                                      project.settings.categoryColors
+                                    }
+                                    difficultyColors={
+                                      project.settings.difficultyColors
+                                    }
+                                    style={{
+                                      ...provided.draggableProps.style,
+                                    }}
+                                  />
+                                )}
+                              </Draggable>
+                            )
+                        )}
+                        {provided.placeholder}
+                      </Stack>
+                    )}
+                  </Droppable>
+                </Box>
+              </DragDropContext>
             </Flex>
-          </>
-        )}
+          )}
+        </Flex>
       </Stack>
     </Flex>
   );
