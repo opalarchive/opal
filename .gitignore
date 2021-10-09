@@ -35,3 +35,6 @@ yarn-error.log*
 
 # REST client for testing api
 *.rest
+
+# VSCode
+.vscode

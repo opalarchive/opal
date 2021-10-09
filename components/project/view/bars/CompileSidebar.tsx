@@ -1,20 +1,22 @@
 import { Box, Select, Stack, Text } from "@chakra-ui/react";
-import { Dispatch, FC, SetStateAction } from "react";
+import { useRouter } from "next/router";
+import { FC } from "react";
 import { FiList } from "react-icons/fi";
+import { UUID } from "../../../../utils/constants";
 import { Project } from "../../../../utils/types";
 
 interface CompileSidebarProps {
-  list: number;
-  // These are just the functions from useState()[1]
-  setList: Dispatch<SetStateAction<number>>;
+  uuid: UUID;
   project: Project;
 }
 
-const CompileSidebar: FC<CompileSidebarProps> = ({
-  list,
-  setList,
-  project,
-}) => {
+const CompileSidebar: FC<CompileSidebarProps> = ({ uuid, project }) => {
+  const router = useRouter();
+  const list =
+    typeof router.query.list === "string"
+      ? parseInt(router.query.list) - 1
+      : -1;
+
   return (
     <Stack direction="column" spacing={4}>
       <Box bg="white" p={4}>
@@ -31,10 +33,21 @@ const CompileSidebar: FC<CompileSidebarProps> = ({
         <Select
           value={list === -1 ? "all" : `list-${list}`}
           onChange={(e) => {
-            if (e.target.value === "all") {
-              setList(-1);
+            const newList = e.target.value;
+            if (newList === "all") {
+              router.push(`/project/view/${uuid}/compile`, undefined, {
+                shallow: true,
+              });
             } else {
-              setList(parseInt(e.target.value.substring(5)));
+              router.push(
+                `/project/view/${uuid}/compile?list=${
+                  parseInt(newList.substring(5)) + 1
+                }`,
+                undefined,
+                {
+                  shallow: true,
+                }
+              );
             }
           }}
         >

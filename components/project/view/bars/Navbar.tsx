@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <Flex direction="row">
             <Box
               className={
-                ProjectViewPage[projectViewPage] == ProjectViewPage.PROBLEMS
+                ProjectViewPage[projectViewPage] === ProjectViewPage.PROBLEMS
                   ? `${styles.linkActive} ${styles.link}`
                   : styles.link
               }
@@ -37,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </Box>
             <Box
               className={
-                ProjectViewPage[projectViewPage] == ProjectViewPage.COMPILE
+                ProjectViewPage[projectViewPage] === ProjectViewPage.COMPILE
                   ? `${styles.linkActive} ${styles.link}`
                   : styles.link
               }
@@ -46,7 +46,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </Box>
             <Box
               className={
-                ProjectViewPage[projectViewPage] == ProjectViewPage.SETTINGS
+                ProjectViewPage[projectViewPage] === ProjectViewPage.SETTINGS
                   ? `${styles.linkActive} ${styles.link}`
                   : styles.link
               }

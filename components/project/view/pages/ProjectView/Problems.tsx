@@ -5,7 +5,7 @@ import ProblemPanel from "../../pieces/ProblemPanel";
 import { Box, Flex, Stack } from "@chakra-ui/react";
 import { SortParam } from "../../../../../utils/types";
 import { useMemo } from "react";
-import FilterSidebar from "../../pieces/FilterSidebar";
+import FilterSidebar from "../../bars/FilterSidebar";
 
 const Problems: FC<ProjectViewProps> = ({
   user,
@@ -109,7 +109,7 @@ const Problems: FC<ProjectViewProps> = ({
       .map((_, idx) => idx)
       .sort((i, j) => {
         const comp = customSortParamComp(i, j);
-        return (comp == 0 ? i - j : comp) * (sortAsc ? 1 : -1);
+        return (comp === 0 ? i - j : comp) * (sortAsc ? 1 : -1);
       });
   }, [project, sortParam, sortAsc]);
 

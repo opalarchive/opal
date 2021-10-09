@@ -13,8 +13,8 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { FiArrowDown, FiArrowUp, FiFilter, FiList } from "react-icons/fi";
 import { Project, SortParam } from "../../../../utils/types";
 import { HiOutlineSortDescending } from "react-icons/hi";
-import RangeSlider from "./RangeSlider";
-import TagPanel from "./TagPanel";
+import RangeSlider from "../pieces/RangeSlider";
+import TagPanel from "../pieces/TagPanel";
 import { useCallback } from "react";
 
 let sortParamArray: SortParam[] = Object.values(SortParam);

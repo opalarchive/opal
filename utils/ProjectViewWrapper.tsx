@@ -14,13 +14,12 @@ import NoProjectAccess from "../components/project/view/pages/NoProjectAccess";
 import ProjectLoading from "../components/project/view/pages/ProjectLoading";
 import NotLoggedIn from "../components/project/view/pages/NotLoggedIn";
 import { Box, Flex } from "@chakra-ui/react";
-import Navbar from "../components/project/view/pieces/Navbar";
+import Navbar from "../components/project/view/bars/Navbar";
 
 const ProjectViewWrapper: FC<
   {
     projectViewPage: ProjectViewPage;
     Component: FC<ProjectViewProps>;
-    uuid: UUID;
   } & ProjectViewPropsRaw
 > = ({
   projectViewPage,
@@ -133,25 +132,37 @@ const ProjectViewWrapper: FC<
       return <ProjectCorrupted />;
     }
 
-    /* TODO: Test this */
     const dbEdit = (path: string, value: object | string | number) => {
       setdbStatus((status) => {
         path = path.replace("\\", "/");
         const k = path.split("/");
 
-        let newdbStatus: any = { ...dbStatus };
+        // TODO: This is certainly not optimal, but for the things firebase can store (string or number),
+        // we SHOULD be fine. If not, we can switch to just-clone
+        //
+        // todo is just a friendly reminder :)
+        let newdbStatus = JSON.parse(JSON.stringify(status));
         let currentNew = newdbStatus;
         let currentOld = dbStatus as any;
         for (let i = 0; i < k.length - 1; i++) {
-          currentNew[k[i]] = { ...currentOld[k[i]] };
+          if (typeof currentNew[k[i]] !== "object") {
+            throw "Invalid dtabase path edit. The developers must be really bad.";
+          }
+          if (Array.isArray(currentNew[k[i]])) {
+            currentNew[k[i]] = [...currentOld[k[i]]];
+          } else {
+            currentNew[k[i]] = { ...currentOld[k[i]] };
+          }
           currentNew = currentNew[k[i]];
           currentOld = currentOld[k[i]];
         }
         currentNew[k[k.length - 1]] = value;
 
-        db.ref(path).set(value);
+        db.ref(fbUser.uid + "/" + path).set(value);
+        console.log(fbUser.uid + "/" + path, value);
 
-        return status;
+        console.log(newdbStatus);
+        return newdbStatus;
       });
     };
 
@@ -166,6 +177,7 @@ const ProjectViewWrapper: FC<
           <Component
             user={user}
             emailVerified={emailVerified}
+            uuid={uuid}
             name={name}
             owner={owner}
             projectConfig={projectConfig}

@@ -7,7 +7,7 @@ import ProjectConfig, {
 } from "../models/ProjectConfig";
 import ProjectData, { IProjectData } from "../models/ProjectData";
 import User, { IUser, UserData } from "../models/User";
-import { isUUID, UserId } from "../utils/constants";
+import { isUUID, UserId, UUID } from "../utils/constants";
 import { useAuth } from "../utils/jwt";
 import { Project, ProjectRole } from "./types";
 
@@ -15,6 +15,7 @@ export interface ProjectViewPropsRaw {
   user: UserData | null;
   emailVerified: boolean;
   exists?: boolean;
+  uuid?: UUID;
   name?: string;
   owner?: UserId;
   projectConfig?: ConfigData;
@@ -23,6 +24,7 @@ export interface ProjectViewPropsRaw {
 export interface ProjectViewProps {
   user: UserData;
   emailVerified: boolean;
+  uuid: UUID;
   name: string;
   owner: UserId;
   projectConfig: ConfigData;
