@@ -23,6 +23,16 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
+import {
+  exportBody,
+  JSONTemplate,
+  Template,
+  YAMLTemplate,
+} from "../../../../../utils/exportData";
+import { BsBoxArrowUpRight } from "react-icons/bs";
+import { Radio, RadioGroup } from "@chakra-ui/radio";
+import { Button } from "@chakra-ui/button";
+import { Textarea } from "@chakra-ui/textarea";
 
 const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
   const router = useRouter();
@@ -88,7 +98,6 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
 
     const sourceInd = result.source.index;
     const destInd = result.destination.index;
-    console.log(result);
     if (result.source.droppableId === result.destination.droppableId) {
       if (result.source.droppableId === "included") {
         setOrder((oldOrder) => {
@@ -138,6 +147,25 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
     }
   };
 
+  // exporting to json, yaml, or custom
+  const [templateType, setTemplateType] = useState<"JSON" | "YAML" | "Custom">(
+    "JSON"
+  );
+  const [customTemplate, setCustomTemplate] = useState<Template>({
+    body: "",
+    problem: "",
+    reply: "",
+    tag: "",
+    escape: false,
+  });
+
+  const template: Template =
+    templateType === "JSON"
+      ? JSONTemplate
+      : templateType === "YAML"
+      ? YAMLTemplate
+      : customTemplate;
+
   return (
     <Flex p={4} bgColor="gray.50" minHeight="100%">
       <Box minWidth={48} maxWidth={72}>
@@ -181,7 +209,7 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
                   )}
                 </UnorderedList>
               </Box>
-              <Divider orientation="vertical" mx={2} />
+              <Divider orientation="vertical" mx={4} />
               <Box flexGrow={1} flexBasis={0}>
                 Difficulty:
                 <UnorderedList spacing={1} mt={1} ml={8}>
@@ -344,6 +372,200 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
                   </Droppable>
                 </Box>
               </DragDropContext>
+            </Flex>
+          )}
+        </Flex>
+        {/* Exporting */}
+        <Flex
+          w="100%"
+          p={4}
+          borderWidth="1px"
+          bgColor="white"
+          direction="column"
+        >
+          <Text fontSize="xl" mb={2}>
+            Export&nbsp;
+            <BsBoxArrowUpRight
+              style={{
+                display: "inline-block",
+                position: "relative",
+                top: "-0.1rem",
+              }}
+            />
+          </Text>
+          {order.length == 0 ? (
+            <Box>No problems to export.</Box>
+          ) : (
+            <Flex flexGrow={1}>
+              <RadioGroup
+                onChange={(nextVal) =>
+                  setTemplateType(nextVal as "JSON" | "YAML" | "Custom")
+                }
+                value={templateType}
+              >
+                <Stack>
+                  <Radio value="JSON">JSON</Radio>
+                  <Radio value="YAML">YAML</Radio>
+                  <Radio value="Custom">Custom</Radio>
+                </Stack>
+              </RadioGroup>
+              <Divider orientation="vertical" mx={4} />
+              <Box flexGrow={1}>
+                <Stack>
+                  <Box>
+                    <Text fontSize="lg" mb={1}>
+                      Body
+                    </Text>
+                    <Box bg="gray.100" w="100%" p={1}>
+                      {templateType === "Custom" ? (
+                        <pre>
+                          <Textarea
+                            p={0}
+                            value={customTemplate.body}
+                            onChange={(e) => {
+                              const t = e.target as HTMLElement;
+                              t.style.height = "5px";
+                              t.style.height = `calc(max(${t.scrollHeight}px, 2.75rem))`;
+                              setCustomTemplate((oldTemplate) => {
+                                let newTemplate = { ...oldTemplate };
+                                newTemplate.body = e.target.value;
+                                return newTemplate;
+                              });
+                            }}
+                            resize="none"
+                            style={{
+                              border: "none",
+                              boxShadow: "none",
+                              overflow: "hidden",
+                              minHeight: 0,
+                            }}
+                          />
+                        </pre>
+                      ) : (
+                        <pre>{template.body}</pre>
+                      )}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Text fontSize="lg" mb={1}>
+                      Problem
+                    </Text>
+                    <Box bg="gray.100" p={1}>
+                      {templateType === "Custom" ? (
+                        <pre>
+                          <Textarea
+                            p={0}
+                            value={customTemplate.problem}
+                            onChange={(e) => {
+                              const t = e.target as HTMLElement;
+                              t.style.height = "5px";
+                              t.style.height = `calc(max(${t.scrollHeight}px, 2.75rem))`;
+                              setCustomTemplate((oldTemplate) => {
+                                let newTemplate = { ...oldTemplate };
+                                newTemplate.problem = e.target.value;
+                                return newTemplate;
+                              });
+                            }}
+                            resize="none"
+                            style={{
+                              border: "none",
+                              boxShadow: "none",
+                              overflow: "hidden",
+                              minHeight: 0,
+                            }}
+                          />
+                        </pre>
+                      ) : (
+                        <pre>{template.problem}</pre>
+                      )}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Text fontSize="lg" mb={1}>
+                      Reply
+                    </Text>
+                    <Box bg="gray.100" p={1}>
+                      {templateType === "Custom" ? (
+                        <pre>
+                          <Textarea
+                            p={0}
+                            value={customTemplate.reply}
+                            onChange={(e) => {
+                              const t = e.target as HTMLElement;
+                              t.style.height = "5px";
+                              t.style.height = `calc(max(${t.scrollHeight}px, 2.75rem))`;
+                              setCustomTemplate((oldTemplate) => {
+                                let newTemplate = { ...oldTemplate };
+                                newTemplate.reply = e.target.value;
+                                return newTemplate;
+                              });
+                            }}
+                            resize="none"
+                            style={{
+                              border: "none",
+                              boxShadow: "none",
+                              overflow: "hidden",
+                              minHeight: 0,
+                            }}
+                          />
+                        </pre>
+                      ) : (
+                        <pre>{template.reply}</pre>
+                      )}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Text fontSize="lg" mb={1}>
+                      Tag
+                    </Text>
+                    <Box bg="gray.100" p={1}>
+                      {templateType === "Custom" ? (
+                        <pre>
+                          <Textarea
+                            p={0}
+                            value={customTemplate.tag}
+                            onChange={(e) => {
+                              const t = e.target as HTMLElement;
+                              t.style.height = "5px";
+                              t.style.height = `calc(max(${t.scrollHeight}px, 2.75rem))`;
+                              setCustomTemplate((oldTemplate) => {
+                                let newTemplate = { ...oldTemplate };
+                                newTemplate.tag = e.target.value;
+                                return newTemplate;
+                              });
+                            }}
+                            resize="none"
+                            style={{
+                              border: "none",
+                              boxShadow: "none",
+                              overflow: "hidden",
+                              minHeight: 0,
+                            }}
+                          />
+                        </pre>
+                      ) : (
+                        <pre>{template.tag}</pre>
+                      )}
+                    </Box>
+                  </Box>
+                </Stack>
+                <Flex mt={4}>
+                  <Box flexGrow={1} />
+                  <Button
+                    colorScheme="blue"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        exportBody(
+                          template,
+                          order.map((idx) => project.problems[idx])
+                        )
+                      );
+                    }}
+                  >
+                    Copy Export &nbsp; <BsBoxArrowUpRight />
+                  </Button>
+                </Flex>
+              </Box>
             </Flex>
           )}
         </Flex>
