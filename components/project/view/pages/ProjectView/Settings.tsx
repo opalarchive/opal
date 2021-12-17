@@ -130,9 +130,10 @@ const Appearance: FC<AppearanceProps> = ({ uuid, project, projectEdit }) => {
               <Flex>
                 <Box flexGrow={1} />
                 <Button
-                  onClick={() =>
-                    setCurrentColor(categoryColors[currentCategory])
-                  }
+                  onClick={() => {
+                    setCurrentColor(categoryColors[currentCategory]);
+                    setCurrentInputColor(categoryColors[currentCategory]);
+                  }}
                   variant="ghost"
                 >
                   Cancel
