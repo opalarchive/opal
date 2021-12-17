@@ -1,0 +1,30 @@
+.link {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.link:hover,
+.link:focus {
+  background-color: var(--chakra-colors-gray-100);
+  color: black;
+  cursor: pointer;
+}
+
+.link:active {
+  background-color: var(--chakra-colors-gray-200);
+}
+
+.linkOther {
+  color: var(--chakra-colors-gray-800);
+}
+
+.linkCurrent {
+  background-color: var(--chakra-colors-gray-200);
+  color: black;
+}

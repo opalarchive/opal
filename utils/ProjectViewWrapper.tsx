@@ -159,9 +159,9 @@ const ProjectViewWrapper: FC<
         currentNew[k[k.length - 1]] = value;
 
         db.ref(fbUser.uid + "/" + path).set(value);
-        console.log(fbUser.uid + "/" + path, value);
+        // console.log(fbUser.uid + "/" + path, value);
 
-        console.log(newdbStatus);
+        // console.log(newdbStatus);
         return newdbStatus;
       });
     };

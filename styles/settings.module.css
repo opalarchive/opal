@@ -1,0 +1,7 @@
+.colorPick {
+  border: 1px solid white;
+  outline: 1px solid black;
+
+  height: 1.25rem;
+  width: 1.25rem;
+}

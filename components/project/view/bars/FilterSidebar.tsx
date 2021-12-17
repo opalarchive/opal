@@ -95,7 +95,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
 
   return (
     <Stack direction="column" spacing={4}>
-      <Box bg="white" p={4}>
+      <Box bg="white" borderWidth="1px" p={4}>
         <Text fontSize="xl" mb={2}>
           List&nbsp;
           <FiList
@@ -124,7 +124,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
           ))}
         </Select>
       </Box>
-      <Box bg="white" p={4}>
+      <Box bg="white" borderWidth="1px" p={4}>
         <Text fontSize="xl" mb={2}>
           Filter&nbsp;
           <FiFilter
@@ -210,7 +210,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
           </Box>
         </Stack>
       </Box>
-      <Box bg="white" p={4}>
+      <Box bg="white" borderWidth="1px" p={4}>
         <Text fontSize="xl" mb={2}>
           Sort&nbsp;
           <HiOutlineSortDescending

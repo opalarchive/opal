@@ -19,7 +19,7 @@ const CompileSidebar: FC<CompileSidebarProps> = ({ uuid, project }) => {
 
   return (
     <Stack direction="column" spacing={4}>
-      <Box bg="white" p={4}>
+      <Box bg="white" borderWidth="1px" p={4}>
         <Text fontSize="xl" mb={2}>
           List&nbsp;
           <FiList

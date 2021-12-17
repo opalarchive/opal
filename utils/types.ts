@@ -12,28 +12,20 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>(
   return obj.hasOwnProperty(prop);
 }
 
-export interface Color {
-  r: number;
-  g: number;
-  b: number;
-}
-const isRGBValue = (n: number) => {
-  return isFinite(n) && n >= 0 && n < 256;
-};
+export type hexColor = string;
 
-export const isColor = (o: unknown): o is Color => {
-  if (typeof o !== "object" || !o) {
+// We will only support colors of the form "#aabbcc" for now
+export const isHexColor = (o: unknown): o is hexColor => {
+  if (typeof o !== "string" || !o) {
     return false;
   }
-  if (!hasOwnProperty(o, "r") || typeof o.r !== "number" || !isRGBValue(o.r)) {
+  if (o.length !== 7) {
     return false;
   }
-  if (!hasOwnProperty(o, "g") || typeof o.g !== "number" || !isRGBValue(o.g)) {
+  if (!o.match(/^#([0-9]|[a-f])+$/g)) {
     return false;
   }
-  if (!hasOwnProperty(o, "b") || typeof o.b !== "number" || !isRGBValue(o.b)) {
-    return false;
-  }
+
   return true;
 };
 
@@ -316,7 +308,7 @@ export const isSettings = (o: unknown): o is Settings => {
   return true;
 };
 
-export type CategoryColors = Record<string, Color>;
+export type CategoryColors = Record<string, hexColor>;
 export const isCategoryColors = (o: unknown): o is CategoryColors => {
   if (typeof o !== "object" || !o) {
     return false;
@@ -324,13 +316,13 @@ export const isCategoryColors = (o: unknown): o is CategoryColors => {
   if (Object.keys(o).some((key) => typeof key !== "string")) {
     return false;
   }
-  if (Object.values(o).some((val) => !isColor(val))) {
+  if (Object.values(o).some((val) => !isHexColor(val))) {
     return false;
   }
   return true;
 };
 
-export type DifficultyColors = Record<string, Color>;
+export type DifficultyColors = Record<string, hexColor>;
 export const isDifficultyColors = (o: unknown): o is DifficultyColors => {
   if (typeof o !== "object" || !o) {
     return false;
@@ -342,7 +334,7 @@ export const isDifficultyColors = (o: unknown): o is DifficultyColors => {
   ) {
     return false;
   }
-  if (Object.values(o).some((val) => !isColor(val))) {
+  if (Object.values(o).some((val) => !isHexColor(val))) {
     return false;
   }
   return true;

@@ -1,12 +1,11 @@
 import { CSSProperties } from "react";
-import { BsCircle, BsCircleFill } from "react-icons/bs";
+import { BsCircleFill } from "react-icons/bs";
 import styles from "../../../../styles/dot.module.css";
-import { ColorToString } from "../../../../utils/pretty";
-import { Color } from "../../../../utils/types";
+import { hexColor } from "../../../../utils/types";
 
 interface DotProps {
   // unfilled?: boolean;
-  color?: Color;
+  color?: hexColor;
   style?: CSSProperties;
 }
 
@@ -28,7 +27,7 @@ const Dot: React.FC<DotProps> = ({ /*unfilled,*/ color, style }) => {
       size="0.6rem"
       className={styles.dot}
       style={{
-        color: !!color ? ColorToString(color) : "black",
+        color: !!color ? color : "black",
         ...(!!style ? style : {}),
       }}
     />

@@ -2,7 +2,7 @@
  * Basically ``make stuff pretty'' for the user.
  */
 
-import { Color, DifficultyColors } from "./types";
+import { hexColor, DifficultyColors } from "./types";
 
 let months = [
   "Jan",
@@ -95,17 +95,27 @@ export const timeElapsed = (time: number) => {
   return `in the future`;
 };
 
-export const lerp = (
-  x1: number,
-  x2: number,
-  y1: number,
-  y2: number,
-  x: number
-) => {
-  return ((y2 - y1) / (x2 - x1)) * (x - x1) + y1;
+// a color lerp, t along the way from color1 to color2, where t is from 0 to 1
+const lerpColor = (color1: hexColor, color2: hexColor, t: number) => {
+  const [r1, g1, b1] = color1
+    .slice(1)
+    .match(/.{2}/g)
+    ?.map((c) => parseInt(c, 16)) as number[];
+  const [r2, g2, b2] = color2
+    .slice(1)
+    .match(/.{2}/g)
+    ?.map((c) => parseInt(c, 16)) as number[];
+
+  const rRes = Math.round(r2 * t + r1 * (1 - t)).toString(16);
+  const gRes = Math.round(g2 * t + g1 * (1 - t)).toString(16);
+  const bRes = Math.round(b2 * t + b1 * (1 - t)).toString(16);
+
+  return (
+    "#" + rRes.padStart(2, "0") + gRes.padStart(2, "0") + bRes.padStart(2, "0")
+  );
 };
 
-// returns first element in sorted array arr that is at least x
+// returns the index of the first element in sorted array arr that is at least x
 export function lowerBound<T>(arr: T[], x: T): number {
   let lo = 0,
     hi = arr.length - 1;
@@ -135,21 +145,10 @@ export function getDifficultyColor(
   if (top === 0) {
     return difficultyColor;
   }
-  return Object.fromEntries(
-    Object.entries(difficultyColor).map(([primaryColor, value]) => [
-      primaryColor,
-      lerp(
-        keys[top - 1],
-        keys[top],
-        difficultyColors[keys[top - 1]][primaryColor as keyof Color],
-        difficultyColors[keys[top]][primaryColor as keyof Color],
-        difficulty
-      ),
-    ])
-  ) as unknown as Color;
-}
 
-// tuples seem to be broken at the moment
-export const ColorToString = (color: Color) => {
-  return `rgb(${color.r}, ${color.g}, ${color.b})`;
-};
+  return lerpColor(
+    difficultyColors[keys[top - 1]],
+    difficultyColors[keys[top]],
+    (difficulty - keys[top - 1]) / (keys[top] - keys[top - 1])
+  );
+}
