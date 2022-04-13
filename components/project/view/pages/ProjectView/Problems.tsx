@@ -151,6 +151,7 @@ const Problems: FC<ProjectViewProps> = ({
             problem={project.problems[idx]}
             categoryColors={project.settings.categoryColors}
             difficultyColors={project.settings.difficultyColors}
+            projectEdit={projectEdit}
           />
         ))}
       </Stack>

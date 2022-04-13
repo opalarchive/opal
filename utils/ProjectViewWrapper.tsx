@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import Configure from "../components/project/view/pages/Configure";
 import { isUUID, UUID } from "./constants";
 import { ProjectViewProps, ProjectViewPropsRaw } from "./getProjectViewProps";
@@ -99,8 +99,8 @@ const ProjectViewWrapper: FC<
         .once("value")
         .then((snapshot) => snapshot.val())
         .then((val) => {
-          setdbStatus(val);
           setValidProject(isProject(val));
+          setdbStatus(val);
           printTime("Load and validate database data");
         })
         .then(() => setSetupDone(true));
@@ -123,6 +123,58 @@ const ProjectViewWrapper: FC<
     };
   }, []);
 
+  const dbEdit = useMemo(() => {
+    return (path: string, value: object | string | number) => {
+      if (!!fbUser && setupDone && !!db && validProject) {
+        setdbStatus((status) => {
+          path = path.replace("\\", "/");
+          const k = path.split("/");
+
+          // TODO: This is certainly not optimal, but for the things firebase can store (string or number),
+          // we SHOULD be fine. If not, we can switch to just-clone
+          //
+          // todo is just a friendly reminder :)
+
+          // Deep copy (why this???)
+          // let newdbStatus = JSON.parse(JSON.stringify(status));
+
+          // Shallow copy
+          let newStatus = { ...status };
+
+          // We gradually narrow the scope each rank of the object tree at a time,
+          // and shallow copy all ancestors of the changed node
+          // This allows React to properly propagate update for components that need
+          // some subtree containing the change, but not update any other components
+          //
+          // e.g. if we change a problem category, any component using project.problems
+          // will rerender, while a component using only project.settings will not
+          let scopeNew = newStatus as any;
+          let scopeOld = status as any;
+
+          for (let i = 0; i < k.length - 1; i++) {
+            if (typeof scopeNew[k[i]] !== "object") {
+              throw "Invalid database path edit. The developers must be really bad.";
+            }
+            if (Array.isArray(scopeOld[k[i]])) {
+              scopeNew[k[i]] = [...scopeOld[k[i]]];
+            } else {
+              scopeNew[k[i]] = { ...scopeOld[k[i]] };
+            }
+            scopeNew = scopeNew[k[i]];
+            scopeOld = scopeOld[k[i]];
+          }
+          scopeNew[k[k.length - 1]] = value;
+
+          db.ref(fbUser.uid + "/" + path).set(value);
+          // console.log(fbUser.uid + "/" + path, value);
+
+          // console.log(newStatus);
+          return newStatus;
+        });
+      }
+    };
+  }, [fbUser, setupDone, db, validProject]);
+
   if (!initialLoadDone || (!!fbUser && (!setupDone || !db))) {
     return <ProjectLoading />;
   }
@@ -131,40 +183,6 @@ const ProjectViewWrapper: FC<
     if (!validProject) {
       return <ProjectCorrupted />;
     }
-
-    const dbEdit = (path: string, value: object | string | number) => {
-      setdbStatus((status) => {
-        path = path.replace("\\", "/");
-        const k = path.split("/");
-
-        // TODO: This is certainly not optimal, but for the things firebase can store (string or number),
-        // we SHOULD be fine. If not, we can switch to just-clone
-        //
-        // todo is just a friendly reminder :)
-        let newdbStatus = JSON.parse(JSON.stringify(status));
-        let currentNew = newdbStatus;
-        let currentOld = dbStatus as any;
-        for (let i = 0; i < k.length - 1; i++) {
-          if (typeof currentNew[k[i]] !== "object") {
-            throw "Invalid dtabase path edit. The developers must be really bad.";
-          }
-          if (Array.isArray(currentNew[k[i]])) {
-            currentNew[k[i]] = [...currentOld[k[i]]];
-          } else {
-            currentNew[k[i]] = { ...currentOld[k[i]] };
-          }
-          currentNew = currentNew[k[i]];
-          currentOld = currentOld[k[i]];
-        }
-        currentNew[k[k.length - 1]] = value;
-
-        db.ref(fbUser.uid + "/" + path).set(value);
-        // console.log(fbUser.uid + "/" + path, value);
-
-        // console.log(newdbStatus);
-        return newdbStatus;
-      });
-    };
 
     return (
       <Flex direction="column" height={height}>

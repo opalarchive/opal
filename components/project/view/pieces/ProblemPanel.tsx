@@ -1,4 +1,4 @@
-import { FC, memo } from "react";
+import { FC, memo, useEffect } from "react";
 import { Box, Flex, Stack, Text, VStack } from "@chakra-ui/layout";
 import {
   CategoryColors,
@@ -27,6 +27,7 @@ interface ProblemProps {
   problem: Problem;
   categoryColors: CategoryColors;
   difficultyColors: DifficultyColors;
+  projectEdit: (path: string, value: object | string | number) => void;
 }
 
 const ProblemPanel: FC<ProblemProps> = ({
@@ -35,6 +36,7 @@ const ProblemPanel: FC<ProblemProps> = ({
   problem,
   categoryColors,
   difficultyColors,
+  projectEdit,
 }) => {
   const problemVoteScore = !!problem.votes
     ? Object.values(problem.votes).reduce<number>((a, b) => a + b, 0)
@@ -73,6 +75,12 @@ const ProblemPanel: FC<ProblemProps> = ({
                     ? "blue.400"
                     : "black"
                 }
+                onClick={() => {
+                  projectEdit(
+                    `problems/${idx}/votes/${user.userId}`,
+                    problem.votes[user.userId] === 1 ? 0 : 1
+                  );
+                }}
               >
                 <FiArrowUp size="1.2rem" />
               </Text>
@@ -83,6 +91,12 @@ const ProblemPanel: FC<ProblemProps> = ({
                     ? "blue.400"
                     : "black"
                 }
+                onClick={() => {
+                  projectEdit(
+                    `problems/${idx}/votes/${user.userId}`,
+                    problem.votes[user.userId] === -1 ? 0 : -1
+                  );
+                }}
               >
                 <FiArrowDown size="1.2rem" />
               </Text>
