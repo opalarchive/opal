@@ -66,7 +66,7 @@ const Appearance: FC<AppearanceProps> = ({ uuid, project, projectEdit }) => {
             style={{
               display: "inline-block",
               position: "relative",
-              top: "-0.15rem",
+              top: "0.175rem",
             }}
           />
         </Text>

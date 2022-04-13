@@ -26,7 +26,7 @@ const CompileSidebar: FC<CompileSidebarProps> = ({ uuid, project }) => {
             style={{
               display: "inline-block",
               position: "relative",
-              top: "-0.05rem",
+              top: "0.225rem",
             }}
           />
         </Text>

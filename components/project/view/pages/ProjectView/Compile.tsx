@@ -185,7 +185,7 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
               style={{
                 display: "inline-block",
                 position: "relative",
-                top: "-0.1rem",
+                top: "0.225rem",
               }}
             />
           </Text>
@@ -251,7 +251,7 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
               style={{
                 display: "inline-block",
                 position: "relative",
-                top: "-0.1rem",
+                top: "0.15rem",
               }}
             />
           </Text>
@@ -389,7 +389,7 @@ const Compile: FC<ProjectViewProps> = ({ uuid, project, projectEdit }) => {
               style={{
                 display: "inline-block",
                 position: "relative",
-                top: "-0.1rem",
+                top: "0.05rem",
               }}
             />
           </Text>

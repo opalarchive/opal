@@ -1,8 +1,8 @@
 .link {
   color: var(--chakra-colors-gray-600);
   padding: var(--chakra-space-4) var(--chakra-space-3);
-  padding-bottom: calc(var(--chakra-space-3) + var(--chakra-space-0\.5));
-  border-bottom: var(--chakra-space-0\.5) solid white;
+  padding-bottom: calc(var(--chakra-space-3) + var(--chakra-space-0-5));
+  border-bottom: var(--chakra-space-0-5) solid white;
 
   transition-property: var(--chakra-transition-property-common);
   transition-duration: calc(1.5 * var(--chakra-transition-duration-normal));
@@ -14,5 +14,5 @@
 
 .linkActive {
   color: var(--chakra-colors-gray-900);
-  border-bottom: var(--chakra-space-0\.5) solid var(--chakra-colors-blue-400);
+  border-bottom: var(--chakra-space-0-5) solid var(--chakra-colors-blue-400);
 }
