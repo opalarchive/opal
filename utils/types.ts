@@ -383,6 +383,7 @@ export enum SortParam {
  */
 export enum ProjectViewPage {
   PROBLEMS = "PROBLEMS",
+  PROBLEM_FOCUS = "PROBLEM_FOCUS",
   COMPILE = "COMPILE",
   SETTINGS = "SETTINGS",
   PAGE404 = "PAGE404",

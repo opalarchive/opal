@@ -8,7 +8,7 @@ export const siteURL = !process.env.PRODUCTION
  * It always starts with a 'p' (for project). The rest
  * is (probably) random base 64.
  **/
-export const uuidLength = 20;
+export const uuidLength = 15;
 export type UUID = string;
 export function isUUID(maybe: any): maybe is UUID {
   if (typeof maybe !== "string") {

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { FC, useMemo } from "react";
 import Compile from "../../../../components/project/view/pages/ProjectView/Compile";
+import ProblemFocus from "../../../../components/project/view/pages/ProjectView/ProblemFocus";
 import Problems from "../../../../components/project/view/pages/ProjectView/Problems";
 import Settings from "../../../../components/project/view/pages/ProjectView/Settings";
 import { UUID } from "../../../../utils/constants";
@@ -30,6 +31,8 @@ const ProjectView: FC<ProjectViewPropsRaw> = ({
     switch (params[0]) {
       case "problems":
         return ProjectViewPage.PROBLEMS;
+      case "i":
+        return ProjectViewPage.PROBLEM_FOCUS;
       case "compile":
         return ProjectViewPage.COMPILE;
       case "settings":
@@ -43,6 +46,8 @@ const ProjectView: FC<ProjectViewPropsRaw> = ({
     switch (ProjectViewPage[projectViewPage]) {
       case ProjectViewPage.PROBLEMS:
         return Problems;
+      case ProjectViewPage.PROBLEM_FOCUS:
+        return ProblemFocus;
       case ProjectViewPage.COMPILE:
         return Compile;
       case ProjectViewPage.SETTINGS:
